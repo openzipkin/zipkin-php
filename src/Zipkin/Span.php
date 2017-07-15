@@ -7,10 +7,12 @@ use InvalidArgumentException;
 final class Span
 {
     private $name;
+    private $startTimestamp;
 
-    private function __construct($name)
+    private function __construct($name, $startTimestamp)
     {
         $this->name = $name;
+        $this->startTimestamp = $startTimestamp;
     }
 
     /**
@@ -18,7 +20,7 @@ final class Span
      * @param array $options a key => value map of options
      * @return Span
      */
-    public static function create($name, $options = [])
+    public static function create($name, array $options = [])
     {
         if (!is_string($name) || empty($name)) {
             throw new InvalidArgumentException(
@@ -26,13 +28,19 @@ final class Span
             );
         }
 
-        if (isset($options['start_timestamp']) && !Timestamp\is_valid_timestamp($options['start_timestamp'])) {
-            throw new InvalidArgumentException(
-                sprintf('Valid microtime expected, got \'%s\'', $options['start_timestamp'])
-            );
+        if (isset($options['start_timestamp'])) {
+            if (!Timestamp\is_valid_timestamp($options['start_timestamp'])) {
+                throw new InvalidArgumentException(
+                    sprintf('Valid microtime expected, got \'%s\'', $options['start_timestamp'])
+                );
+            }
+
+            $startTimestamp = $options['start_timestamp'];
+        } else {
+            $startTimestamp = Timestamp\now();
         }
 
-        return new self($name);
+        return new self($name, $startTimestamp);
     }
 
     /**
@@ -41,5 +49,13 @@ final class Span
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return float
+     */
+    public function getStartTimestamp()
+    {
+        return $this->startTimestamp;
     }
 }

@@ -9,6 +9,7 @@ use Zipkin\Span;
 class SpanTest extends PHPUnit_Framework_TestCase
 {
     const TEST_NAME = 'test_span';
+    const TEST_START_TIMESTAMP = 1500125039.5501;
 
     public function testSpanCreationFailsDueToInvalidName()
     {
@@ -33,5 +34,16 @@ class SpanTest extends PHPUnit_Framework_TestCase
         $this->expectExceptionMessage('Valid microtime expected, got \'100\'');
 
         Span::create(self::TEST_NAME, $options);
+    }
+
+    public function testSpanCreationWithValidTimestampSuccess()
+    {
+        $options = [
+            'start_timestamp' => self::TEST_START_TIMESTAMP,
+        ];
+
+        $span = Span::create(self::TEST_NAME, $options);
+
+        $this->assertEquals(self::TEST_START_TIMESTAMP, $span->getStartTimestamp());
     }
 }
