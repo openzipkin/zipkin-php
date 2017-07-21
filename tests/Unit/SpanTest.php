@@ -5,11 +5,12 @@ namespace ZipkinTests\Unit;
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 use Zipkin\Span;
+use Zipkin\Timestamp;
 
 class SpanTest extends PHPUnit_Framework_TestCase
 {
     const TEST_NAME = 'test_span';
-    const TEST_START_TIMESTAMP = 1500125039.5501;
+    const TEST_START_TIMESTAMP = 1472470996199000;
 
     public function testSpanCreationFailsDueToInvalidName()
     {
@@ -45,5 +46,15 @@ class SpanTest extends PHPUnit_Framework_TestCase
         $span = Span::create(self::TEST_NAME, $options);
 
         $this->assertEquals(self::TEST_START_TIMESTAMP, $span->getStartTimestamp());
+    }
+
+    public function testFinishASpanHasTheExpectedDuration()
+    {
+        $before = Timestamp\now();
+        $span = Span::create(self::TEST_NAME);
+        $span->finish();
+        $after = Timestamp\now();
+
+        $this->assertTrue(($after - $before) > $span->getDuration());
     }
 }

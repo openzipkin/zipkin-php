@@ -27,5 +27,10 @@
         "psr-4": {
             "ZipkinTests\\": "./tests/"
         }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit tests",
+        "lint": "./vendor/bin/phpcs --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
+        "fix-lint": "./vendor/bin/phpcbf --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./"
     }
 }

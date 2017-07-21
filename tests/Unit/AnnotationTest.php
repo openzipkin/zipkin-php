@@ -9,13 +9,13 @@ use Zipkin\Annotation;
 final class AnnotationTest extends PHPUnit_Framework_TestCase
 {
     const TEST_VALUE = 'test_value';
-    const TEST_TIMESTAMP = 1500125039.5501;
+    const TEST_TIMESTAMP = 1500125039550100;
 
-    public function testAnAnnotationCreationSuccess()
+    public function testAnnotationCreationFailsDueToInvalidValue()
     {
-        $annotation = Annotation::create(self::TEST_VALUE, self::TEST_TIMESTAMP);
-        $this->assertEquals(self::TEST_VALUE, $annotation->getValue());
-        $this->assertEquals(self::TEST_TIMESTAMP, $annotation->getTimestamp());
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid annotation value');
+        Annotation::create(new \stdClass(), self::TEST_TIMESTAMP);
     }
 
     public function testAnnotationCreationFailsOnNonFloatTimestamp()
@@ -23,5 +23,12 @@ final class AnnotationTest extends PHPUnit_Framework_TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Valid timestamp represented microtime expected, got \'100\'');
         Annotation::create(self::TEST_VALUE, 100);
+    }
+
+    public function testAnnotationCreationSuccess()
+    {
+        $annotation = Annotation::create(self::TEST_VALUE, self::TEST_TIMESTAMP);
+        $this->assertEquals(self::TEST_VALUE, $annotation->getValue());
+        $this->assertEquals(self::TEST_TIMESTAMP, $annotation->getTimestamp());
     }
 }

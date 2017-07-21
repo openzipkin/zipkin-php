@@ -6,8 +6,29 @@ use InvalidArgumentException;
 
 final class Span
 {
+    /**
+     * Span name in lowercase, rpc method for example. Conventionally, when the
+     * span name isn't known, name = "unknown".
+     *
+     * @var string
+     */
     private $name;
+
+    /**
+     * Epoch microseconds of the start of this span, absent if this an incomplete
+     * span.
+     *
+     * @var int
+     */
     private $startTimestamp;
+
+    /**
+     * Measurement in microseconds of the critical path, if known. Durations of
+     * less than one microsecond must be rounded up to 1 microsecond.
+     *
+     * @var int
+     */
+    private $duration;
 
     private function __construct($name, $startTimestamp)
     {
@@ -57,5 +78,19 @@ final class Span
     public function getStartTimestamp()
     {
         return $this->startTimestamp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    public function finish()
+    {
+        $now = Timestamp\now();
+        $this->duration = ($now - $this->startTimestamp);
     }
 }
