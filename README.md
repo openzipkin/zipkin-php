@@ -1,3 +1,3 @@
 # Zipkin PHP
 
-A zipkin instrumentation for PHP
+[WIP] A zipkin instrumentation for PHP

@@ -1,6 +1,6 @@
 <?php
 
-namespace ZipkinTests;
+namespace ZipkinTests\Unit;
 
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;

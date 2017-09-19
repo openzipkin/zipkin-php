@@ -2,21 +2,34 @@
 
 namespace Zipkin;
 
-interface Span
+final class NoopSpan implements Span
 {
+    /**
+     * @return NoopSpan
+     */
+    public static function create()
+    {
+        return new self;
+    }
+
     /**
      * When true, no recording is done and nothing is reported to zipkin. However, this span should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
-     * 
+     *
      * @return bool
      */
-    public function isNoop();
+    public function isNoop()
+    {
+        return true;
+    }
 
     /**
      * @return TraceContext
      */
-    public function getContext();
+    public function getContext()
+    {
+    }
 
     /**
      * Starts the span with an implicit timestamp.
@@ -27,7 +40,9 @@ interface Span
      * @param float $timestamp
      * @return void
      */
-    public function start($timestamp = null);
+    public function start($timestamp)
+    {
+    }
 
     /**
      * Sets the string name for the logical operation this span represents.
@@ -35,7 +50,9 @@ interface Span
      * @param string $name
      * @return void
      */
-    public function setName($name);
+    public function setName($name)
+    {
+    }
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
@@ -45,7 +62,9 @@ interface Span
      * @param string $kind
      * @return void
      */
-    public function setKind($kind);
+    public function setKind($kind)
+    {
+    }
 
     /**
      * Tags give your span context for search, viewing and analysis. For example, a key
@@ -57,7 +76,10 @@ interface Span
      * @param $value String value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag($key, $value);
+    public function setTag($key, $value)
+    {
+        // TODO: Implement setTag() method.
+    }
 
     /**
      * Associates an event that explains latency with the current system time.
@@ -67,7 +89,10 @@ interface Span
      * @return void
      * @see Annotation
      */
-    public function annotate($value, $timestamp);
+    public function annotate($value, $timestamp)
+    {
+        // TODO: Implement annotate() method.
+    }
 
     /**
      * For a client span, this would be the server's address.
@@ -77,14 +102,18 @@ interface Span
      * @param Endpoint $remoteEndpoint
      * @return void
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint);
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint)
+    {
+    }
 
     /**
      * Throws away the current span without reporting it.
      *
      * @return void
      */
-    public function abandon();
+    public function abandon()
+    {
+    }
 
     /**
      * Like {@link #finish()}, except with a given timestamp in microseconds.
@@ -95,7 +124,9 @@ interface Span
      * @param float $timestamp
      * @return void
      */
-    public function finish($timestamp);
+    public function finish($timestamp)
+    {
+    }
 
     /**
      * Reports the span, even if unfinished. Most users will not call this method.
@@ -109,5 +140,7 @@ interface Span
      *
      * @return void
      */
-    public function flush();
+    public function flush()
+    {
+    }
 }

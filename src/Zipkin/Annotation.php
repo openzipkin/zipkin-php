@@ -3,6 +3,7 @@
 namespace Zipkin;
 
 use InvalidArgumentException;
+use Zipkin\Timestamp;
 
 final class Annotation
 {
@@ -29,7 +30,30 @@ final class Annotation
      */
     const CLIENT_RECEIVE = 'cr';
 
+    const MESSAGE_SEND = 'ms';
+    const MESSAGE_RECV = 'mr';
+    const WIRE_SEND = 'ws';
+    const WIRE_RECV = 'wr';
+    const CLIENT_SEND_FRAGMENT = 'csf';
+    const CLIENT_RECV_FRAGMENT = 'crf';
+    const SERVER_SEND_FRAGMENT = 'ssf';
+    const SERVER_RECV_FRAGMENT = 'srf';
+    const LOCAL_COMPONENT = 'lc';
+    const ERROR = 'error';
+    const CLIENT_ADDR = 'ca';
+    const SERVER_ADDR = 'sa';
+    const MESSAGE_ADDR = 'ma';
+
+    const CORE_ANNOTATIONS = ['cs', 'cr', 'ss', 'sr', 'ws', 'wr', 'csf', 'crf', 'ssf', 'srf'];
+
+    /**
+     * @var string
+     */
     private $value;
+
+    /**
+     * @var float
+     */
     private $timestamp;
 
     private function __construct($value, $timestamp)
@@ -39,13 +63,14 @@ final class Annotation
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      * @param float $timestamp
+     * @throws InvalidArgumentException on empty or not stringable value or invalid timestamp
      * @return Annotation
      */
     public static function create($value, $timestamp)
     {
-        if (!is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+        if (empty($value) || !is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
             throw new InvalidArgumentException('Invalid annotation value');
         }
 
@@ -59,7 +84,7 @@ final class Annotation
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getValue()
     {
@@ -72,5 +97,16 @@ final class Annotation
     public function getTimestamp()
     {
         return $this->timestamp;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'value' => $this->value,
+            'timestamp' => $this->timestamp,
+        ];
     }
 }
