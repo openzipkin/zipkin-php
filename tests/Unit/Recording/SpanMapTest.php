@@ -5,8 +5,8 @@ namespace ZipkinTests\Unit\Recording;
 use PHPUnit_Framework_TestCase;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
+use Zipkin\Recording\Span;
 use Zipkin\Recording\SpanMap;
-use Zipkin\Span;
 use Zipkin\TraceContext;
 
 /**

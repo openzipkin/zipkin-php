@@ -134,8 +134,8 @@ final class RealSpan implements Span
     /**
      * Associates an event that explains latency with the current system time.
      *
-     * @param string $value A short tag indicating the event, like "finagle.retry"
-     * @param float $timestamp
+     * @param string|Annotation $value A short tag indicating the event, like "finagle.retry"
+     * @param float|null $timestamp
      * @return void
      * @throws \InvalidArgumentException
      * @see Annotation

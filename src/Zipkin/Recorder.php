@@ -140,7 +140,7 @@ class Recorder
 
     public function finish(TraceContext $context, $finishTimestamp)
     {
-        $span = $this->spanMap->remove($context);
+        $span = $this->spanMap->get($context);
 
         if ($span !== null) {
             $span->finish($finishTimestamp);
@@ -158,7 +158,6 @@ class Recorder
 
         if ($span !== null && !$this->noop) {
             $span->finish();
-
             $this->reporter->report([$span]);
         }
     }

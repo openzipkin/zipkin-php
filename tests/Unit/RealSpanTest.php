@@ -20,7 +20,7 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
     {
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $recorder = $this->prophesize(Recorder::class);
-        $span = RealSpan::create($context, $recorder);
+        $span = RealSpan::create($context, $recorder->reveal());
         $this->assertEquals($context, $span->getContext());
     }
 

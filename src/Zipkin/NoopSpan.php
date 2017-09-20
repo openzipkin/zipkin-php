@@ -37,10 +37,10 @@ final class NoopSpan implements Span
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
      *
-     * @param float $timestamp
+     * @param float|null $timestamp
      * @return void
      */
-    public function start($timestamp)
+    public function start($timestamp = null)
     {
     }
 
@@ -141,6 +141,20 @@ final class NoopSpan implements Span
      * @return void
      */
     public function flush()
+    {
+    }
+
+    /**
+     * Tags give your span context for search, viewing and analysis. For example, a key
+     * "your_app.version" would let you lookup spans by version. A tag {@link TraceKeys#SQL_QUERY}
+     * isn't searchable, but it can help in debugging when viewing a trace.
+     *
+     * @param string $key Name used to lookup spans, such as "your_app.version". See {@link TraceKeys} for
+     * standard ones.
+     * @param $value String value, cannot be <code>null</code>.
+     * @return void
+     */
+    public function tag($key, $value)
     {
     }
 }

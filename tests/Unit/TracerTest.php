@@ -59,7 +59,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             false
         );
 
-        $samplingFlags = DefaultSamplingFlags::create(true, false);
+        $samplingFlags = DefaultSamplingFlags::create(false, false);
 
         $traceContext = TraceContext::createAsRoot($samplingFlags);
 
@@ -77,7 +77,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             false
         );
 
-        $samplingFlags = DefaultSamplingFlags::create(false, false);
+        $samplingFlags = DefaultSamplingFlags::create(true, false);
 
         $traceContext = TraceContext::createAsRoot($samplingFlags);
 

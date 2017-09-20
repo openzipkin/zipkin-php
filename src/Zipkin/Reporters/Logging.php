@@ -1,6 +1,6 @@
 <?php
 
-namespace src\Zipkin\Reporters;
+namespace Zipkin\Reporters;
 
 use Psr\Log\LoggerInterface;
 use Zipkin\Recording\Span;

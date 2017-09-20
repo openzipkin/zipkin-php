@@ -3,7 +3,8 @@
 namespace Zipkin;
 
 use Psr\Log\NullLogger;
-use src\Zipkin\Reporters\Logging;
+use Zipkin\Reporters\Logging;
+use Zipkin\Samplers\BinarySampler;
 
 class TracingBuilder
 {
@@ -41,19 +42,23 @@ class TracingBuilder
      * Controls the name of the service being traced, while still using a default site-local IP.
      * This is an alternative to {@link #localEndpoint(Endpoint)}.
      *
-     * @param $localServiceName name of the service being traced. Defaults to "unknown".
+     * @param string $localServiceName name of the service being traced. Defaults to "unknown".
+     * @return TracingBuilder
      */
     public function havingLocalServiceName($localServiceName)
     {
         $this->localServiceName = $localServiceName;
+        return $this;
     }
 
     /**
-     * @param localEndpoint Endpoint of the local service being traced. Defaults to site local.
+     * @param Endpoint $endpoint Endpoint of the local service being traced. Defaults to site local.
+     * @return TracingBuilder
      */
     public function havingLocalEndpoint(Endpoint $endpoint)
     {
         $this->localEndpoint = $endpoint;
+        return $this;
     }
 
     /**
@@ -72,25 +77,39 @@ class TracingBuilder
      * }</pre>
      *
      * <p>See https://github.com/openzipkin/zipkin-reporter-java
+     *
+     * @param Reporter $reporter
+     * @return TracingBuilder
      */
     public function havingReporter(Reporter $reporter)
     {
         $this->reporter = $reporter;
+        return $this;
     }
 
     /**
      * Sampler is responsible for deciding if a particular trace should be "sampled", i.e. whether
      * the overhead of tracing will occur and/or if a trace will be reported to Zipkin.
+     *
+     * @param Sampler $sampler
+     * @return TracingBuilder
      */
     public function havingSampler(Sampler $sampler)
     {
         $this->sampler = $sampler;
+        return $this;
     }
 
-    /** When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit) */
+    /**
+     * When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit)
+     *
+     * @param $traceId128Bits
+     * @return TracingBuilder
+     */
     public function havingTraceId128bits($traceId128Bits)
     {
         $this->traceId128bits = $traceId128Bits;
+        return $this;
     }
 
     public function build()
@@ -104,6 +123,10 @@ class TracingBuilder
 
         if ($this->reporter === null) {
             $this->reporter = new Logging(new NullLogger());
+        }
+
+        if ($this->sampler === null) {
+            $this->sampler = BinarySampler::createAsNeverSample();
         }
 
         return new DefaultTracing(
