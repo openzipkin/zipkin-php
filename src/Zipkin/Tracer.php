@@ -116,8 +116,7 @@ final class Tracer
     /**
      * Allow tracer to send span data to be instrumented.
      *
-     * This method might not be needed depending on the tracing implementation
-     * but one should make sure this method is called after the request is finished.
+     * Make sure this method is called after the request is finished.
      * As an implementor, a good idea would be to use an asynchronous message bus
      * or use the call to fastcgi_finish_request in order to not to delay the end
      * of the request to the client.
