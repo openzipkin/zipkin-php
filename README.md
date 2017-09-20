@@ -10,14 +10,23 @@ This is a PHP library for OpenZipkin.
 ## Example usage
 
 ```php
+use GuzzleHttp\Client;
+use Zipkin\Annotation;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Timestamp;
 use Zipkin\TracingBuilder;
+use Zipkin\Reporters\HttpLogging;
 
 $endpoint = Endpoint::createFromGlobals();
-$reporter = new Zipkin\Reporters\NoopLogging();
+$client = new Client();
+
+// Logger to stdout
+$logger = new \Monolog\Logger('log');
+$logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
+
+$reporter = new HttpLogging($client, $logger);
 $sampler = BinarySampler::createAsAlwaysSample();
 $tracing = TracingBuilder::create()
     ->havingLocalEndpoint($endpoint)
@@ -29,12 +38,18 @@ $tracer = $tracing->getTracer();
 
 $defaultSamplingFlags = DefaultSamplingFlags::createAsSampled();
 $span = $tracer->newTrace($defaultSamplingFlags);
+$span->start(Timestamp\now());
 $span->setName('my_span_name');
-$span->annotate('test_annotation', Timestamp\now());
+$span->annotate(Annotation::SERVER_RECEIVE, Timestamp\now());
+
+...
 
 $childSpan = $tracer->newChild($span->getContext());
 $childSpan->start();
 $childSpan->setName('my_child_span');
+
+...
+
 $childSpan->finish(Timestamp\now());
 
 $span->finish(Timestamp\now());

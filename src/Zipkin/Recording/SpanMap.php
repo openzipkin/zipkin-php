@@ -69,15 +69,15 @@ final class SpanMap
     }
 
     /**
-     * @return \Generator|Span[]
+     * @return Span[]
      */
     public function removeAll()
     {
-        foreach ($this->map as $span) {
-            yield $span;
-        }
+        $spans = $this->map;
 
         $this->map = [];
+
+        return array_values($spans);
     }
 
     /**

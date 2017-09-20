@@ -114,7 +114,7 @@ final class Tracer
     }
 
     /**
-     * Allow tracer to send span data to be instrumented.
+     * Calling this will flush any pending spans to the transport on the current thread.
      *
      * Make sure this method is called after the request is finished.
      * As an implementor, a good idea would be to use an asynchronous message bus

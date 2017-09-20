@@ -1,6 +1,6 @@
 {
     "name": "jcchavezs/zipkin",
-    "description": "A zipkin instrumentation for PHP",
+    "description": "A Zipkin instrumentation for PHP",
     "type": "library",
     "license": "MIT",
     "authors": [

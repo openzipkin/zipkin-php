@@ -186,7 +186,7 @@ final class Span
     /**
      * Completes and reports the span
      *
-     * @param null $finishTimestamp
+     * @param int|null $finishTimestamp
      */
     public function finish($finishTimestamp = null)
     {
@@ -197,13 +197,15 @@ final class Span
         if ($this->timestamp !== null && $finishTimestamp !== null) {
             $this->duration = $finishTimestamp - $this->timestamp;
         }
+
+        $this->finished = true;
     }
 
     public function toArray()
     {
         $endpoint = $this->endpoint;
 
-        return [
+        $spanAsArray = [
             'id' => (string) $this->spanId,
             'name' => $this->name,
             'traceId' => (string) $this->traceId,
@@ -211,13 +213,19 @@ final class Span
             'timestamp' => $this->timestamp,
             'duration' => $this->duration,
             'debug' => $this->debug,
-            'annotations' => array_map(
+        ];
+
+        if (!empty($this->annotations)) {
+            $spanAsArray['annotations'] = array_map(
                 function(Annotation $annotation) use ($endpoint) {
                     return $annotation->toArray() + ['endpoint' => $endpoint->toArray()];
                 },
                 $this->annotations
-            ),
-            'binaryAnnotations' => array_map(
+            );
+        }
+
+        if (!empty($this->tags)) {
+            $spanAsArray['binaryAnnotations'] = array_map(
                 function($key, $value) use ($endpoint) {
                     return [
                         'key' => $key,
@@ -227,8 +235,10 @@ final class Span
                 },
                 array_keys($this->tags),
                 $this->tags
-            ),
-        ];
+            );
+        }
+
+        return $spanAsArray;
     }
 
     /**

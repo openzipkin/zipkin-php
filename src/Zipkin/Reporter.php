@@ -7,8 +7,8 @@ use Zipkin\Recording\Span;
 interface Reporter
 {
     /**
-     * @param Span[]|\Generator $spans
+     * @param Span[] $spans
      * @return void
      */
-    public function report($spans);
+    public function report(array $spans);
 }
