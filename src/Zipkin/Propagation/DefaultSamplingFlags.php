@@ -78,7 +78,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public function getSampled()
     {
-      return $this->sampled;
+        return $this->sampled;
     }
 
     /**

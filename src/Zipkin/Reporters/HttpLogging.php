@@ -47,7 +47,7 @@ class HttpLogging implements Reporter
     {
         try {
             $this->client->request('POST', $this->options['host'] . $this->options['endpoint'], [
-                'body' => json_encode(array_map(function(Span $span) {
+                'body' => json_encode(array_map(function (Span $span) {
                     return $span->toArray();
                 }, $spans)),
             ]);

@@ -8,7 +8,7 @@ interface Span
      * When true, no recording is done and nothing is reported to zipkin. However, this span should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
-     * 
+     *
      * @return bool
      */
     public function isNoop();

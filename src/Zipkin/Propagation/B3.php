@@ -61,8 +61,7 @@ final class B3 implements Propagation
          * @param $carrier
          * @return void
          */
-        return function(TraceContext $traceContext, $carrier) use ($setter)
-        {
+        return function (TraceContext $traceContext, $carrier) use ($setter) {
             $setter->put($carrier, self::TRACE_ID_NAME, $traceContext->getTraceId());
             $setter->put($carrier, self::SPAN_ID_NAME, $traceContext->getSpanId());
 
@@ -93,14 +92,13 @@ final class B3 implements Propagation
          * @param mixed $carrier
          * @return TraceContext
          */
-        return function($carrier) use ($getter)
-        {
+        return function ($carrier) use ($getter) {
             $sampledString = $getter->get($carrier, self::SAMPLED_NAME);
 
             $sampled = null;
             if ($sampledString === '1' || strtolower($sampledString) === 'true') {
                 $sampled = true;
-            } else if ($sampledString === '0' || strtolower($sampledString) === 'false') {
+            } elseif ($sampledString === '0' || strtolower($sampledString) === 'false') {
                 $sampled = false;
             }
 
@@ -130,4 +128,3 @@ final class B3 implements Propagation
         };
     }
 }
-

@@ -38,5 +38,3 @@ interface Propagation
      */
     public function getExtractor(Getter $getter);
 }
-
-

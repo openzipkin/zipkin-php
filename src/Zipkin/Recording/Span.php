@@ -217,7 +217,7 @@ final class Span
 
         if (!empty($this->annotations)) {
             $spanAsArray['annotations'] = array_map(
-                function(Annotation $annotation) use ($endpoint) {
+                function (Annotation $annotation) use ($endpoint) {
                     return $annotation->toArray() + ['endpoint' => $endpoint->toArray()];
                 },
                 $this->annotations
@@ -226,7 +226,7 @@ final class Span
 
         if (!empty($this->tags)) {
             $spanAsArray['binaryAnnotations'] = array_map(
-                function($key, $value) use ($endpoint) {
+                function ($key, $value) use ($endpoint) {
                     return [
                         'key' => $key,
                         'value' => $value,
@@ -246,6 +246,5 @@ final class Span
      */
     public function __toString()
     {
-
     }
 }

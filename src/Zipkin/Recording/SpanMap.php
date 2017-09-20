@@ -46,7 +46,6 @@ final class SpanMap
         }
 
         return $this->map[$contextHash];
-
     }
 
     /**

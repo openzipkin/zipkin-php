@@ -62,7 +62,8 @@ final class Tracer
      * @param SamplingFlags $samplingFlags
      * @return Span
      */
-    public function newTrace(SamplingFlags $samplingFlags = null) {
+    public function newTrace(SamplingFlags $samplingFlags = null)
+    {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
         }

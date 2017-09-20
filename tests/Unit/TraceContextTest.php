@@ -47,6 +47,6 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
 
     private function randomBool()
     {
-        return (mt_rand(0,1) === 1);
+        return (mt_rand(0, 1) === 1);
     }
 }
