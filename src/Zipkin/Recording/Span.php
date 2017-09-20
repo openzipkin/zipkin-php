@@ -8,7 +8,6 @@ use Zipkin\TraceContext;
 
 final class Span
 {
-
     /**
      * Epoch microseconds of the start of this span, absent if this an incomplete
      * span.
@@ -35,6 +34,9 @@ final class Span
      */
     private $timestamp;
 
+    /**
+     * @var bool
+     */
     private $finished = false;
 
     /**
@@ -45,6 +47,9 @@ final class Span
      */
     private $name;
 
+    /**
+     * @var string
+     */
     private $kind;
 
     /**
@@ -76,6 +81,9 @@ final class Span
      */
     private $debug;
 
+    /**
+     * @var bool
+     */
     private $sampled;
 
     /**
@@ -87,6 +95,9 @@ final class Span
      */
     private $annotations = [];
 
+    /**
+     * @var array
+     */
     private $tags = [];
 
     /**
@@ -111,6 +122,9 @@ final class Span
      */
     private $duration;
 
+    /**
+     * @var Endpoint
+     */
     private $remoteEndpoint;
 
     private function __construct($traceId, $parentId, $spanId, $debug, $sampled, Endpoint $endpoint)
@@ -140,11 +154,18 @@ final class Span
         );
     }
 
+    /**
+     * @return int
+     */
     public function getTimestamp()
     {
         return $this->timestamp;
     }
 
+    /**
+     * @param int $timestamp
+     * @return void
+     */
     public function start($timestamp)
     {
         $this->timestamp = $timestamp;
@@ -168,16 +189,29 @@ final class Span
         $this->kind = $kind;
     }
 
+    /**
+     * @param int $timestamp
+     * @param string $value
+     * @throws \InvalidArgumentException
+     */
     public function annotate($timestamp, $value)
     {
         $this->annotations[] = Annotation::create($value, $timestamp);
     }
 
+    /**
+     * @param string $key
+     * @param string $value
+     */
     public function tag($key, $value)
     {
         $this->tags[$key] = $value;
     }
 
+    /**
+     * @param Endpoint $remoteEndpoint
+     * @return void
+     */
     public function setRemoteEndpoint(Endpoint $remoteEndpoint)
     {
         $this->remoteEndpoint = $remoteEndpoint;
@@ -201,6 +235,9 @@ final class Span
         $this->finished = true;
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $endpoint = $this->endpoint;

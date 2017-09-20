@@ -46,7 +46,7 @@ class Recorder
 
     public static function createAsNoop()
     {
-        return new self(Endpoint::createAsEmpty(), null,true);
+        return new self(Endpoint::createAsEmpty(), null, true);
     }
 
     /**

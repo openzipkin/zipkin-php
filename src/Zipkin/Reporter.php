@@ -2,12 +2,12 @@
 
 namespace Zipkin;
 
-use Zipkin\Recording\Span;
+use Zipkin\Recording\Span as MutableSpan;
 
 interface Reporter
 {
     /**
-     * @param Span[] $spans
+     * @param MutableSpan[] $spans
      * @return void
      */
     public function report(array $spans);
