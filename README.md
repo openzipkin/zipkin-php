@@ -4,8 +4,13 @@
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%205.6-8892BF.svg)](https://php.net/)
 [![License](https://img.shields.io/packagist/l/jcchavezs/zipkin.svg)](https://github.com/jcchavezs/zipkin-php/blob/master/LICENSE)
 
-
 This is a PHP library for OpenZipkin.
+
+## Installation
+
+```bash
+composer require jcchavezs/zipkin
+```
 
 ## Example usage
 
