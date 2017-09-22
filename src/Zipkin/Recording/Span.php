@@ -127,22 +127,27 @@ final class Span
      */
     private $remoteEndpoint;
 
-    private function __construct($traceId, $parentId, $spanId, $debug, $sampled, Endpoint $endpoint)
+    /**
+     * @var Endpoint
+     */
+    private $localEndpoint;
+
+    private function __construct($traceId, $parentId, $spanId, $debug, $sampled, Endpoint $localEndpoint)
     {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
         $this->spanId = $spanId;
         $this->debug = $debug;
         $this->sampled = $sampled;
-        $this->endpoint = $endpoint;
+        $this->localEndpoint = $localEndpoint;
     }
 
     /**
      * @param TraceContext $context
-     * @param Endpoint $endpoint
+     * @param Endpoint $localEndpoint
      * @return Span
      */
-    public static function createFromContext(TraceContext $context, Endpoint $endpoint)
+    public static function createFromContext(TraceContext $context, Endpoint $localEndpoint)
     {
         return new self(
             $context->getTraceId(),
@@ -150,7 +155,7 @@ final class Span
             $context->getSpanId(),
             $context->debug(),
             $context->getSampled(),
-            $endpoint
+            $localEndpoint
         );
     }
 
@@ -240,39 +245,30 @@ final class Span
      */
     public function toArray()
     {
-        $endpoint = $this->endpoint;
-
         $spanAsArray = [
             'id' => (string) $this->spanId,
+            'kind' => $this->kind,
             'name' => $this->name,
             'traceId' => (string) $this->traceId,
             'parentId' => $this->parentId ? (string) $this->parentId : null,
             'timestamp' => $this->timestamp,
             'duration' => $this->duration,
             'debug' => $this->debug,
+            'localEndpoint' => $this->localEndpoint->toArray(),
         ];
 
+        if ($this->remoteEndpoint !== null) {
+            $spanAsArray['remoteEndpoint'] = $this->remoteEndpoint->toArray();
+        }
+
         if (!empty($this->annotations)) {
-            $spanAsArray['annotations'] = array_map(
-                function (Annotation $annotation) use ($endpoint) {
-                    return $annotation->toArray() + ['endpoint' => $endpoint->toArray()];
-                },
-                $this->annotations
-            );
+            $spanAsArray['annotations'] = array_map(function (Annotation $annotation) {
+                return $annotation->toArray();
+            }, $this->annotations);
         }
 
         if (!empty($this->tags)) {
-            $spanAsArray['binaryAnnotations'] = array_map(
-                function ($key, $value) use ($endpoint) {
-                    return [
-                        'key' => $key,
-                        'value' => $value,
-                        'endpoint' => $endpoint->toArray()
-                    ];
-                },
-                array_keys($this->tags),
-                $this->tags
-            );
+            $spanAsArray['tags'] = $this->tags;
         }
 
         return $spanAsArray;

@@ -3,6 +3,7 @@
 namespace ZipkinTests\Unit\Recording;
 
 use PHPUnit_Framework_TestCase;
+use Zipkin\Kind;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recording\Span;
@@ -40,11 +41,12 @@ final class SpanTest extends PHPUnit_Framework_TestCase
         $context->setParentId($parentId);
         $context->setTraceId($traceId);
 
-        $endpoint = Endpoint::create('test_service_name', '127.0.0.1', null, 3333);
-        $span = Span::createFromContext($context, $endpoint);
+        $localEndpoint = Endpoint::create('test_service_name', '127.0.0.1', null, 3333);
+        $span = Span::createFromContext($context, $localEndpoint);
         $timestamp = Timestamp\now();
 
         $span->start($timestamp);
+        $span->setKind(Kind\CLIENT);
         $span->setName('test_name');
         $span->annotate($timestamp, 'test_annotation');
         $span->tag('test_key', 'test_value');
@@ -52,33 +54,26 @@ final class SpanTest extends PHPUnit_Framework_TestCase
 
         $expectedSpanArray = [
             'id' => $spanId,
+            'kind' => 'client',
             'traceId' => $traceId,
             'parentId' => $parentId,
             'timestamp' => $timestamp,
             'name' => 'test_name',
             'duration' => 100,
             'debug' => false,
+            'localEndpoint' => [
+                'serviceName' => 'test_service_name',
+                'ipv4' => '127.0.0.1',
+                'port' => 3333,
+            ],
             'annotations' => [
                 [
                     'value' => 'test_annotation',
                     'timestamp' => $timestamp,
-                    'endpoint' => [
-                        'serviceName' => 'test_service_name',
-                        'ipv4' => '127.0.0.1',
-                        'port' => 3333,
-                    ],
                 ],
             ],
-            'binaryAnnotations' => [
-                [
-                    'key' => 'test_key',
-                    'value' => 'test_value',
-                    'endpoint' => [
-                        'serviceName' => 'test_service_name',
-                        'ipv4' => '127.0.0.1',
-                        'port' => 3333,
-                    ],
-                ],
+            'tags' => [
+                'test_key' => 'test_value',
             ],
         ];
 

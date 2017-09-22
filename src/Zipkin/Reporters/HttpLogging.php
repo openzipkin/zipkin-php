@@ -14,7 +14,7 @@ class HttpLogging implements Reporter
         'host' => 'http://localhost:9411',
         'endpoint' => '/api/v2/spans',
         'muteErrors' => false,
-        'contextOptions' => []
+        'contextOptions' => [],
     ];
 
     /**

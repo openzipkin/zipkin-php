@@ -11,11 +11,11 @@ use Zipkin\TraceContext;
 
 final class B3Test extends PHPUnit_Framework_TestCase
 {
-    const TRACE_ID_NAME = 'X-B3-TraceId';
-    const SPAN_ID_NAME = 'X-B3-SpanId';
-    const PARENT_SPAN_ID_NAME = 'X-B3-ParentSpanId';
-    const SAMPLED_NAME = 'X-B3-Sampled';
-    const FLAGS_NAME = 'X-B3-Flags';
+    const TRACE_ID_NAME = 'x-b3-traceid';
+    const SPAN_ID_NAME = 'x-b3-spanid';
+    const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
+    const SAMPLED_NAME = 'x-b3-sampled';
+    const FLAGS_NAME = 'x-b3-flags';
 
     const TEST_TRACE_ID = 'test_trace_id';
     const TEST_SPAN_ID = 'test_span_id';

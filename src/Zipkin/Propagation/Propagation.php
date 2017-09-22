@@ -27,14 +27,19 @@ interface Propagation
     public function getKeys();
 
     /**
+     * Used to send the trace context downstream. For example, as http headers.
+     * Returns a injector as a callable having the signature function(TraceContext $context, $carrier): void
+     *
      * @param Setter $setter invoked for each propagation key to add.
      * @return Callable
      */
     public function getInjector(Setter $setter);
 
     /**
+     * Returns the extractor as a callable having the signature function($carrier): TraceContext|SamplingFlags
+     *
      * @param Getter $getter invoked for each propagation key to get.
-     * @return Callable
+     * @return callable
      */
     public function getExtractor(Getter $getter);
 }
