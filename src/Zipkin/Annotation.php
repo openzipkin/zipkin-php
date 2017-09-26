@@ -100,7 +100,7 @@ final class Annotation
     }
 
     /**
-     * @return array
+     * @return array|scalar[string]
      */
     public function toArray()
     {

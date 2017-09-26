@@ -2,15 +2,20 @@
 
 namespace ZipkingTests\Unit;
 
+use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\TraceContext;
 
 final class TraceContextTest extends PHPUnit_Framework_TestCase
 {
-    const TEST_TRACE_ID = 123;
-    const TEST_PARENT_ID = 456;
-    const TEST_SPAN_ID = 789;
+    const TEST_TRACE_ID = 'bd7a977555f6b982';
+    const TEST_PARENT_ID = 'bd7a977555f6b982';
+    const TEST_SPAN_ID = 'be2d01e33cc78d97';
+
+    const TEST_INVALID_TRACE_ID = 'invalid_bd7a977555f6b982';
+    const TEST_INVALID_PARENT_ID = 'invalid_bd7a977555f6b982';
+    const TEST_INVALID_SPAN_ID = 'invalid_be2d01e33cc78d97';
 
     public function testCreateAsRootSuccess()
     {
@@ -43,6 +48,39 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::TEST_SPAN_ID, $childContext->getParentId());
         $this->assertEquals($sampled, $childContext->getSampled());
         $this->assertEquals($debug, $childContext->debug());
+    }
+
+    public function testSetSpanIdFailsDueToInvalidId()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $sampled = $this->randomBool();
+        $debug = $this->randomBool();
+        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $parentContext = TraceContext::createAsRoot($samplingFlags);
+        $parentContext->setSpanId(self::TEST_INVALID_SPAN_ID);
+    }
+
+    public function testSetParentIdFailsDueToInvalidId()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $sampled = $this->randomBool();
+        $debug = $this->randomBool();
+        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $parentContext = TraceContext::createAsRoot($samplingFlags);
+        $parentContext->setParentId(self::TEST_INVALID_PARENT_ID);
+    }
+
+    public function testSetTraceIdFailsDueToInvalidId()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $sampled = $this->randomBool();
+        $debug = $this->randomBool();
+        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $parentContext = TraceContext::createAsRoot($samplingFlags);
+        $parentContext->setTraceId(self::TEST_INVALID_TRACE_ID);
     }
 
     private function randomBool()

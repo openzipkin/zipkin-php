@@ -17,9 +17,9 @@ final class B3Test extends PHPUnit_Framework_TestCase
     const SAMPLED_NAME = 'X-B3-Sampled';
     const FLAGS_NAME = 'x-b3-flags';
 
-    const TEST_TRACE_ID = 'test_trace_id';
-    const TEST_SPAN_ID = 'test_span_id';
-    const TEST_PARENT_ID = 'test_parent_id';
+    const TEST_TRACE_ID = 'bd7a977555f6b982';
+    const TEST_PARENT_ID = 'bd7a977555f6b982';
+    const TEST_SPAN_ID = 'be2d01e33cc78d97';
     const TEST_SAMPLE = true;
     const TEST_DEBUG = false;
 

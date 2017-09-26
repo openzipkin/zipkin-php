@@ -2,6 +2,7 @@
 
 namespace Zipkin;
 
+use InvalidArgumentException;
 use Zipkin\Propagation\SamplingFlags;
 
 final class TraceContext implements SamplingFlags
@@ -77,7 +78,7 @@ final class TraceContext implements SamplingFlags
     /**
      * Unique 8-byte identifier for a trace, set on all spans within it.
      *
-     * @return mixed
+     * @return string
      */
     public function getTraceId()
     {
@@ -85,10 +86,16 @@ final class TraceContext implements SamplingFlags
     }
 
     /**
-     * @param $traceId
+     * @param string $traceId
+     * @return void
+     * @throws \InvalidArgumentException
      */
     public function setTraceId($traceId)
     {
+        if (!$this->isValidTraceId($traceId)) {
+            throw new InvalidArgumentException(sprintf('Invalid trace id, got %s', $traceId));
+        }
+
         $this->traceId = $traceId;
     }
 
@@ -97,30 +104,48 @@ final class TraceContext implements SamplingFlags
      *
      * <p>A span is uniquely identified in storage by ({@linkplain #traceId}, {@linkplain #spanId}).
      *
-     * @return mixed
+     * @return string
      */
     public function getSpanId()
     {
         return $this->spanId;
     }
 
+    /**
+     * @param string $spanId
+     * @return void
+     * @throws \InvalidArgumentException
+     */
     public function setSpanId($spanId)
     {
+        if (!$this->isValidSpanId($spanId)) {
+            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
+        }
+
         $this->spanId = $spanId;
     }
 
     /**
      * The parent's {@link #spanId} or null if this the root span in a trace.
      *
-     * @return mixed
+     * @return string
      */
     public function getParentId()
     {
         return $this->parentId;
     }
 
+    /**
+     * @param string $parentId
+     * @return void
+     * @throws \InvalidArgumentException
+     */
     public function setParentId($parentId)
     {
+        if (!$this->isValidSpanId($parentId)) {
+            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $parentId));
+        }
+
         $this->parentId = $parentId;
     }
 
@@ -154,5 +179,16 @@ final class TraceContext implements SamplingFlags
     private static function nextId()
     {
         return bin2hex(openssl_random_pseudo_bytes(8));
+    }
+
+    private function isValidTraceId($value)
+    {
+        return ctype_xdigit((string) $value) &&
+        (strlen((string) $value) === 16 || strlen((string) $value) === 32);
+    }
+
+    private function isValidSpanId($value)
+    {
+        return ctype_xdigit((string) $value) && strlen((string) $value) === 16;
     }
 }

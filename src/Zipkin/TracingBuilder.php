@@ -43,7 +43,7 @@ class TracingBuilder
      * This is an alternative to {@link #localEndpoint(Endpoint)}.
      *
      * @param string $localServiceName name of the service being traced. Defaults to "unknown".
-     * @return TracingBuilder
+     * @return $this
      */
     public function havingLocalServiceName($localServiceName)
     {
@@ -53,7 +53,7 @@ class TracingBuilder
 
     /**
      * @param Endpoint $endpoint Endpoint of the local service being traced. Defaults to site local.
-     * @return TracingBuilder
+     * @return $this
      */
     public function havingLocalEndpoint(Endpoint $endpoint)
     {
@@ -79,7 +79,7 @@ class TracingBuilder
      * <p>See https://github.com/openzipkin/zipkin-reporter-java
      *
      * @param Reporter $reporter
-     * @return TracingBuilder
+     * @return $this
      */
     public function havingReporter(Reporter $reporter)
     {
@@ -92,7 +92,7 @@ class TracingBuilder
      * the overhead of tracing will occur and/or if a trace will be reported to Zipkin.
      *
      * @param Sampler $sampler
-     * @return TracingBuilder
+     * @return $this
      */
     public function havingSampler(Sampler $sampler)
     {
@@ -104,7 +104,7 @@ class TracingBuilder
      * When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit)
      *
      * @param $traceId128Bits
-     * @return TracingBuilder
+     * @return $this
      */
     public function havingTraceId128bits($traceId128Bits)
     {
@@ -112,6 +112,9 @@ class TracingBuilder
         return $this;
     }
 
+    /**
+     * @return DefaultTracing
+     */
     public function build()
     {
         if ($this->localEndpoint === null) {
