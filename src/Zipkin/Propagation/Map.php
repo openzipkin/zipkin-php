@@ -9,19 +9,17 @@ use Zipkin\Propagation\Exceptions\InvalidPropagationKey;
 final class Map implements Getter, Setter
 {
     /**
-     * @param array|ArrayAccess $carrier
+     * @param ArrayAccess $carrier
      * @param string $key
      * @return string
      * @throws InvalidPropagationCarrier
      */
     public function get($carrier, $key)
     {
-        if (is_array($carrier)) {
-            return array_key_exists($key, $carrier) ? $carrier[$key] : null;
-        }
+        $lKey = strtolower($key);
 
         if ($carrier instanceof ArrayAccess) {
-            return $carrier->offsetExists($key) ? $carrier->offsetGet($key) : null;
+            return $carrier->offsetExists($lKey) ? $carrier->offsetGet($lKey) : null;
         }
 
         throw InvalidPropagationCarrier::forCarrier($carrier);
@@ -45,8 +43,10 @@ final class Map implements Getter, Setter
             throw InvalidPropagationKey::forEmptyKey();
         }
 
+        $lKey = strtolower($key);
+
         if ($carrier instanceof ArrayAccess) {
-            $carrier[$key] = $value;
+            $carrier[$lKey] = $value;
             return;
         }
 

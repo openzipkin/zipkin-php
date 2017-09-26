@@ -10,28 +10,28 @@ final class B3 implements Propagation
     /**
      * 128 or 64-bit trace ID lower-hex encoded into 32 or 16 characters (required)
      */
-    const TRACE_ID_NAME = 'x-b3-traceid';
+    const TRACE_ID_NAME = 'X-B3-TraceId';
     
     /**
      * 64-bit span ID lower-hex encoded into 16 characters (required)
      */
-    const SPAN_ID_NAME = 'x-b3-spanid';
+    const SPAN_ID_NAME = 'X-B3-SpanId';
     
     /**
      * 64-bit parent span ID lower-hex encoded into 16 characters (absent on root span)
      */
-    const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
+    const PARENT_SPAN_ID_NAME = 'X-B3-ParentSpanId';
     
     /**
      * '1' means report this span to the tracing system, '0' means do not. (absent means defer the
      * decision to the receiver of this header).
      */
-    const SAMPLED_NAME = 'x-b3-sampled';
+    const SAMPLED_NAME = 'X-B3-Sampled';
     
     /**
      * '1' implies sampled and is a request to override collection-tier sampling policy.
      */
-    const FLAGS_NAME = 'x-b3-flags';
+    const FLAGS_NAME = 'X-B3-Flags';
     
     /**
      * @return array|string[]
@@ -98,25 +98,25 @@ final class B3 implements Propagation
 
             $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
 
-            $result = TraceContext::createAsRoot(DefaultSamplingFlags::create($sampled, $debug));
+            $traceContext = TraceContext::createAsRoot(DefaultSamplingFlags::create($sampled, $debug));
 
             if ($traceId === null) {
-                return $result;
+                return $traceContext;
             }
 
-            $result->setTraceId($traceId);
+            $traceContext->setTraceId($traceId);
 
             $spanId = $getter->get($carrier, self::SPAN_ID_NAME);
             if ($spanId !== null) {
-                $result->setSpanId($spanId);
+                $traceContext->setSpanId($spanId);
             }
 
             $parentSpanId = $getter->get($carrier, self::PARENT_SPAN_ID_NAME);
             if ($parentSpanId !== null) {
-                $result->setParentId($parentSpanId);
+                $traceContext->setParentId($parentSpanId);
             }
 
-            return $result;
+            return $traceContext;
         };
     }
 }

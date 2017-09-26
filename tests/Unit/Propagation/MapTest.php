@@ -24,14 +24,6 @@ final class MapTest extends PHPUnit_Framework_TestCase
         $map->get($carrier, self::TEST_KEY);
     }
 
-    public function testGetFromMapSuccessForArrayCarrier()
-    {
-        $carrier = [self::TEST_KEY => self::TEST_VALUE];
-        $map = new Map();
-        $value = $map->get($carrier, self::TEST_KEY);
-        $this->assertEquals(self::TEST_VALUE, $value);
-    }
-
     public function testGetFromMapSuccessForArrayAccessCarrier()
     {
         $carrier = new ArrayObject([self::TEST_KEY => self::TEST_VALUE]);

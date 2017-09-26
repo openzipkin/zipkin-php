@@ -31,7 +31,7 @@ interface Propagation
      * Returns a injector as a callable having the signature function(TraceContext $context, $carrier): void
      *
      * @param Setter $setter invoked for each propagation key to add.
-     * @return Callable
+     * @return callable
      */
     public function getInjector(Setter $setter);
 

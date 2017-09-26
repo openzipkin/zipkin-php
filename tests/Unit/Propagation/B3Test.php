@@ -11,10 +11,10 @@ use Zipkin\TraceContext;
 
 final class B3Test extends PHPUnit_Framework_TestCase
 {
-    const TRACE_ID_NAME = 'x-b3-traceid';
-    const SPAN_ID_NAME = 'x-b3-spanid';
-    const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
-    const SAMPLED_NAME = 'x-b3-sampled';
+    const TRACE_ID_NAME = 'x-b3-Traceid';
+    const SPAN_ID_NAME = 'x-b3-SpanId';
+    const PARENT_SPAN_ID_NAME = 'x-b3-parentSpanId';
+    const SAMPLED_NAME = 'X-B3-Sampled';
     const FLAGS_NAME = 'x-b3-flags';
 
     const TEST_TRACE_ID = 'test_trace_id';
@@ -30,28 +30,29 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $context->setSpanId(self::TEST_SPAN_ID);
         $context->setParentId(self::TEST_PARENT_ID);
         $carrier = new ArrayObject();
-        $setter = new Map();
+        $setterNGetter = new Map();
         $b3Propagator = new B3();
-        $injector = $b3Propagator->getInjector($setter);
+        $injector = $b3Propagator->getInjector($setterNGetter);
         $injector($context, $carrier);
 
-        $this->assertEquals(self::TEST_TRACE_ID, $carrier[self::TRACE_ID_NAME]);
-        $this->assertEquals(self::TEST_SPAN_ID, $carrier[self::SPAN_ID_NAME]);
-        $this->assertEquals(self::TEST_PARENT_ID, $carrier[self::PARENT_SPAN_ID_NAME]);
+        $this->assertEquals(self::TEST_TRACE_ID, $carrier[strtolower(self::TRACE_ID_NAME)]);
+        $this->assertEquals(self::TEST_SPAN_ID, $carrier[strtolower(self::SPAN_ID_NAME)]);
+        $this->assertEquals(self::TEST_PARENT_ID, $carrier[strtolower(self::PARENT_SPAN_ID_NAME)]);
     }
 
     public function testGetExtractorReturnsTheExpectedFunction()
     {
-        $carrier = [
-            self::TRACE_ID_NAME => self::TEST_TRACE_ID,
-            self::SPAN_ID_NAME => self::TEST_SPAN_ID,
-            self::PARENT_SPAN_ID_NAME => self::TEST_PARENT_ID,
-        ];
+        $carrier = new ArrayObject([
+            strtolower(self::TRACE_ID_NAME) => self::TEST_TRACE_ID,
+            strtolower(self::SPAN_ID_NAME) => self::TEST_SPAN_ID,
+            strtolower(self::PARENT_SPAN_ID_NAME) => self::TEST_PARENT_ID,
+        ]);
 
         $getter = new Map();
         $b3Propagator = new B3();
         $extractor = $b3Propagator->getExtractor($getter);
         $context = $extractor($carrier);
+
         $this->assertInstanceOf(TraceContext::class, $context);
         $this->assertEquals(self::TEST_TRACE_ID, $context->getTraceId());
         $this->assertEquals(self::TEST_SPAN_ID, $context->getSpanId());
