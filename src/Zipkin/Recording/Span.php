@@ -153,8 +153,8 @@ final class Span
             $context->getTraceId(),
             $context->getParentId(),
             $context->getSpanId(),
-            $context->debug(),
-            $context->getSampled(),
+            $context->isDebug(),
+            $context->isSampled(),
             $localEndpoint
         );
     }
@@ -279,5 +279,6 @@ final class Span
      */
     public function __toString()
     {
+        return json_encode($this->toArray());
     }
 }

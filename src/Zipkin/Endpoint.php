@@ -6,6 +6,8 @@ use InvalidArgumentException;
 
 class Endpoint
 {
+    const DEFAULT_SERVICE_NAME = 'unknown';
+
     /**
      * Service name in lowercase, such as "memcache" or "zipkin-web"
      * Conventionally, when the service name isn't known, service_name = "unknown".
@@ -38,8 +40,8 @@ class Endpoint
     }
 
     /**
-     * @param $serviceName
-     * @param $ipv4
+     * @param string $serviceName
+     * @param int $ipv4
      * @param string $ipv6
      * @param int $port
      * @return Endpoint
@@ -75,13 +77,16 @@ class Endpoint
         }
 
         return new self(
-            $_SERVER['SERVER_SOFTWARE'],
+            $_SERVER['SERVER_SOFTWARE'] ?: self::DEFAULT_SERVICE_NAME,
             $_SERVER['REMOTE_ADDR'],
             null,
             $_SERVER['REMOTE_PORT']
         );
     }
 
+    /**
+     * @return Endpoint
+     */
     public static function createAsEmpty()
     {
         return new self('', 0);
@@ -128,6 +133,9 @@ class Endpoint
         return new self($serviceName, $this->ipv4, $this->ipv6, $this->port);
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $endpoint = [

@@ -7,10 +7,10 @@ interface SamplingFlags
     /**
      * @return bool
      */
-    public function getSampled();
+    public function isSampled();
 
     /**
      * @return bool
      */
-    public function debug();
+    public function isDebug();
 }

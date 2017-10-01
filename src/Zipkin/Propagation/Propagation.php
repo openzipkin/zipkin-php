@@ -2,6 +2,8 @@
 
 namespace Zipkin\Propagation;
 
+use Zipkin\TraceContext;
+
 /**
  * Injects and extracts {@link TraceContext trace identifiers} as text into carriers that travel
  * in-band across process boundaries. Identifiers are often encoded as messaging or RPC request
@@ -36,7 +38,10 @@ interface Propagation
     public function getInjector(Setter $setter);
 
     /**
-     * Returns the extractor as a callable having the signature function($carrier): TraceContext|SamplingFlags
+     * Returns the extractor as a callable having the signature function($carrier): TraceContext|SamplingFlags|null
+     * - @return SamplingFlags if the context does not contain a traceID.
+     * - @return TraceContext if the context contains a traceID and a spanID.
+     * - @return null if the context contains a traceID but not a spanID.
      *
      * @param Getter $getter invoked for each propagation key to get.
      * @return callable

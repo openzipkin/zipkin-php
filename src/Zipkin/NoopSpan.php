@@ -149,7 +149,7 @@ final class NoopSpan implements Span
      * "your_app.version" would let you lookup spans by version. A tag {@link TraceKeys#SQL_QUERY}
      * isn't searchable, but it can help in debugging when viewing a trace.
      *
-     * @param string $key Name used to lookup spans, such as "your_app.version". See {@link TraceKeys} for
+     * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
      * @param $value String value, cannot be <code>null</code>.
      * @return void

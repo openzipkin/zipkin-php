@@ -7,8 +7,8 @@ const CLIENT = 'client';
 const SERVER = 'server';
 
 /**
-* When present, {@link #start()} is the moment a producer sent a message to a destination.
-* A duration between {@link #start()} and {@link #finish()} may imply batching delay. {@link
+* When present, {@link Tracer#start()} is the moment a producer sent a message to a destination.
+* A duration between {@link Tracer#start()} and {@link Tracer#finish()} may imply batching delay. {@link
 * #remoteEndpoint(Endpoint)} indicates the destination, such as a broker.
 *
 * <p>Unlike {@link #CLIENT}, messaging spans never share a span ID. For example, the {@link
@@ -18,8 +18,8 @@ const SERVER = 'server';
 const PRODUCER = 'producer';
 
 /**
-* When present, {@link #start()} is the moment a consumer received a message from an
-* origin. A duration between {@link #start()} and {@link #finish()} may imply a processing backlog.
+* When present, {@link Tracer#start()} is the moment a consumer received a message from an
+* origin. A duration between {@link Tracer#start()} and {@link Tracer#finish()} may imply a processing backlog.
 * while {@link #remoteEndpoint(Endpoint)} indicates the origin, such as a broker.
 *
 * <p>Unlike {@link #SERVER}, messaging spans never share a span ID. For example, the {@link

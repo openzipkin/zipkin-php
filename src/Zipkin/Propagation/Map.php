@@ -5,14 +5,12 @@ namespace Zipkin\Propagation;
 use ArrayAccess;
 use Zipkin\Propagation\Exceptions\InvalidPropagationCarrier;
 use Zipkin\Propagation\Exceptions\InvalidPropagationKey;
+use Zipkin\Propagation\Exceptions\InvalidPropagationValue;
 
 final class Map implements Getter, Setter
 {
     /**
-     * @param ArrayAccess $carrier
-     * @param string $key
-     * @return string
-     * @throws InvalidPropagationCarrier
+     * {@inheritdoc}
      */
     public function get($carrier, $key)
     {
@@ -26,12 +24,7 @@ final class Map implements Getter, Setter
     }
 
     /**
-     * @param ArrayAccess $carrier
-     * @param string $key
-     * @param string $value
-     * @return void
-     * @throws InvalidPropagationCarrier
-     * @throws InvalidPropagationKey
+     * {@inheritdoc}
      */
     public function put($carrier, $key, $value)
     {
@@ -41,6 +34,10 @@ final class Map implements Getter, Setter
 
         if ($key === '') {
             throw InvalidPropagationKey::forEmptyKey();
+        }
+
+        if ($value === null) {
+            throw InvalidPropagationValue::forInvalidValue($key, $value);
         }
 
         $lKey = strtolower($key);

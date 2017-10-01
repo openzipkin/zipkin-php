@@ -27,7 +27,7 @@ final class BinarySampler implements Sampler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isSampled($traceId)
     {

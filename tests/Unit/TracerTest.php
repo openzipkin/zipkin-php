@@ -44,8 +44,8 @@ final class TracerTest extends PHPUnit_Framework_TestCase
 
         $span = $tracer->newTrace($samplingFlags);
 
-        $this->assertEquals(true, $span->getContext()->getSampled());
-        $this->assertEquals(false, $span->getContext()->debug());
+        $this->assertEquals(true, $span->getContext()->isSampled());
+        $this->assertEquals(false, $span->getContext()->isDebug());
         $this->assertNull($span->getContext()->getParentId());
         $this->assertEquals($span->getContext()->getTraceId(), $span->getContext()->getSpanId());
     }

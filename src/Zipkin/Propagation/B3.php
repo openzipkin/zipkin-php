@@ -2,9 +2,11 @@
 
 namespace Zipkin\Propagation;
 
-use InvalidArgumentException;
 use Zipkin\TraceContext;
 
+/**
+ * @see https://github.com/openzipkin/b3-propagation
+ */
 final class B3 implements Propagation
 {
     /**
@@ -48,7 +50,7 @@ final class B3 implements Propagation
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getInjector(Setter $setter)
     {
@@ -65,24 +67,25 @@ final class B3 implements Propagation
                 $setter->put($carrier, self::PARENT_SPAN_ID_NAME, $traceContext->getParentId());
             }
 
-            if ($traceContext->getSampled() !== null) {
-                $setter->put($carrier, self::SAMPLED_NAME, $traceContext->getSampled() ? '1' : '0');
+            if ($traceContext->isSampled() !== null) {
+                $setter->put($carrier, self::SAMPLED_NAME, $traceContext->isSampled() ? '1' : '0');
             }
 
-            if ($traceContext->debug() !== null) {
+            if ($traceContext->isDebug() !== null) {
                 $setter->put($carrier, self::FLAGS_NAME, '1');
             }
         };
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getExtractor(Getter $getter)
     {
         /**
          * @param mixed $carrier
-         * @return TraceContext
+         * @return TraceContext|null
+         * @throws \InvalidArgumentException
          */
         return function ($carrier) use ($getter) {
             $sampledString = $getter->get($carrier, self::SAMPLED_NAME);
@@ -98,25 +101,18 @@ final class B3 implements Propagation
 
             $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
 
-            $traceContext = TraceContext::createAsRoot(DefaultSamplingFlags::create($sampled, $debug));
-
             if ($traceId === null) {
-                return $traceContext;
+                return TraceContext::createAsRoot(DefaultSamplingFlags::create($sampled, $debug));
             }
-
-            $traceContext->setTraceId($traceId);
 
             $spanId = $getter->get($carrier, self::SPAN_ID_NAME);
-            if ($spanId !== null) {
-                $traceContext->setSpanId($spanId);
-            }
-
             $parentSpanId = $getter->get($carrier, self::PARENT_SPAN_ID_NAME);
-            if ($parentSpanId !== null) {
-                $traceContext->setParentId($parentSpanId);
+
+            if ($spanId !== null) {
+                return TraceContext::create($traceId, $spanId, $parentSpanId, $sampled, $debug);
             }
 
-            return $traceContext;
+            return null;
         };
     }
 }

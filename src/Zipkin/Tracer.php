@@ -80,7 +80,7 @@ final class Tracer
      */
     public function newChild(TraceContext $parent)
     {
-        if ($parent->getSampled()) {
+        if ($parent->isSampled()) {
             return $this->ensureSampled($this->nextContext($parent));
         }
 
@@ -149,7 +149,7 @@ final class Tracer
      */
     private function ensureSampled(TraceContext $context)
     {
-        if ($context->getSampled() === null) {
+        if ($context->isSampled() === null) {
             $context = $context->withSampled($this->sampler->isSampled($context->getTraceId()));
         }
 
@@ -164,7 +164,7 @@ final class Tracer
      */
     private function toSpan(TraceContext $context)
     {
-        if (!$this->isNoop && $context->getSampled()) {
+        if (!$this->isNoop && $context->isSampled()) {
             return RealSpan::create($context, $this->recorder);
         }
 

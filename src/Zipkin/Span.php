@@ -104,7 +104,7 @@ interface Span
      * For example, a one-way span can be modeled as a span where one tracer calls start and another
      * calls finish. In order to report that span from its origin, flush must be called.
      *
-     * Another example is where a user didn't call finish within a deadline or before a shutdown
+     * Another example is where a user did not call finish within a deadline or before a shutdown
      * occurs. By flushing, you can report what was in progress.
      *
      * @return void

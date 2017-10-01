@@ -2,9 +2,10 @@
 
 [![Build Status](https://travis-ci.org/jcchavezs/zipkin-php.svg?branch=master)](https://travis-ci.org/jcchavezs/zipkin-php)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%205.6-8892BF.svg)](https://php.net/)
+[![Total Downloads](https://poser.pugx.org/jcchavezs/zipkin/downloads)](https://packagist.org/packages/jcchavezs/zipkin)
 [![License](https://img.shields.io/packagist/l/jcchavezs/zipkin.svg)](https://github.com/jcchavezs/zipkin-php/blob/master/LICENSE)
 
-This is a PHP library for OpenZipkin.
+This is a **production ready** PHP library for Zipkin.
 
 ## Installation
 
@@ -13,6 +14,9 @@ composer require jcchavezs/zipkin
 ```
 
 ## Example usage
+
+This is a simple example of usage, for a more complete frontend/backend 
+example, check [this repository](https://github.com/openzipkin/zipkin-php-example).
 
 ```php
 use GuzzleHttp\Client;

@@ -27,8 +27,8 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($context->getTraceId());
         $this->assertNotNull($context->getSpanId());
         $this->assertEquals(null, $context->getParentId());
-        $this->assertEquals($sampled, $context->getSampled());
-        $this->assertEquals($debug, $context->debug());
+        $this->assertEquals($sampled, $context->isSampled());
+        $this->assertEquals($debug, $context->isDebug());
     }
 
     public function testCreateFromParentSuccess()
@@ -36,51 +36,69 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         $sampled = $this->randomBool();
         $debug = $this->randomBool();
         $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
-        $parentContext = TraceContext::createAsRoot($samplingFlags);
-        $parentContext->setTraceId(self::TEST_TRACE_ID);
-        $parentContext->setParentId(self::TEST_PARENT_ID);
-        $parentContext->setSpanId(self::TEST_SPAN_ID);
+        $parentContext = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            $samplingFlags->isSampled(),
+            $samplingFlags->isDebug()
+        );
 
         $childContext = TraceContext::createFromParent($parentContext);
 
         $this->assertNotNull($childContext->getSpanId());
         $this->assertEquals(self::TEST_TRACE_ID, $childContext->getTraceId());
         $this->assertEquals(self::TEST_SPAN_ID, $childContext->getParentId());
-        $this->assertEquals($sampled, $childContext->getSampled());
-        $this->assertEquals($debug, $childContext->debug());
+        $this->assertEquals($sampled, $childContext->isSampled());
+        $this->assertEquals($debug, $childContext->isDebug());
     }
 
-    public function testSetSpanIdFailsDueToInvalidId()
+    public function testCreateFailsDueToInvalidId()
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid trace id, got invalid_bd7a977555f6b982');
 
         $sampled = $this->randomBool();
         $debug = $this->randomBool();
-        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
-        $parentContext = TraceContext::createAsRoot($samplingFlags);
-        $parentContext->setSpanId(self::TEST_INVALID_SPAN_ID);
+        TraceContext::create(
+            self::TEST_INVALID_TRACE_ID,
+            self::TEST_SPAN_ID,
+            null,
+            $sampled,
+            $debug
+        );
     }
 
-    public function testSetParentIdFailsDueToInvalidId()
+    public function testCreateFailsDueToInvalidSpanId()
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid span id, got invalid_be2d01e33cc78d97');
 
         $sampled = $this->randomBool();
         $debug = $this->randomBool();
-        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
-        $parentContext = TraceContext::createAsRoot($samplingFlags);
-        $parentContext->setParentId(self::TEST_INVALID_PARENT_ID);
+        TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_INVALID_SPAN_ID,
+            null,
+            $sampled,
+            $debug
+        );
     }
 
-    public function testSetTraceIdFailsDueToInvalidId()
+    public function testCreateFailsDueToInvalidParentSpanId()
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid parent span id, got invalid_bd7a977555f6b982');
 
         $sampled = $this->randomBool();
         $debug = $this->randomBool();
-        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
-        $parentContext = TraceContext::createAsRoot($samplingFlags);
-        $parentContext->setTraceId(self::TEST_INVALID_TRACE_ID);
+        TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_INVALID_PARENT_ID,
+            $sampled,
+            $debug
+        );
     }
 
     private function randomBool()

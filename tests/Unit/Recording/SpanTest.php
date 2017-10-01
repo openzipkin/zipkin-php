@@ -36,10 +36,7 @@ final class SpanTest extends PHPUnit_Framework_TestCase
         $traceId = 'e463f94de30144fa';
         $parentId = 'e463f94de30144fb';
 
-        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
-        $context->setSpanId($spanId);
-        $context->setParentId($parentId);
-        $context->setTraceId($traceId);
+        $context = TraceContext::create($traceId, $spanId, $parentId);
 
         $localEndpoint = Endpoint::create('test_service_name', '127.0.0.1', null, 3333);
         $span = Span::createFromContext($context, $localEndpoint);

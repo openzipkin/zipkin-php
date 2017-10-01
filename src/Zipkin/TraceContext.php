@@ -3,6 +3,7 @@
 namespace Zipkin;
 
 use InvalidArgumentException;
+use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\SamplingFlags;
 
 final class TraceContext implements SamplingFlags
@@ -10,12 +11,12 @@ final class TraceContext implements SamplingFlags
     /**
      * @var bool
      */
-    private $sampled;
+    private $isSampled;
 
     /**
      * @var bool
      */
-    private $debug;
+    private $isDebug;
 
     /**
      * @var string
@@ -37,23 +38,61 @@ final class TraceContext implements SamplingFlags
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
-        $this->sampled = $isSampled;
-        $this->debug = $debug;
+        $this->isSampled = $isSampled;
+        $this->isDebug = $debug;
     }
 
-    public static function createAsRoot(SamplingFlags $samplingFlags)
+    /**
+     * @param string $traceId
+     * @param string $spanId
+     * @param string|null $parentId
+     * @param bool|null $isSampled
+     * @param bool $isDebug
+     * @return TraceContext
+     * @throws \InvalidArgumentException
+     */
+    public static function create($traceId, $spanId, $parentId = null, $isSampled = null, $isDebug = false)
     {
+        if (!self::isValidSpanId($spanId)) {
+            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
+        }
+
+        if (!self::isValidTraceId($traceId)) {
+            throw new InvalidArgumentException(sprintf('Invalid trace id, got %s', $traceId));
+        }
+
+        if (!self::isValidSpanId($parentId)) {
+            throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
+        }
+
+        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug);
+    }
+
+    /**
+     * @param SamplingFlags|null $samplingFlags
+     * @return TraceContext
+     */
+    public static function createAsRoot(SamplingFlags $samplingFlags = null)
+    {
+        if ($samplingFlags === null) {
+            $samplingFlags = DefaultSamplingFlags::createAsEmpty();
+        }
+
         $nextId = self::nextId();
 
         return new TraceContext(
             $nextId,
             $nextId,
             null,
-            $samplingFlags->getSampled(),
-            $samplingFlags->debug()
+            $samplingFlags->isSampled(),
+            $samplingFlags->isDebug()
         );
     }
 
+    /**
+     * @param TraceContext $parent
+     * @return TraceContext
+     */
     public static function createFromParent(TraceContext $parent)
     {
         $nextId = self::nextId();
@@ -62,17 +101,25 @@ final class TraceContext implements SamplingFlags
             $parent->traceId,
             $nextId,
             $parent->spanId,
-            $parent->sampled,
-            $parent->debug
+            $parent->isSampled,
+            $parent->isDebug
         );
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isSampled()
+    {
+        return $this->isSampled;
     }
 
     /**
      * @return bool
      */
-    public function debug()
+    public function isDebug()
     {
-        return $this->debug;
+        return $this->isDebug;
     }
 
     /**
@@ -83,20 +130,6 @@ final class TraceContext implements SamplingFlags
     public function getTraceId()
     {
         return $this->traceId;
-    }
-
-    /**
-     * @param string $traceId
-     * @return void
-     * @throws \InvalidArgumentException
-     */
-    public function setTraceId($traceId)
-    {
-        if (!$this->isValidTraceId($traceId)) {
-            throw new InvalidArgumentException(sprintf('Invalid trace id, got %s', $traceId));
-        }
-
-        $this->traceId = $traceId;
     }
 
     /**
@@ -112,20 +145,6 @@ final class TraceContext implements SamplingFlags
     }
 
     /**
-     * @param string $spanId
-     * @return void
-     * @throws \InvalidArgumentException
-     */
-    public function setSpanId($spanId)
-    {
-        if (!$this->isValidSpanId($spanId)) {
-            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
-        }
-
-        $this->spanId = $spanId;
-    }
-
-    /**
      * The parent's {@link #spanId} or null if this the root span in a trace.
      *
      * @return string
@@ -136,35 +155,9 @@ final class TraceContext implements SamplingFlags
     }
 
     /**
-     * @param string $parentId
-     * @return void
-     * @throws \InvalidArgumentException
+     * @param string $isSampled
+     * @return TraceContext
      */
-    public function setParentId($parentId)
-    {
-        if (!$this->isValidSpanId($parentId)) {
-            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $parentId));
-        }
-
-        $this->parentId = $parentId;
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function getSampled()
-    {
-        return $this->sampled;
-    }
-
-    /**
-     * @param bool $sampled
-     */
-    public function setSampled($sampled)
-    {
-        $this->sampled = $sampled;
-    }
-
     public function withSampled($isSampled)
     {
         return new TraceContext(
@@ -172,7 +165,7 @@ final class TraceContext implements SamplingFlags
             $this->parentId,
             $this->spanId,
             $isSampled,
-            $this->debug
+            $this->isDebug
         );
     }
 
@@ -181,13 +174,13 @@ final class TraceContext implements SamplingFlags
         return bin2hex(openssl_random_pseudo_bytes(8));
     }
 
-    private function isValidTraceId($value)
+    private static function isValidTraceId($value)
     {
         return ctype_xdigit((string) $value) &&
         (strlen((string) $value) === 16 || strlen((string) $value) === 32);
     }
 
-    private function isValidSpanId($value)
+    private static function isValidSpanId($value)
     {
         return ctype_xdigit((string) $value) && strlen((string) $value) === 16;
     }

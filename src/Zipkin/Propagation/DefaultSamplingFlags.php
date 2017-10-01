@@ -76,7 +76,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return bool|null
      */
-    public function getSampled()
+    public function isSampled()
     {
         return $this->sampled;
     }
@@ -84,7 +84,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return bool
      */
-    public function debug()
+    public function isDebug()
     {
         return $this->debug;
     }

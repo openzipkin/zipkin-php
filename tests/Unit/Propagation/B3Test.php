@@ -25,10 +25,13 @@ final class B3Test extends PHPUnit_Framework_TestCase
 
     public function testGetInjectorReturnsTheExpectedFunction()
     {
-        $context = TraceContext::createAsRoot(DefaultSamplingFlags::create(self::TEST_SAMPLE, self::TEST_DEBUG));
-        $context->setTraceId(self::TEST_TRACE_ID);
-        $context->setSpanId(self::TEST_SPAN_ID);
-        $context->setParentId(self::TEST_PARENT_ID);
+        $context = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            self::TEST_SAMPLE,
+            self::TEST_DEBUG
+        );
         $carrier = new ArrayObject();
         $setterNGetter = new Map();
         $b3Propagator = new B3();

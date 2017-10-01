@@ -35,7 +35,7 @@ final class PercentageSampler implements Sampler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isSampled($traceId)
     {

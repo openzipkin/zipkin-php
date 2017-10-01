@@ -3,7 +3,6 @@
 namespace Zipkin;
 
 use Zipkin\Recording\SpanMap;
-use function Zipkin\Timestamp\is_valid_timestamp;
 
 class Recorder
 {
@@ -107,6 +106,7 @@ class Recorder
      * @param TraceContext $context
      * @param $timestamp
      * @param $value
+     * @throws \InvalidArgumentException
      */
     public function annotate(TraceContext $context, $timestamp, $value)
     {
@@ -118,6 +118,11 @@ class Recorder
         $span->annotate($timestamp, $value);
     }
 
+    /**
+     * @param TraceContext $context
+     * @param string $key
+     * @param string $value
+     */
     public function tag(TraceContext $context, $key, $value)
     {
         if ($this->noop) {
@@ -128,6 +133,11 @@ class Recorder
         $span->tag($key, $value);
     }
 
+    /**
+     * @param TraceContext $context
+     * @param Endpoint $remoteEndpoint
+     * @return void
+     */
     public function setRemoteEndpoint(TraceContext $context, Endpoint $remoteEndpoint)
     {
         if ($this->noop) {
@@ -138,6 +148,11 @@ class Recorder
         $span->setRemoteEndpoint($remoteEndpoint);
     }
 
+    /**
+     * @param TraceContext $context
+     * @param mixed $finishTimestamp
+     * @return void
+     */
     public function finish(TraceContext $context, $finishTimestamp)
     {
         $span = $this->spanMap->get($context);
@@ -147,11 +162,19 @@ class Recorder
         }
     }
 
+    /**
+     * @param TraceContext $context
+     * @return void
+     */
     public function abandon(TraceContext $context)
     {
         $this->spanMap->remove($context);
     }
 
+    /**
+     * @param TraceContext $context
+     * @return void
+     */
     public function flush(TraceContext $context)
     {
         $span = $this->spanMap->remove($context);
@@ -162,6 +185,9 @@ class Recorder
         }
     }
 
+    /**
+     * @return void
+     */
     public function flushAll()
     {
         $this->reporter->report($this->spanMap->removeAll());
