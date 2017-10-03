@@ -2,8 +2,6 @@
 
 namespace Zipkin\Propagation;
 
-use Zipkin\Propagation\Exceptions\InvalidPropagationValue;
-
 interface Setter
 {
     /**
@@ -13,7 +11,6 @@ interface Setter
      * @param string $key
      * @param string $value
      * @return void
-     * @throws InvalidPropagationValue if the value is not a string
      */
     public function put($carrier, $key, $value);
 }

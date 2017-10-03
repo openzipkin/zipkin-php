@@ -41,7 +41,7 @@ class Endpoint
 
     /**
      * @param string $serviceName
-     * @param int $ipv4
+     * @param string $ipv4
      * @param string $ipv6
      * @param int $port
      * @return Endpoint
@@ -77,7 +77,7 @@ class Endpoint
         }
 
         return new self(
-            $_SERVER['SERVER_SOFTWARE'] ?: self::DEFAULT_SERVICE_NAME,
+            $_SERVER['SERVER_SOFTWARE'] ?: '',
             $_SERVER['REMOTE_ADDR'],
             null,
             $_SERVER['REMOTE_PORT']

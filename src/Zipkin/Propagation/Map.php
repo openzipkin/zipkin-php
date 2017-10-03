@@ -5,7 +5,6 @@ namespace Zipkin\Propagation;
 use ArrayAccess;
 use Zipkin\Propagation\Exceptions\InvalidPropagationCarrier;
 use Zipkin\Propagation\Exceptions\InvalidPropagationKey;
-use Zipkin\Propagation\Exceptions\InvalidPropagationValue;
 
 final class Map implements Getter, Setter
 {
@@ -34,10 +33,6 @@ final class Map implements Getter, Setter
 
         if ($key === '') {
             throw InvalidPropagationKey::forEmptyKey();
-        }
-
-        if ($value === null) {
-            throw InvalidPropagationValue::forInvalidValue($key, $value);
         }
 
         $lKey = strtolower($key);

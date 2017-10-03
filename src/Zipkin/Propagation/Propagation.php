@@ -19,7 +19,12 @@ use Zipkin\TraceContext;
 interface Propagation
 {
     /**
-     * The propagation fields defined
+     * The propagation fields defined. If your carrier is reused, you should delete the fields here
+     * before calling {@link Setter#put(object, string, string)}.
+     *
+     * <p>For example, if the carrier is a single-use or immutable request object, you don't need to
+     * clear fields as they could not have been set before. If it is a mutable, retryable object,
+     * successive calls should clear these fields first.
      *
      * @return array|string[]
      */
@@ -29,8 +34,9 @@ interface Propagation
     public function getKeys();
 
     /**
-     * Used to send the trace context downstream. For example, as http headers.
      * Returns a injector as a callable having the signature function(TraceContext $context, $carrier): void
+     *
+     * The injector replaces a propagated field with the given value.
      *
      * @param Setter $setter invoked for each propagation key to add.
      * @return callable
