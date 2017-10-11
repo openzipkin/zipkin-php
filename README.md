@@ -56,6 +56,7 @@ $span->annotate(Annotation::SERVER_RECEIVE, Timestamp\now());
 $childSpan = $tracer->newChild($span->getContext());
 $childSpan->start();
 $childSpan->setName('my_child_span');
+$childSpan->annotate(Annotation::CLIENT_SEND, Timestamp\now());
 
 ...
 

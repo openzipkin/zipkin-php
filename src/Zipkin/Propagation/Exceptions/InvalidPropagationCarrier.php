@@ -9,7 +9,7 @@ final class InvalidPropagationCarrier extends InvalidArgumentException
     public static function forCarrier($carrier)
     {
         return new self(sprintf(
-            'Invalid carrier. Expected array or ArrayAccess, got %s',
+            'Invalid carrier of type %s',
             is_object($carrier) ? get_class($carrier) : gettype($carrier)
         ));
     }
