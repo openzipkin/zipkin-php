@@ -18,7 +18,7 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
 
     public function testCreateRealSpanSuccess()
     {
-        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+        $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $span = RealSpan::create($context, $recorder->reveal());
         $this->assertEquals($context, $span->getContext());
@@ -26,7 +26,7 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
 
     public function testSetNameSuccess()
     {
-        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+        $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->setName($context, self::TEST_NAME)->shouldBeCalled();
         $span = RealSpan::create($context, $recorder->reveal());
@@ -35,10 +35,20 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
 
     public function testSetKindSuccess()
     {
-        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+        $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->setKind($context, self::TEST_KIND)->shouldBeCalled();
         $span = RealSpan::create($context, $recorder->reveal());
         $span->setKind(self::TEST_KIND);
+    }
+
+    public function testSetRemoteEndpointSuccess()
+    {
+        $context = TraceContext::createAsRoot();
+        $remoteEndpoint = Endpoint::createAsEmpty();
+        $recorder = $this->prophesize(Recorder::class);
+        $recorder->setRemoteEndpoint($context, $remoteEndpoint)->shouldBeCalled();
+        $span = RealSpan::create($context, $recorder->reveal());
+        $span->setRemoteEndpoint($remoteEndpoint);
     }
 }
