@@ -159,7 +159,7 @@ final class RealSpan implements Span
      */
     public function setRemoteEndpoint(Endpoint $remoteEndpoint)
     {
-        $this->setRemoteEndpoint($remoteEndpoint);
+        $this->recorder->setRemoteEndpoint($this->traceContext, $remoteEndpoint);
     }
 
     /**
