@@ -70,17 +70,16 @@ class Endpoint
         return new self($serviceName, $ipv4, $ipv6, (int) $port);
     }
 
+    /**
+     * @return Endpoint
+     */
     public static function createFromGlobals()
     {
-        if (empty($_SERVER)) {
-            throw new \RuntimeException('Could not fetch server information from CLI.');
-        }
-
         return new self(
-            $_SERVER['SERVER_SOFTWARE'] ?: '',
-            $_SERVER['REMOTE_ADDR'],
+            PHP_SAPI,
+            array_key_exists('REMOTE_ADDR', $_SERVER) ? $_SERVER['REMOTE_ADDR'] : null,
             null,
-            $_SERVER['REMOTE_PORT']
+            array_key_exists('REMOTE_PORT', $_SERVER) ? $_SERVER['REMOTE_PORT'] : null
         );
     }
 
