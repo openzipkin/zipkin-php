@@ -30,4 +30,10 @@ final class EndpointTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('my_service', $endpoint->getServiceName());
         $this->assertEquals('192.168.33.11', $endpoint->getIpv4());
     }
+
+    public function testEndpointFromGlobalsIsCreatedSuccessfully()
+    {
+        $endpoint = Endpoint::createFromGlobals();
+        $this->assertEquals(PHP_SAPI, $endpoint->getServiceName());
+    }
 }
