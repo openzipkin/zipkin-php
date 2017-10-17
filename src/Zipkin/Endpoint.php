@@ -17,21 +17,21 @@ class Endpoint
     private $serviceName;
 
     /**
-     * @var string host address packed into 4 bytes.
+     * @var string|null host address packed into 4 bytes.
      */
     private $ipv4;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $ipv6;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $port;
 
-    private function __construct($serviceName, $ipv4, $ipv6 = null, $port = null)
+    private function __construct($serviceName, $ipv4 = null, $ipv6 = null, $port = null)
     {
         $this->serviceName = $serviceName;
         $this->ipv4 = $ipv4;
@@ -41,33 +41,43 @@ class Endpoint
 
     /**
      * @param string $serviceName
-     * @param string $ipv4
-     * @param string $ipv6
-     * @param int $port
+     * @param string|null $ipv4
+     * @param string|null $ipv6
+     * @param int|null $port
      * @return Endpoint
      * @throws \InvalidArgumentException
      */
-    public static function create($serviceName, $ipv4, $ipv6 = null, $port = null)
+    public static function create($serviceName, $ipv4 = null, $ipv6 = null, $port = null)
     {
         if ($serviceName !== (string) $serviceName) {
             throw new InvalidArgumentException(
-                sprintf('service name must be a string, got %s', gettype($serviceName))
+                sprintf('Service name must be a string, got %s', gettype($serviceName))
             );
         }
 
-        if ($port !== null && (int) $port > 65535) {
+        if ($ipv4 !== null && filter_var($ipv4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
             throw new InvalidArgumentException(
-                sprintf('Invalid port. Expected a number between 0 and 65535, got %s', (string) $port)
+                sprintf('Invalid IPv4. Expected something in the range 0.0.0.0 and 255.255.255.255, got %s', $ipv4)
             );
         }
 
-        if (filter_var($ipv4, FILTER_VALIDATE_IP) === false) {
+        if ($ipv6 !== null && filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
             throw new InvalidArgumentException(
-                sprintf('Invalid IP. Expected something in the range 0.0.0.0 and 255.255.255.255, got %s', $ipv4)
+                sprintf('Invalid IPv6 %s', $ipv6)
             );
         }
 
-        return new self($serviceName, $ipv4, $ipv6, (int) $port);
+        if ($port !== null) {
+            $port = (int) $port;
+
+            if ($port > 65535) {
+                throw new InvalidArgumentException(
+                    sprintf('Invalid port. Expected a number between 0 and 65535, got %d', $port)
+                );
+            }
+        }
+
+        return new self($serviceName, $ipv4, $ipv6, $port);
     }
 
     /**
@@ -88,7 +98,7 @@ class Endpoint
      */
     public static function createAsEmpty()
     {
-        return new self('', 0);
+        return new self('');
     }
 
     /**
@@ -100,7 +110,7 @@ class Endpoint
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIpv4()
     {
@@ -108,7 +118,7 @@ class Endpoint
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIpv6()
     {
@@ -116,7 +126,7 @@ class Endpoint
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getPort()
     {
