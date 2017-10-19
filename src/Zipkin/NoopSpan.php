@@ -4,12 +4,20 @@ namespace Zipkin;
 
 final class NoopSpan implements Span
 {
+    private $context;
+
+    private function __construct(TraceContext $context)
+    {
+        $this->context = $context;
+    }
+
     /**
+     * @param TraceContext $context
      * @return NoopSpan
      */
-    public static function create()
+    public static function create(TraceContext $context)
     {
-        return new self;
+        return new self($context);
     }
 
     /**
@@ -29,6 +37,7 @@ final class NoopSpan implements Span
      */
     public function getContext()
     {
+        return $this->context;
     }
 
     /**

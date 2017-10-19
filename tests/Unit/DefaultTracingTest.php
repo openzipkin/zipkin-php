@@ -11,6 +11,9 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Tracer;
 use Zipkin\Tracing;
 
+/**
+ * @covers DefaultTracing
+ */
 final class DefaultTracingTest extends PHPUnit_Framework_TestCase
 {
     public function testDefaultTracingCreationSuccess()
