@@ -43,7 +43,57 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::TEST_PARENT_ID, $carrier[strtolower(self::PARENT_SPAN_ID_NAME)]);
     }
 
-    public function testGetExtractorReturnsTheExpectedFunction()
+    public function testExtractorExtractsTheExpectedValuesForEmptySampling()
+    {
+        $carrier = new ArrayObject();
+
+        $getter = new Map();
+        $b3Propagator = new B3();
+        $extractor = $b3Propagator->getExtractor($getter);
+        $samplingFlags = $extractor($carrier);
+
+        $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
+        $this->assertNull($samplingFlags->isSampled());
+        $this->assertFalse($samplingFlags->isDebug());
+    }
+
+    public function testExtractorExtractsTheExpectedValuesForSamplingDebug()
+    {
+        $isSampled = $this->randomBool();
+
+        $carrier = new ArrayObject([
+            strtolower(self::SAMPLED_NAME) => $isSampled,
+            strtolower(self::FLAGS_NAME) => '1',
+        ]);
+
+        $getter = new Map();
+        $b3Propagator = new B3();
+        $extractor = $b3Propagator->getExtractor($getter);
+        $samplingFlags = $extractor($carrier);
+
+        $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
+        $this->assertTrue($samplingFlags->isDebug());
+    }
+
+    public function testExtractorExtractsTheExpectedValuesForSampling()
+    {
+        $isSampled = $this->randomBool();
+
+        $carrier = new ArrayObject([
+            strtolower(self::SAMPLED_NAME) => $isSampled ? '1' : '0',
+            strtolower(self::FLAGS_NAME) => '0',
+        ]);
+
+        $getter = new Map();
+        $b3Propagator = new B3();
+        $extractor = $b3Propagator->getExtractor($getter);
+        $samplingFlags = $extractor($carrier);
+
+        $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
+        $this->assertEquals($isSampled, $samplingFlags->isSampled());
+    }
+
+    public function testExtractorExtractsTheExpectedValuesForTraceContext()
     {
         $carrier = new ArrayObject([
             strtolower(self::TRACE_ID_NAME) => self::TEST_TRACE_ID,
@@ -60,5 +110,10 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::TEST_TRACE_ID, $context->getTraceId());
         $this->assertEquals(self::TEST_SPAN_ID, $context->getSpanId());
         $this->assertEquals(self::TEST_PARENT_ID, $context->getParentId());
+    }
+
+    private function randomBool()
+    {
+        return (mt_rand(0, 1) === 1);
     }
 }

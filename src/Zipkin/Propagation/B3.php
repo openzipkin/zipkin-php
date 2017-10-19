@@ -84,35 +84,41 @@ final class B3 implements Propagation
     {
         /**
          * @param mixed $carrier
-         * @return TraceContext|null
+         * @return TraceContext|SamplingFlags
          * @throws \InvalidArgumentException
          */
         return function ($carrier) use ($getter) {
             $sampledString = $getter->get($carrier, self::SAMPLED_NAME);
 
-            $sampled = null;
+            $isSampled = null;
             if ($sampledString === '1' || strtolower($sampledString) === 'true') {
-                $sampled = true;
+                $isSampled = true;
             } elseif ($sampledString === '0' || strtolower($sampledString) === 'false') {
-                $sampled = false;
+                $isSampled = false;
             }
 
-            $debug = ('1' === $getter->get($carrier, self::FLAGS_NAME));
+            $isDebug = $getter->get($carrier, self::FLAGS_NAME);
+            if ($isDebug !== null) {
+                $isDebug = ($isDebug === '1');
+            }
 
             $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
 
-            if ($traceId === null) {
-                return TraceContext::createAsRoot(DefaultSamplingFlags::create($sampled, $debug));
+            if ($isSampled === null && $isDebug === null && $traceId === null) {
+                return DefaultSamplingFlags::createAsEmpty();
             }
 
             $spanId = $getter->get($carrier, self::SPAN_ID_NAME);
-            $parentSpanId = $getter->get($carrier, self::PARENT_SPAN_ID_NAME);
 
-            if ($spanId !== null) {
-                return TraceContext::create($traceId, $spanId, $parentSpanId, $sampled, $debug);
+            if ($spanId === null) {
+                return $isDebug === true
+                    ? DefaultSamplingFlags::createAsDebug()
+                    : DefaultSamplingFlags::create($isSampled, $isDebug);
             }
 
-            return null;
+            $parentSpanId = $getter->get($carrier, self::PARENT_SPAN_ID_NAME);
+
+            return TraceContext::create($traceId, $spanId, $parentSpanId, $isSampled, $isDebug);
         };
     }
 }
