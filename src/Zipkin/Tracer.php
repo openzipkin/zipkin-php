@@ -84,7 +84,7 @@ final class Tracer
             return $this->ensureSampled($this->nextContext($parent));
         }
 
-        return NoopSpan::create();
+        return NoopSpan::create($parent);
     }
 
     /**
@@ -137,10 +137,16 @@ final class Tracer
     private function nextContext(SamplingFlags $contextOrFlags)
     {
         if ($contextOrFlags instanceof TraceContext) {
-            return TraceContext::createFromParent($contextOrFlags);
+            $context = TraceContext::createFromParent($contextOrFlags);
+        } else {
+            $context = TraceContext::createAsRoot($contextOrFlags);
         }
 
-        return TraceContext::createAsRoot($contextOrFlags);
+        if ($context->isSampled() === null) {
+            $context = $context->withSampled($this->sampler->isSampled($context->getTraceId()));
+        }
+
+        return $context;
     }
 
     /**
@@ -168,6 +174,6 @@ final class Tracer
             return RealSpan::create($context, $this->recorder);
         }
 
-        return NoopSpan::create();
+        return NoopSpan::create($context);
     }
 }

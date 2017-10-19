@@ -10,6 +10,7 @@ use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\RealSpan;
 use Zipkin\Reporter;
 use Zipkin\Sampler;
+use Zipkin\Samplers\BinarySampler;
 use Zipkin\TraceContext;
 use Zipkin\Tracer;
 
@@ -84,5 +85,31 @@ final class TracerTest extends PHPUnit_Framework_TestCase
         $span = $tracer->newChild($traceContext);
 
         $this->assertInstanceOf(RealSpan::class, $span);
+    }
+
+    public function testNewTraceIsSampledOnAlwaysSampling()
+    {
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $this->reporter->reveal(),
+            BinarySampler::createAsAlwaysSample(),
+            false
+        );
+
+        $span = $tracer->newTrace(DefaultSamplingFlags::createAsEmpty());
+        $this->assertTrue($span->getContext()->isSampled());
+    }
+
+    public function testNewTraceIsSampledOnNeverSampling()
+    {
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $this->reporter->reveal(),
+            BinarySampler::createAsNeverSample(),
+            false
+        );
+
+        $span = $tracer->newTrace(DefaultSamplingFlags::createAsEmpty());
+        $this->assertFalse($span->getContext()->isSampled());
     }
 }
