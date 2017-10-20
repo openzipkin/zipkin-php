@@ -82,11 +82,6 @@ final class Span
     private $debug;
 
     /**
-     * @var bool
-     */
-    private $sampled;
-
-    /**
      * Associates events that explain latency with a timestamp. Unlike log
      * statements, annotations are often codes: for example SERVER_RECV("sr").
      * Annotations are sorted ascending by timestamp.
@@ -132,13 +127,12 @@ final class Span
      */
     private $localEndpoint;
 
-    private function __construct($traceId, $parentId, $spanId, $debug, $sampled, Endpoint $localEndpoint)
+    private function __construct($traceId, $parentId, $spanId, $debug, Endpoint $localEndpoint)
     {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
         $this->spanId = $spanId;
         $this->debug = $debug;
-        $this->sampled = $sampled;
         $this->localEndpoint = $localEndpoint;
     }
 
@@ -154,7 +148,6 @@ final class Span
             $context->getParentId(),
             $context->getSpanId(),
             $context->isDebug(),
-            $context->isSampled(),
             $localEndpoint
         );
     }
@@ -247,7 +240,6 @@ final class Span
     {
         $spanAsArray = [
             'id' => (string) $this->spanId,
-            'kind' => $this->kind,
             'name' => $this->name,
             'traceId' => (string) $this->traceId,
             'parentId' => $this->parentId ? (string) $this->parentId : null,
@@ -256,6 +248,10 @@ final class Span
             'debug' => $this->debug,
             'localEndpoint' => $this->localEndpoint->toArray(),
         ];
+
+        if ($this->kind !== null) {
+            $spanAsArray['kind'] = $this->kind;
+        }
 
         if ($this->remoteEndpoint !== null) {
             $spanAsArray['remoteEndpoint'] = $this->remoteEndpoint->toArray();

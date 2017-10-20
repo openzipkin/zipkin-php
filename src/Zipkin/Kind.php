@@ -2,9 +2,9 @@
 
 namespace Zipkin\Kind;
 
-const CLIENT = 'client';
+const CLIENT = 'CLIENT';
 
-const SERVER = 'server';
+const SERVER = 'SERVER';
 
 /**
 * When present, {@link Tracer#start()} is the moment a producer sent a message to a destination.
@@ -15,7 +15,7 @@ const SERVER = 'server';
 * #CONSUMER} of the same message has {@link TraceContext#parentId()} set to this span's {@link
 * TraceContext#spanId()}.
 */
-const PRODUCER = 'producer';
+const PRODUCER = 'PRODUCER';
 
 /**
 * When present, {@link Tracer#start()} is the moment a consumer received a message from an
@@ -25,4 +25,4 @@ const PRODUCER = 'producer';
 * <p>Unlike {@link #SERVER}, messaging spans never share a span ID. For example, the {@link
 * #PRODUCER} of this message is the {@link TraceContext#parentId()} of this span.
 */
-const CONSUMER = 'consumer';
+const CONSUMER = 'CONSUMER';

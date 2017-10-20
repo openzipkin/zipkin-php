@@ -51,7 +51,7 @@ final class SpanTest extends PHPUnit_Framework_TestCase
 
         $expectedSpanArray = [
             'id' => $spanId,
-            'kind' => 'client',
+            'kind' => 'CLIENT',
             'traceId' => $traceId,
             'parentId' => $parentId,
             'timestamp' => $timestamp,

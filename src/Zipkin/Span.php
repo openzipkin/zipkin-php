@@ -42,6 +42,8 @@ interface Span
      * kind is {@link Kind#SERVER}, the span's start timestamp is implicitly annotated as "sr"
      * and that plus its duration as "ss".
      *
+     * The value must be strictly one of the ones listed in {@link Kind}.
+     *
      * @param string $kind
      * @return void
      */
