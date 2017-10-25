@@ -65,7 +65,7 @@ class Recorder
 
     /**
      * @param TraceContext $context
-     * @param float $timestamp
+     * @param int $timestamp
      */
     public function start(TraceContext $context, $timestamp)
     {
