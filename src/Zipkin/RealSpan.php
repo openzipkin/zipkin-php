@@ -59,7 +59,7 @@ final class RealSpan implements Span
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
      *
-     * @param float $timestamp
+     * @param int $timestamp
      * @return void
      * @throws \InvalidArgumentException
      */
@@ -98,7 +98,7 @@ final class RealSpan implements Span
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
-     * kind is {@link Kind#SERVER}, the span's start timestamp is implicitly annotated as "sr"
+     * kind is {@link Zipkin\Kind\SERVER}, the span's start timestamp is implicitly annotated as "sr"
      * and that plus its duration as "ss".
      *
      * @param string $kind
@@ -178,14 +178,18 @@ final class RealSpan implements Span
      * {@link zipkin.Span#duration Zipkin's span duration} is derived by subtracting the start
      * timestamp from this, and set when appropriate.
      *
-     * @param float $timestamp
+     * @param int|null $timestamp
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function finish($timestamp)
+    public function finish($timestamp = null)
     {
-        if (!Timestamp\is_valid_timestamp($timestamp)) {
+        if ($timestamp !== null && !Timestamp\is_valid_timestamp($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');
+        }
+
+        if ($timestamp === null) {
+            $timestamp = Timestamp\now();
         }
 
         $this->recorder->finish($this->traceContext, $timestamp);
