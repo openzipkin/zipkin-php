@@ -30,7 +30,7 @@ final class Annotation
 
     /**
      * @param string $value
-     * @param float $timestamp
+     * @param int $timestamp
      * @throws InvalidArgumentException on empty or not stringable value or invalid timestamp
      * @return Annotation
      */

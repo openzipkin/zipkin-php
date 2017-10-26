@@ -24,7 +24,7 @@ interface Span
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
      *
-     * @param float $timestamp
+     * @param int|null $timestamp
      * @return void
      */
     public function start($timestamp = null);
@@ -39,7 +39,7 @@ interface Span
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
-     * kind is {@link Kind#SERVER}, the span's start timestamp is implicitly annotated as "sr"
+     * kind is {@link Zipkin\Kind\SERVER}, the span's start timestamp is implicitly annotated as "sr"
      * and that plus its duration as "ss".
      *
      * The value must be strictly one of the ones listed in {@link Kind}.
@@ -65,7 +65,7 @@ interface Span
      * Associates an event that explains latency with the current system time.
      *
      * @param string $value A short tag indicating the event, like "finagle.retry"
-     * @param float $timestamp
+     * @param int $timestamp
      * @return void
      * @see Annotation
      */
@@ -94,10 +94,10 @@ interface Span
      * {@link zipkin.Span#duration Zipkin's span duration} is derived by subtracting the start
      * timestamp from this, and set when appropriate.
      *
-     * @param float $timestamp
+     * @param int|null $timestamp
      * @return void
      */
-    public function finish($timestamp);
+    public function finish($timestamp = null);
 
     /**
      * Reports the span, even if unfinished. Most users will not call this method.
