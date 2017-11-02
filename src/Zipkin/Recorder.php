@@ -150,7 +150,7 @@ class Recorder
 
     /**
      * @param TraceContext $context
-     * @param mixed $finishTimestamp
+     * @param int $finishTimestamp
      * @return void
      */
     public function finish(TraceContext $context, $finishTimestamp)

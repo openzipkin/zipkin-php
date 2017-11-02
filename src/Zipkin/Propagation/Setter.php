@@ -12,5 +12,5 @@ interface Setter
      * @param string $value
      * @return void
      */
-    public function put($carrier, $key, $value);
+    public function put(&$carrier, $key, $value);
 }
