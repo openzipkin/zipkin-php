@@ -10,6 +10,7 @@ final class Map implements Getter, Setter
 {
     /**
      * {@inheritdoc}
+     * @param array|ArrayAccess $carrier
      */
     public function get($carrier, $key)
     {
@@ -19,13 +20,18 @@ final class Map implements Getter, Setter
             return $carrier->offsetExists($lKey) ? $carrier->offsetGet($lKey) : null;
         }
 
+        if (is_array($carrier)) {
+            return array_key_exists($lKey, $carrier) ? $carrier[$lKey] : null;
+        }
+
         throw InvalidPropagationCarrier::forCarrier($carrier);
     }
 
     /**
      * {@inheritdoc}
+     * @param array|ArrayAccess $carrier
      */
-    public function put($carrier, $key, $value)
+    public function put(&$carrier, $key, $value)
     {
         if ($key !== (string) $key) {
             throw InvalidPropagationKey::forInvalidKey($key);
@@ -37,7 +43,7 @@ final class Map implements Getter, Setter
 
         $lKey = strtolower($key);
 
-        if ($carrier instanceof ArrayAccess) {
+        if ($carrier instanceof ArrayAccess || is_array($carrier)) {
             $carrier[$lKey] = $value;
             return;
         }
