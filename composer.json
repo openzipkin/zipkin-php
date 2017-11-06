@@ -23,7 +23,7 @@
         "psr-4": {
             "Zipkin\\": "./src/Zipkin/"
         },
-        "files": ["./src/Zipkin/Timestamp.php", "./src/Zipkin/Kind.php", "./src/Zipkin/Tags.php"]
+        "files": ["./src/Zipkin/Timestamp.php", "./src/Zipkin/Kind.php", "./src/Zipkin/Tags.php", "./src/Zipkin/Annotations.php"]
     },
     "autoload-dev": {
         "psr-4": {

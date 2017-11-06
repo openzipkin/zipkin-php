@@ -46,7 +46,7 @@ final class NoopSpan implements Span
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
      *
-     * @param float|null $timestamp
+     * @param int|null $timestamp
      * @return void
      */
     public function start($timestamp = null)
@@ -95,7 +95,7 @@ final class NoopSpan implements Span
      * @param string $value A short tag indicating the event, like "finagle.retry"
      * @param int $timestamp
      * @return void
-     * @see Annotation
+     * @see Annotations
      */
     public function annotate($value, $timestamp)
     {

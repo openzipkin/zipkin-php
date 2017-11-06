@@ -17,3 +17,7 @@ const HTTP_REQUEST_SIZE = 'http.request.size';
 const HTTP_RESPONSE_SIZE = 'http.response.size';
 
 const SQL_QUERY = 'sql.query';
+
+const LOCAL_COMPONENT = 'lc';
+
+const ERROR = 'error';

@@ -67,7 +67,7 @@ interface Span
      * @param string $value A short tag indicating the event, like "finagle.retry"
      * @param int $timestamp
      * @return void
-     * @see Annotation
+     * @see Annotations
      */
     public function annotate($value, $timestamp);
 

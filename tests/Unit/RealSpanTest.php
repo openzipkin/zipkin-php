@@ -8,6 +8,8 @@ use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\RealSpan;
 use Zipkin\Recorder;
 use Zipkin\Reporter;
+use Zipkin\Timestamp;
+use Zipkin\Annotations;
 use Zipkin\TraceContext;
 
 class RealSpanTest extends PHPUnit_Framework_TestCase
@@ -50,5 +52,28 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
         $recorder->setRemoteEndpoint($context, $remoteEndpoint)->shouldBeCalled();
         $span = RealSpan::create($context, $recorder->reveal());
         $span->setRemoteEndpoint($remoteEndpoint);
+    }
+
+    public function testAnnotateSuccess()
+    {
+        $timestamp = Timestamp\now();
+        $value = Annotations\WIRE_SEND;
+        $context = TraceContext::createAsRoot();
+        $recorder = $this->prophesize(Recorder::class);
+        $recorder->annotate($context, $timestamp, $value)->shouldBeCalled();
+        $span = RealSpan::create($context, $recorder->reveal());
+        $span->annotate($value, $timestamp);
+    }
+
+    public function testAnnotateFailsDueToInvalidValue()
+    {
+        $timestamp = Timestamp\now();
+        $value = new \stdClass;
+        $context = TraceContext::createAsRoot();
+        $recorder = $this->prophesize(Recorder::class);
+        $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();
+        $span = RealSpan::create($context, $recorder->reveal());
+        $this->expectException(\InvalidArgumentException::class);
+        $span->annotate($value, $timestamp);
     }
 }
