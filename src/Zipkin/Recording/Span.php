@@ -2,7 +2,6 @@
 
 namespace Zipkin\Recording;
 
-use Zipkin\Annotation;
 use Zipkin\Endpoint;
 use Zipkin\TraceContext;
 
@@ -15,10 +14,6 @@ final class Span
      * This value should be set directly by instrumentation, using the most
      * precise value possible. For example, gettimeofday or syncing nanoTime
      * against a tick of currentTimeMillis.
-     *
-     * For compatibility with instrumentation that precede this field, collectors
-     * or span stores can derive this via Annotation.timestamp.
-     * For example, SERVER_RECV.timestamp or CLIENT_SEND.timestamp.
      *
      * Timestamp is nullable for input only. Spans without a timestamp cannot be
      * presented in a timeline: Span stores should not output spans missing a
@@ -86,7 +81,7 @@ final class Span
      * statements, annotations are often codes: for example SERVER_RECV("sr").
      * Annotations are sorted ascending by timestamp.
      *
-     * @var Annotation[]
+     * @var string[][]
      */
     private $annotations = [];
 
@@ -102,10 +97,6 @@ final class Span
      * This value should be set directly, as opposed to implicitly via annotation
      * timestamps. Doing so encourages precision decoupled from problems of
      * clocks, such as skew or NTP updates causing time to move backwards.
-     *
-     * For compatibility with instrumentation that precede this field, collectors
-     * or span stores can derive this by subtracting Annotation.timestamp.
-     * For example, SERVER_SEND.timestamp - SERVER_RECV.timestamp.
      *
      * If this field is persisted as unset, zipkin will continue to work, except
      * duration query support will be implementation-specific. Similarly, setting
@@ -194,7 +185,10 @@ final class Span
      */
     public function annotate($timestamp, $value)
     {
-        $this->annotations[] = Annotation::create($value, $timestamp);
+        $this->annotations[] = [
+            'value' => $value,
+            'timestamp' => $timestamp,
+        ];
     }
 
     /**
@@ -258,9 +252,7 @@ final class Span
         }
 
         if (!empty($this->annotations)) {
-            $spanAsArray['annotations'] = array_map(function (Annotation $annotation) {
-                return $annotation->toArray();
-            }, $this->annotations);
+            $spanAsArray['annotations'] = $this->annotations;
         }
 
         if (!empty($this->tags)) {
