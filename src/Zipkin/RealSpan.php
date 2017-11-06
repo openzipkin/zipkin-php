@@ -70,7 +70,7 @@ final class RealSpan implements Span
         } else {
             if (!Timestamp\is_valid_timestamp($timestamp)) {
                 throw new InvalidArgumentException(
-                    sprintf('Invalid timestamp. Expected float, got %s', $timestamp)
+                    sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
                 );
             }
         }
@@ -134,16 +134,22 @@ final class RealSpan implements Span
     /**
      * Associates an event that explains latency with the current system time.
      *
-     * @param string|Annotation $value A short tag indicating the event, like "finagle.retry"
-     * @param float|null $timestamp
+     * @param string $value A short tag indicating the event, like "finagle.retry"
+     * @param int|null $timestamp
      * @return void
      * @throws \InvalidArgumentException
-     * @see Annotation
+     * @see Annotations
      */
     public function annotate($value, $timestamp = null)
     {
-        if (is_object($value) && $value instanceof Annotation) {
-            $this->recorder->annotate($this->traceContext, $value->getTimestamp(), $value->getValue());
+        if (empty($value) || !is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+            throw new InvalidArgumentException('Invalid annotation value');
+        }
+
+        if (!Timestamp\is_valid_timestamp($timestamp)) {
+            throw new InvalidArgumentException(
+                sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
+            );
         }
 
         $this->recorder->annotate($this->traceContext, $timestamp, $value);

@@ -50,7 +50,7 @@ class Recorder
 
     /**
      * @param TraceContext $context
-     * @return float
+     * @return int
      */
     public function getTimestamp(TraceContext $context)
     {
