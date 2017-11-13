@@ -29,19 +29,24 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(null, $context->getParentId());
         $this->assertEquals($sampled, $context->isSampled());
         $this->assertEquals($debug, $context->isDebug());
+        $this->assertEquals([], $context->getExtra());
     }
 
     public function testCreateFromParentSuccess()
     {
         $sampled = $this->randomBool();
         $debug = $this->randomBool();
+        $extra = [
+            'field_1' => 'value_1'
+        ];
         $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
         $parentContext = TraceContext::create(
             self::TEST_TRACE_ID,
             self::TEST_SPAN_ID,
             self::TEST_PARENT_ID,
             $samplingFlags->isSampled(),
-            $samplingFlags->isDebug()
+            $samplingFlags->isDebug(),
+            $extra
         );
 
         $childContext = TraceContext::createFromParent($parentContext);
@@ -51,6 +56,7 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::TEST_SPAN_ID, $childContext->getParentId());
         $this->assertEquals($sampled, $childContext->isSampled());
         $this->assertEquals($debug, $childContext->isDebug());
+        $this->assertEquals($extra, $childContext->getExtra());
     }
 
     public function testCreateFailsDueToInvalidId()

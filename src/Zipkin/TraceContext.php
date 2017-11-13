@@ -33,13 +33,19 @@ final class TraceContext implements SamplingFlags
      */
     private $parentId;
 
-    private function __construct($traceId, $spanId, $parentId, $isSampled, $debug)
+    /**
+     * @var string[]
+     */
+    private $extra = [];
+
+    private function __construct($traceId, $spanId, $parentId, $isSampled, $isDebug, array $extra)
     {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
         $this->isSampled = $isSampled;
-        $this->isDebug = $debug;
+        $this->isDebug = $isDebug;
+        $this->extra = $extra;
     }
 
     /**
@@ -48,11 +54,18 @@ final class TraceContext implements SamplingFlags
      * @param string|null $parentId
      * @param bool|null $isSampled
      * @param bool $isDebug
+     * @param array $extra
      * @return TraceContext
      * @throws \InvalidArgumentException
      */
-    public static function create($traceId, $spanId, $parentId = null, $isSampled = null, $isDebug = false)
-    {
+    public static function create(
+        $traceId,
+        $spanId,
+        $parentId = null,
+        $isSampled = null,
+        $isDebug = false,
+        array $extra = []
+    ) {
         if (!self::isValidSpanId($spanId)) {
             throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
         }
@@ -65,7 +78,7 @@ final class TraceContext implements SamplingFlags
             throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
         }
 
-        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug);
+        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $extra);
     }
 
     /**
@@ -85,7 +98,8 @@ final class TraceContext implements SamplingFlags
             $nextId,
             null,
             $samplingFlags->isSampled(),
-            $samplingFlags->isDebug()
+            $samplingFlags->isDebug(),
+            []
         );
     }
 
@@ -102,7 +116,8 @@ final class TraceContext implements SamplingFlags
             $nextId,
             $parent->spanId,
             $parent->isSampled,
-            $parent->isDebug
+            $parent->isDebug,
+            $parent->extra
         );
     }
 
@@ -165,8 +180,35 @@ final class TraceContext implements SamplingFlags
             $this->parentId,
             $this->spanId,
             $isSampled,
-            $this->isDebug
+            $this->isDebug,
+            $this->extra
         );
+    }
+
+    public function withExtra(array $extra)
+    {
+        return new TraceContext(
+            $this->traceId,
+            $this->parentId,
+            $this->spanId,
+            $this->isSampled,
+            $this->isDebug,
+            $extra
+        );
+    }
+
+    /**
+     * Returns a list of additional data propagated through this trace.
+     *
+     * <p>The contents are intentionally opaque, deferring to {@linkplain Propagation} to define. An
+     * example implementation could be storing a class containing a correlation value, which is
+     * extracted from incoming requests and injected as-is onto outgoing requests.
+     *
+     * @return string[]
+     */
+    public function getExtra()
+    {
+        return $this->extra;
     }
 
     private static function nextId()
