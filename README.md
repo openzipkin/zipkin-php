@@ -63,7 +63,7 @@ the correct spot in the tree representing the distributed operation.
 
 ### Local Tracing
 
-When tracing local code, just run it inside a $span->
+When tracing local code, just run it inside a span
 
 ```php
 $span = $tracer->newTrace()->setName('encode')->start();
@@ -94,7 +94,7 @@ keys or details. For example, you might add a tag with your runtime
 version.
 
 ```php
-$span->tag('clnt/finagle.version', '6.36.0');
+$span->tag('http.status_code', '200');
 ```
 
 ### RPC tracing
@@ -309,12 +309,6 @@ Here's an example of AWS propagation:
 
 * `TraceContext` if trace and span IDs were present.
 * `SamplingFlags` if no identifiers were present
-
-## Disabling Tracing
-
-If you are in a situation where you need to turn off tracing at runtime,
-invoke `$tracing->setNoop(true)`. This will turn any new spans into "noop"
-spans, and drop any data until `$tracing->setNoop(false)` is invoked.
 
 ## Tests
 
