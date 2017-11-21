@@ -27,18 +27,21 @@ final class DefaultTracing implements Tracing
      * @param Endpoint $localEndpoint
      * @param Reporter $reporter
      * @param Sampler $sampler
+     * @param bool $traceId128bits
      * @param bool $isNoop
      */
     public function __construct(
         Endpoint $localEndpoint,
         Reporter $reporter,
         Sampler $sampler,
+        $traceId128bits = false,
         $isNoop = false
     ) {
         $this->tracer = new Tracer(
             $localEndpoint,
             $reporter,
             $sampler,
+            $traceId128bits,
             $isNoop
         );
 
