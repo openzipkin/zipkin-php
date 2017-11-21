@@ -31,7 +31,7 @@ class TracingBuilder
     /**
      * @var bool
      */
-    private $traceId128bits = false;
+    private $usesTraceId128bits = false;
 
     public static function create()
     {
@@ -103,12 +103,12 @@ class TracingBuilder
     /**
      * When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit)
      *
-     * @param $traceId128Bits
+     * @param $usesTraceId128bits
      * @return $this
      */
-    public function havingTraceId128bits($traceId128Bits)
+    public function havingTraceId128bits($usesTraceId128bits)
     {
-        $this->traceId128bits = $traceId128Bits;
+        $this->usesTraceId128bits = $usesTraceId128bits;
         return $this;
     }
 
@@ -136,7 +136,7 @@ class TracingBuilder
             $this->localEndpoint,
             $this->reporter,
             $this->sampler,
-            $this->traceId128bits
+            $this->usesTraceId128bits
         );
     }
 }
