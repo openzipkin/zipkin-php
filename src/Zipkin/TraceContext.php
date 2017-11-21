@@ -33,19 +33,13 @@ final class TraceContext implements SamplingFlags
      */
     private $parentId;
 
-    /**
-     * @var bool
-     */
-    private $traceId128bits;
-
-    private function __construct($traceId, $spanId, $parentId, $isSampled, $debug, $traceId128bits = false)
+    private function __construct($traceId, $spanId, $parentId, $isSampled, $debug)
     {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
         $this->isSampled = $isSampled;
         $this->isDebug = $debug;
-        $this->traceId128bits = $traceId128bits;
     }
 
     /**
@@ -78,16 +72,21 @@ final class TraceContext implements SamplingFlags
      * @param SamplingFlags|null $samplingFlags
      * @return TraceContext
      */
-    public static function createAsRoot(SamplingFlags $samplingFlags = null)
+    public static function createAsRoot(SamplingFlags $samplingFlags = null, $traceId128bits = false)
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
         }
 
         $nextId = self::nextId();
+        if ($traceId128bits) {
+            $traceId = self::traceIdWith128bits();
+        } else {
+            $traceId = $nextId;
+        }
 
         return new TraceContext(
-            $nextId,
+            $traceId,
             $nextId,
             null,
             $samplingFlags->isSampled(),
@@ -183,25 +182,9 @@ final class TraceContext implements SamplingFlags
         );
     }
 
-    /**
-     * check traceId128bits flag
-     * change trace id to 128bits if necessary
-     * @param bool $traceId128bits
-     */
-    public function checkTraceId128bits($traceId128bits = false)
+    private static function traceIdWith128bits()
     {
-        if ($traceId128bits) {
-            $this->traceId128bits = $traceId128bits;
-            $this->traceId = self::traceId($traceId128bits);
-        }
-    }
-
-    private static function traceId($traceId128bits = false)
-    {
-        if ($traceId128bits) {
-            return bin2hex(openssl_random_pseudo_bytes(16));
-        }
-        return self::nextId();
+        return bin2hex(openssl_random_pseudo_bytes(16));
     }
 
     private static function nextId()

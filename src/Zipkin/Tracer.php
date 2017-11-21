@@ -147,9 +147,7 @@ final class Tracer
         if ($contextOrFlags instanceof TraceContext) {
             $context = TraceContext::createFromParent($contextOrFlags);
         } else {
-            $context = TraceContext::createAsRoot($contextOrFlags);
-            //check and set trace id 128bits if flag is true after create a root trace context
-            $context->checkTraceId128bits($this->traceId128bits);
+            $context = TraceContext::createAsRoot($contextOrFlags, $this->traceId128bits);
         }
 
         if ($context->isSampled() === null) {
