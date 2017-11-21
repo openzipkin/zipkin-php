@@ -162,8 +162,8 @@ final class TraceContext implements SamplingFlags
     {
         return new TraceContext(
             $this->traceId,
-            $this->parentId,
             $this->spanId,
+            $this->parentId,
             $isSampled,
             $this->isDebug
         );
