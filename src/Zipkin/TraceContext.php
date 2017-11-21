@@ -190,7 +190,7 @@ final class TraceContext implements SamplingFlags
      */
     public function checkTraceId128bits($traceId128bits = false)
     {
-        if($traceId128bits) {
+        if ($traceId128bits) {
             $this->traceId128bits = $traceId128bits;
             $this->traceId = self::traceId($traceId128bits);
         }
@@ -198,7 +198,7 @@ final class TraceContext implements SamplingFlags
 
     private static function traceId($traceId128bits = false)
     {
-        if($traceId128bits) {
+        if ($traceId128bits) {
             return bin2hex(openssl_random_pseudo_bytes(16));
         }
         return self::nextId();
