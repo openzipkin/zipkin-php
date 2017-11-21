@@ -33,13 +33,19 @@ final class TraceContext implements SamplingFlags
      */
     private $parentId;
 
-    private function __construct($traceId, $spanId, $parentId, $isSampled, $debug)
+    /**
+     * @var bool
+     */
+    private $traceId128bits;
+
+    private function __construct($traceId, $spanId, $parentId, $isSampled, $debug, $traceId128bits = false)
     {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
         $this->isSampled = $isSampled;
         $this->isDebug = $debug;
+        $this->traceId128bits = $traceId128bits;
     }
 
     /**
@@ -167,6 +173,26 @@ final class TraceContext implements SamplingFlags
             $isSampled,
             $this->isDebug
         );
+    }
+
+    /**
+     * check traceId128bits flag
+     * change trace id to 128bits if necessary
+     * @param bool $traceId128bits
+     */
+    public function setTraceId128bits($traceId128bits = false)
+    {
+        if($traceId128bits) {
+            $this->traceId = self::traceId($traceId128bits);
+        }
+    }
+
+    private static function traceId($traceId128bits = false)
+    {
+        if($traceId128bits) {
+            return bin2hex(openssl_random_pseudo_bytes(16));
+        }
+        return self::nextId();
     }
 
     private static function nextId()
