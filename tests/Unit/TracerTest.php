@@ -49,6 +49,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(true, $span->getContext()->isSampled());
         $this->assertEquals(false, $span->getContext()->isDebug());
         $this->assertNull($span->getContext()->getParentId());
+        $this->assertFalse($span->getContext()->usesTraceId128bits());
         $this->assertEquals($span->getContext()->getTraceId(), $span->getContext()->getSpanId());
     }
 
@@ -69,7 +70,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(true, $span->getContext()->isSampled());
         $this->assertEquals(false, $span->getContext()->isDebug());
         $this->assertNull($span->getContext()->getParentId());
-        $this->assertEquals(strlen($span->getContext()->getTraceId()), 32);
+        $this->assertTrue($span->getContext()->usesTraceId128bits());
     }
 
     public function testNewChildIsBeingCreatedAsNoop()

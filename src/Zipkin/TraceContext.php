@@ -33,13 +33,19 @@ final class TraceContext implements SamplingFlags
      */
     private $parentId;
 
-    private function __construct($traceId, $spanId, $parentId, $isSampled, $debug)
+    /**
+     * @var bool
+     */
+    private $usesTraceId128bits;
+
+    private function __construct($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits)
     {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
         $this->isSampled = $isSampled;
-        $this->isDebug = $debug;
+        $this->isDebug = $isDebug;
+        $this->usesTraceId128bits = $usesTraceId128bits;
     }
 
     /**
@@ -48,11 +54,17 @@ final class TraceContext implements SamplingFlags
      * @param string|null $parentId
      * @param bool|null $isSampled
      * @param bool $isDebug
+     * @param bool $usesTraceId128bits
      * @return TraceContext
-     * @throws \InvalidArgumentException
      */
-    public static function create($traceId, $spanId, $parentId = null, $isSampled = null, $isDebug = false)
-    {
+    public static function create(
+        $traceId,
+        $spanId,
+        $parentId = null,
+        $isSampled = null,
+        $isDebug = false,
+        $usesTraceId128bits = false
+    ) {
         if (!self::isValidSpanId($spanId)) {
             throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
         }
@@ -65,24 +77,25 @@ final class TraceContext implements SamplingFlags
             throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
         }
 
-        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug);
+        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits);
     }
 
     /**
      * @param SamplingFlags|null $samplingFlags
+     * @param bool $usesTraceId128bits
      * @return TraceContext
      */
-    public static function createAsRoot(SamplingFlags $samplingFlags = null, $traceId128bits = false)
+    public static function createAsRoot(SamplingFlags $samplingFlags = null, $usesTraceId128bits = false)
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
         }
 
         $nextId = self::nextId();
-        if ($traceId128bits) {
+
+        $traceId = $nextId;
+        if ($usesTraceId128bits) {
             $traceId = self::traceIdWith128bits();
-        } else {
-            $traceId = $nextId;
         }
 
         return new TraceContext(
@@ -90,7 +103,8 @@ final class TraceContext implements SamplingFlags
             $nextId,
             null,
             $samplingFlags->isSampled(),
-            $samplingFlags->isDebug()
+            $samplingFlags->isDebug(),
+            $usesTraceId128bits
         );
     }
 
@@ -107,7 +121,8 @@ final class TraceContext implements SamplingFlags
             $nextId,
             $parent->spanId,
             $parent->isSampled,
-            $parent->isDebug
+            $parent->isDebug,
+            $parent->usesTraceId128bits
         );
     }
 
@@ -130,9 +145,9 @@ final class TraceContext implements SamplingFlags
     /**
      * @return bool
      */
-    public function isTraceId128bits()
+    public function usesTraceId128bits()
     {
-        return $this->traceId128bits;
+        return $this->usesTraceId128bits;
     }
 
     /**
@@ -178,7 +193,8 @@ final class TraceContext implements SamplingFlags
             $this->spanId,
             $this->parentId,
             $isSampled,
-            $this->isDebug
+            $this->isDebug,
+            $this->usesTraceId128bits
         );
     }
 

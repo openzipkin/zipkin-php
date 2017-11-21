@@ -21,7 +21,7 @@ final class Tracer
     /**
      * @var bool
      */
-    private $traceId128bits;
+    private $usesTraceId128bits;
 
     /**
      * @var Recorder
@@ -32,19 +32,19 @@ final class Tracer
      * @param Endpoint $localEndpoint
      * @param Reporter $reporter
      * @param Sampler $sampler
-     * @param bool $traceId128bits
+     * @param bool $usesTraceId128bits
      * @param bool $isNoop
      */
     public function __construct(
         Endpoint $localEndpoint,
         Reporter $reporter,
         Sampler $sampler,
-        $traceId128bits,
+        $usesTraceId128bits,
         $isNoop
     ) {
         $this->recorder = new Recorder($localEndpoint, $reporter, $isNoop);
         $this->sampler = $sampler;
-        $this->traceId128bits = $traceId128bits;
+        $this->usesTraceId128bits = $usesTraceId128bits;
         $this->isNoop = $isNoop;
     }
 
@@ -147,7 +147,7 @@ final class Tracer
         if ($contextOrFlags instanceof TraceContext) {
             $context = TraceContext::createFromParent($contextOrFlags);
         } else {
-            $context = TraceContext::createAsRoot($contextOrFlags, $this->traceId128bits);
+            $context = TraceContext::createAsRoot($contextOrFlags, $this->usesTraceId128bits);
         }
 
         if ($context->isSampled() === null) {
