@@ -72,16 +72,21 @@ final class TraceContext implements SamplingFlags
      * @param SamplingFlags|null $samplingFlags
      * @return TraceContext
      */
-    public static function createAsRoot(SamplingFlags $samplingFlags = null)
+    public static function createAsRoot(SamplingFlags $samplingFlags = null, $traceId128bits = false)
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
         }
 
         $nextId = self::nextId();
+        if ($traceId128bits) {
+            $traceId = self::traceIdWith128bits();
+        } else {
+            $traceId = $nextId;
+        }
 
         return new TraceContext(
-            $nextId,
+            $traceId,
             $nextId,
             null,
             $samplingFlags->isSampled(),
@@ -120,6 +125,14 @@ final class TraceContext implements SamplingFlags
     public function isDebug()
     {
         return $this->isDebug;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTraceId128bits()
+    {
+        return $this->traceId128bits;
     }
 
     /**
@@ -162,11 +175,16 @@ final class TraceContext implements SamplingFlags
     {
         return new TraceContext(
             $this->traceId,
-            $this->parentId,
             $this->spanId,
+            $this->parentId,
             $isSampled,
             $this->isDebug
         );
+    }
+
+    private static function traceIdWith128bits()
+    {
+        return bin2hex(openssl_random_pseudo_bytes(16));
     }
 
     private static function nextId()
