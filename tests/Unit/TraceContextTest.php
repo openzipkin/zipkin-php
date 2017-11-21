@@ -101,6 +101,17 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCreate128bitsTraceId()
+    {
+        $sampled = $this->randomBool();
+        $debug = $this->randomBool();
+        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $context = TraceContext::createAsRoot($samplingFlags);
+        $context->checkTraceId128bits(true);
+
+        $this->assertEquals(32, strlen($context->getTraceId()));
+    }
+
     private function randomBool()
     {
         return (mt_rand(0, 1) === 1);
