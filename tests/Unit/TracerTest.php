@@ -38,6 +38,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             $this->sampler->reveal(),
+            false,
             false
         );
 
@@ -47,8 +48,30 @@ final class TracerTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(true, $span->getContext()->isSampled());
         $this->assertEquals(false, $span->getContext()->isDebug());
+        $this->assertEquals(false, $span->getContext()->isTraceId128bits());
         $this->assertNull($span->getContext()->getParentId());
         $this->assertEquals($span->getContext()->getTraceId(), $span->getContext()->getSpanId());
+    }
+
+    public function testNewTraceSuccessWith128bits()
+    {
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $this->reporter->reveal(),
+            $this->sampler->reveal(),
+            true,
+            false
+        );
+
+        $samplingFlags = DefaultSamplingFlags::create(true, false);
+
+        $span = $tracer->newTrace($samplingFlags);
+
+        $this->assertEquals(true, $span->getContext()->isSampled());
+        $this->assertEquals(false, $span->getContext()->isDebug());
+        $this->assertEquals(true, $span->getContext()->isTraceId128bits());
+        $this->assertNull($span->getContext()->getParentId());
+        $this->assertEquals(strlen($span->getContext()->getTraceId()), 32);
     }
 
     public function testNewChildIsBeingCreatedAsNoop()
@@ -57,6 +80,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             $this->sampler->reveal(),
+            false,
             false
         );
 
@@ -75,6 +99,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             $this->sampler->reveal(),
+            false,
             false
         );
 
@@ -93,6 +118,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             BinarySampler::createAsAlwaysSample(),
+            false,
             false
         );
 
@@ -106,6 +132,7 @@ final class TracerTest extends PHPUnit_Framework_TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             BinarySampler::createAsNeverSample(),
+            false,
             false
         );
 

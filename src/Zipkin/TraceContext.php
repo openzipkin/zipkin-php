@@ -129,6 +129,14 @@ final class TraceContext implements SamplingFlags
     }
 
     /**
+     * @return bool
+     */
+    public function isTraceId128bits()
+    {
+        return $this->traceId128bits;
+    }
+
+    /**
      * Unique 8-byte identifier for a trace, set on all spans within it.
      *
      * @return string
@@ -180,9 +188,10 @@ final class TraceContext implements SamplingFlags
      * change trace id to 128bits if necessary
      * @param bool $traceId128bits
      */
-    public function setTraceId128bits($traceId128bits = false)
+    public function checkTraceId128bits($traceId128bits = false)
     {
         if($traceId128bits) {
+            $this->traceId128bits = $traceId128bits;
             $this->traceId = self::traceId($traceId128bits);
         }
     }
