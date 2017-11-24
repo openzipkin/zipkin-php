@@ -32,9 +32,10 @@ interface Propagation
     public function getKeys();
 
     /**
-     * Returns a injector as a callable having the signature function(TraceContext $context, $carrier): void
+     * Returns a injector as a callable having the signature function(TraceContext $context, &$carrier): void
      *
-     * The injector replaces a propagated field with the given value.
+     * The injector replaces a propagated field with the given value so <b>it is very important the carrier is
+     * being passed by reference.</b>
      *
      * @param Setter $setter invoked for each propagation key to add.
      * @return callable
