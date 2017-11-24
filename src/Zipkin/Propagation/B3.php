@@ -56,10 +56,10 @@ final class B3 implements Propagation
     {
         /**
          * @param TraceContext $traceContext
-         * @param $carrier
+         * @param &$carrier
          * @return void
          */
-        return function (TraceContext $traceContext, $carrier) use ($setter) {
+        return function (TraceContext $traceContext, &$carrier) use ($setter) {
             $setter->put($carrier, self::TRACE_ID_NAME, $traceContext->getTraceId());
             $setter->put($carrier, self::SPAN_ID_NAME, $traceContext->getSpanId());
 
