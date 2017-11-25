@@ -23,7 +23,10 @@ final class B3Test extends PHPUnit_Framework_TestCase
     const TEST_SAMPLE = true;
     const TEST_DEBUG = false;
 
-    public function testGetInjectorReturnsTheExpectedFunction()
+    /**
+     * @dataProvider carrierProvider
+     */
+    public function testGetInjectorReturnsTheExpectedFunction($carrier)
     {
         $context = TraceContext::create(
             self::TEST_TRACE_ID,
@@ -32,7 +35,6 @@ final class B3Test extends PHPUnit_Framework_TestCase
             self::TEST_SAMPLE,
             self::TEST_DEBUG
         );
-        $carrier = new ArrayObject();
         $setterNGetter = new Map();
         $b3Propagator = new B3();
         $injector = $b3Propagator->getInjector($setterNGetter);
@@ -43,10 +45,11 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::TEST_PARENT_ID, $carrier[strtolower(self::PARENT_SPAN_ID_NAME)]);
     }
 
-    public function testExtractorExtractsTheExpectedValuesForEmptySampling()
+    /**
+     * @dataProvider carrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForEmptySampling($carrier)
     {
-        $carrier = new ArrayObject();
-
         $getter = new Map();
         $b3Propagator = new B3();
         $extractor = $b3Propagator->getExtractor($getter);
@@ -57,14 +60,15 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertFalse($samplingFlags->isDebug());
     }
 
-    public function testExtractorExtractsTheExpectedValuesForSamplingDebug()
+    /**
+     * @dataProvider carrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForSamplingDebug($carrier)
     {
         $isSampled = $this->randomBool();
 
-        $carrier = new ArrayObject([
-            strtolower(self::SAMPLED_NAME) => $isSampled,
-            strtolower(self::FLAGS_NAME) => '1',
-        ]);
+        $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled;
+        $carrier[strtolower(self::FLAGS_NAME)] = '1';
 
         $getter = new Map();
         $b3Propagator = new B3();
@@ -75,14 +79,15 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertTrue($samplingFlags->isDebug());
     }
 
-    public function testExtractorExtractsTheExpectedValuesForSampling()
+    /**
+     * @dataProvider carrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForSampling($carrier)
     {
         $isSampled = $this->randomBool();
 
-        $carrier = new ArrayObject([
-            strtolower(self::SAMPLED_NAME) => $isSampled ? '1' : '0',
-            strtolower(self::FLAGS_NAME) => '0',
-        ]);
+        $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled ? '1' : '0';
+        $carrier[strtolower(self::FLAGS_NAME)] = '0';
 
         $getter = new Map();
         $b3Propagator = new B3();
@@ -93,13 +98,14 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertEquals($isSampled, $samplingFlags->isSampled());
     }
 
-    public function testExtractorExtractsTheExpectedValuesForTraceContext()
+    /**
+     * @dataProvider carrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForTraceContext($carrier)
     {
-        $carrier = new ArrayObject([
-            strtolower(self::TRACE_ID_NAME) => self::TEST_TRACE_ID,
-            strtolower(self::SPAN_ID_NAME) => self::TEST_SPAN_ID,
-            strtolower(self::PARENT_SPAN_ID_NAME) => self::TEST_PARENT_ID,
-        ]);
+        $carrier[strtolower(self::TRACE_ID_NAME)] = self::TEST_TRACE_ID;
+        $carrier[strtolower(self::SPAN_ID_NAME)] = self::TEST_SPAN_ID;
+        $carrier[strtolower(self::PARENT_SPAN_ID_NAME)] = self::TEST_PARENT_ID;
 
         $getter = new Map();
         $b3Propagator = new B3();
@@ -110,6 +116,14 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::TEST_TRACE_ID, $context->getTraceId());
         $this->assertEquals(self::TEST_SPAN_ID, $context->getSpanId());
         $this->assertEquals(self::TEST_PARENT_ID, $context->getParentId());
+    }
+
+    public function carrierProvider()
+    {
+        return [
+            [new ArrayObject()],
+            [[]]
+        ];
     }
 
     private function randomBool()
