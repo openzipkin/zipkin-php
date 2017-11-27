@@ -88,4 +88,13 @@ final class DefaultSamplingFlags implements SamplingFlags
     {
         return $this->debug;
     }
+
+    /**
+     * @return bool
+     */
+    public function isEqual(SamplingFlags $samplingFlags)
+    {
+        return $this->debug === $samplingFlags->isDebug()
+            && $this->sampled === $samplingFlags->isSampled();
+    }
 }

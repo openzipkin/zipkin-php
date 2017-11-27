@@ -2,7 +2,7 @@
 
 namespace Zipkin\Propagation;
 
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 /**
  * @see https://github.com/openzipkin/b3-propagation

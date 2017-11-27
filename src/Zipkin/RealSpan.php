@@ -3,6 +3,7 @@
 namespace Zipkin;
 
 use InvalidArgumentException;
+use Zipkin\Propagation\TraceContext;
 use Zipkin\Timestamp;
 
 final class RealSpan implements Span

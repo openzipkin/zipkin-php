@@ -7,7 +7,7 @@ use PHPUnit_Framework_TestCase;
 use Zipkin\Propagation\B3;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\Map;
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 final class B3Test extends PHPUnit_Framework_TestCase
 {

@@ -310,6 +310,22 @@ Here's an example of AWS propagation:
 * `TraceContext` if trace and span IDs were present.
 * `SamplingFlags` if no identifiers were present
 
+## Current Span
+
+Brave supports a "current span" concept which represents the in-flight
+operation. `Tracer::currentSpan()` can be used to add custom tags to a
+span and `Tracer::nextSpan()` can be used to create a child of whatever
+is in-flight.
+
+### Setting a span in scope manually
+
+When writing new instrumentation, it is important to place a span you
+created in scope as the current span.
+
+In edge cases, you may need to clear the current span temporarily. For
+example, launching a task that should not be associated with the current
+request. To do this, simply pass null to `setSpanInScope`.
+
 ## Tests
 
 Tests can be run by

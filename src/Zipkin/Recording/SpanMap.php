@@ -3,7 +3,7 @@
 namespace Zipkin\Recording;
 
 use Zipkin\Endpoint;
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 final class SpanMap
 {

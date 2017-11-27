@@ -10,7 +10,7 @@ use Zipkin\Recorder;
 use Zipkin\Reporter;
 use Zipkin\Timestamp;
 use Zipkin\Annotations;
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 class RealSpanTest extends PHPUnit_Framework_TestCase
 {

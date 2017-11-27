@@ -8,7 +8,7 @@ use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recording\Span;
 use Zipkin\Timestamp;
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 final class SpanTest extends PHPUnit_Framework_TestCase
 {

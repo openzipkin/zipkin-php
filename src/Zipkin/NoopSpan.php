@@ -2,6 +2,8 @@
 
 namespace Zipkin;
 
+use Zipkin\Propagation\TraceContext;
+
 final class NoopSpan implements Span
 {
     private $context;

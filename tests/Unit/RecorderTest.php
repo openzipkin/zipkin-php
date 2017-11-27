@@ -8,7 +8,7 @@ use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recorder;
 use Zipkin\Reporter;
 use function Zipkin\Timestamp\now;
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 final class RecorderTest extends PHPUnit_Framework_TestCase
 {
