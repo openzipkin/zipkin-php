@@ -1,6 +1,6 @@
 <?php
 
-namespace ZipkingTests\Unit;
+namespace ZipkinTests\Unit;
 
 use PHPUnit_Framework_TestCase;
 use Zipkin\Endpoint;

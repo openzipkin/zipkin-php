@@ -140,27 +140,26 @@ class TracingBuilder
      */
     public function build()
     {
-        if ($this->localEndpoint === null) {
-            $this->localEndpoint = Endpoint::createFromGlobals();
+        $localEndpoint = $this->localEndpoint;
+        if ($localEndpoint === null) {
+            $localEndpoint = Endpoint::createFromGlobals();
             if ($this->localServiceName !== null) {
-                $this->localEndpoint->withServiceName($this->localServiceName);
+                $localEndpoint->withServiceName($this->localServiceName);
             }
         }
 
-        if ($this->reporter === null) {
-            $this->reporter = new Logging(new NullLogger());
-        }
+        $reporter = ($this->reporter ?: new Logging(new NullLogger()));
 
-        if ($this->sampler === null) {
-            $this->sampler = BinarySampler::createAsNeverSample();
-        }
+        $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
+
+        $currentTraceContext = $this->currentTraceContext ?: CurrentTraceContext::create();
 
         return new DefaultTracing(
-            $this->localEndpoint,
-            $this->reporter,
-            $this->sampler,
+            $localEndpoint,
+            $reporter,
+            $sampler,
             $this->usesTraceId128bits,
-            $this->currentTraceContext,
+            $currentTraceContext,
             $this->isNoop
         );
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace ZipkingTests\Unit;
+namespace ZipkinTests\Unit;
 
 use PHPUnit_Framework_TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -254,5 +254,32 @@ final class TracerTest extends PHPUnit_Framework_TestCase
         $currentSpan = $tracer->getCurrentSpan();
 
         $this->assertEquals($context, $currentSpan->getContext());
+    }
+
+    /**
+     * @dataProvider spanForScopeProvider
+     */
+    public function testOpenScopeReturnsScopeCloser($spanForScope)
+    {
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $this->reporter->reveal(),
+            BinarySampler::createAsNeverSample(),
+            false,
+            CurrentTraceContext::create(),
+            false
+        );
+
+        $scopeCloser = $tracer->openScope($spanForScope);
+
+        $this->assertTrue(is_callable($scopeCloser));
+    }
+
+    public function spanForScopeProvider()
+    {
+        return [
+            [null],
+            [NoopSpan::create(TraceContext::createAsRoot())]
+        ];
     }
 }

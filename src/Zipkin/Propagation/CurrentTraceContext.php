@@ -3,8 +3,7 @@
 namespace Zipkin\Propagation;
 
 /**
- * This makes a given span the current span by placing it in scope (usually but not always a thread
- * local scope).
+ * This makes a given span the current span by placing it in scope.
  *
  * <p>This type is an SPI, and intended to be used by implementors looking to change thread-local
  * storage, or integrate with other contexts such as logging (MDC).
@@ -24,13 +23,19 @@ final class CurrentTraceContext
         $this->context = $currentContext;
     }
 
+    /**
+     * Creates a current trace context controller. If there is no context, and consequently no span, it holds null.
+     *
+     * @param TraceContext|null $currentContext
+     * @return CurrentTraceContext
+     */
     public static function create(TraceContext $currentContext = null)
     {
         return new self($currentContext);
     }
 
     /**
-     * Returns the current span in scope or null if there isn't one.
+     * Returns the current span context in scope or null if there isn't one.
      *
      * @return TraceContext|null
      */

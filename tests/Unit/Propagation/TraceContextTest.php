@@ -1,6 +1,6 @@
 <?php
 
-namespace ZipkingTests\Unit\Propagation;
+namespace ZipkinTests\Unit\Propagation;
 
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;

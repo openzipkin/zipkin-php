@@ -143,7 +143,7 @@ final class Tracer
      *
      * @return callable The scope closer
      */
-    public function setSpanInScope(Span $span = null)
+    public function openScope(Span $span = null)
     {
         return $this->currentTraceContext->createScopeAndRetrieveItsCloser(
             $span === null ? null : $span->getContext()

@@ -282,7 +282,7 @@ created in scope as the current span.
 
 In edge cases, you may need to clear the current span temporarily. For
 example, launching a task that should not be associated with the current
-request. To do this, simply pass null to `setSpanInScope`.
+request. To do this, simply pass null to `openScope`.
 
 ## Tests
 
