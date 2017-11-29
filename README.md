@@ -270,10 +270,42 @@ sharing span IDs between a client and a server.
 
 ## Current Span
 
-Brave supports a "current span" concept which represents the in-flight
+Zipkin supports a "current span" concept which represents the in-flight
 operation. `Tracer::currentSpan()` can be used to add custom tags to a
 span and `Tracer::nextSpan()` can be used to create a child of whatever
 is in-flight.
+
+A common use case for the current span is to instrument RPC clients. For example:
+
+```php
+/**
+  * This http clients composes an http client using PSR7
+  */
+class TraceClient implements ClientInterface
+{
+    public function request($method, $uri = '', array $options = [])
+    {
+        /* Gets the child Span of the current one */
+        $span = $this->tracer->nextSpan();
+        $span->setKind(Zipkin\Kind\CLIENT);
+        $span->tag(Tags\HTTP_PATH, $uri);
+        
+        try {
+            $response = $this->client->request($method, $uri, $options);
+            $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
+            
+            return $response;
+        catch (\Exception $e) {
+            $span->tag(Tags\Error, $response->getReasonPhrase());        
+            $span->tag(Tags\HTTP_STATUS_CODE, $e->getResponse->getStatusCode());
+            
+            throw $e;
+        } finally {
+            $span->finish();
+        }
+    }
+}
+```
 
 ### Setting a span in scope manually
 
