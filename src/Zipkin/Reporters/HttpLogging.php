@@ -12,10 +12,8 @@ use Zipkin\Reporter;
 final class HttpLogging implements Reporter
 {
     const DEFAULT_OPTIONS = [
-        'host' => 'http://localhost:9411',
+        'baseUrl' => 'http://localhost:9411',
         'endpoint' => '/api/v2/spans',
-        'muteErrors' => false,
-        'contextOptions' => [],
     ];
 
     /**
@@ -56,7 +54,7 @@ final class HttpLogging implements Reporter
         try {
             $this->client->request(
                 'POST',
-                $this->options['host'] . $this->options['endpoint'],
+                $this->options['baseUrl'] . $this->options['endpoint'],
                 ['body' => $body]
             );
         } catch (GuzzleException $e) {

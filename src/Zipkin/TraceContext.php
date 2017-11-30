@@ -56,6 +56,7 @@ final class TraceContext implements SamplingFlags
      * @param bool $isDebug
      * @param bool $usesTraceId128bits
      * @return TraceContext
+     * @throws \InvalidArgumentException
      */
     public static function create(
         $traceId,
@@ -65,15 +66,15 @@ final class TraceContext implements SamplingFlags
         $isDebug = false,
         $usesTraceId128bits = false
     ) {
-        if (!self::isValidSpanId($spanId)) {
-            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
-        }
-
         if (!self::isValidTraceId($traceId)) {
             throw new InvalidArgumentException(sprintf('Invalid trace id, got %s', $traceId));
         }
 
-        if (!self::isValidSpanId($parentId)) {
+        if (!self::isValidSpanId($spanId)) {
+            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
+        }
+
+        if ($parentId !== null && !self::isValidSpanId($parentId)) {
             throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
         }
 
