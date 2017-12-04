@@ -3,6 +3,7 @@
 namespace Zipkin;
 
 use Psr\Log\NullLogger;
+use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Reporters\Logging;
 use Zipkin\Samplers\BinarySampler;
 
@@ -32,6 +33,16 @@ class TracingBuilder
      * @var bool
      */
     private $usesTraceId128bits = false;
+
+    /**
+     * @var CurrentTraceContext
+     */
+    private $currentTraceContext;
+
+    /**
+     * @var bool
+     */
+    private $isNoop = false;
 
     public static function create()
     {
@@ -112,31 +123,44 @@ class TracingBuilder
         return $this;
     }
 
+    public function havingCurrentTraceContext(CurrentTraceContext $currentTraceContext)
+    {
+        $this->currentTraceContext = $currentTraceContext;
+        return $this;
+    }
+
+    public function beingNoop()
+    {
+        $this->isNoop = true;
+        return $this;
+    }
+
     /**
      * @return DefaultTracing
      */
     public function build()
     {
-        if ($this->localEndpoint === null) {
-            $this->localEndpoint = Endpoint::createFromGlobals();
+        $localEndpoint = $this->localEndpoint;
+        if ($localEndpoint === null) {
+            $localEndpoint = Endpoint::createFromGlobals();
             if ($this->localServiceName !== null) {
-                $this->localEndpoint->withServiceName($this->localServiceName);
+                $localEndpoint->withServiceName($this->localServiceName);
             }
         }
 
-        if ($this->reporter === null) {
-            $this->reporter = new Logging(new NullLogger());
-        }
+        $reporter = ($this->reporter ?: new Logging(new NullLogger()));
 
-        if ($this->sampler === null) {
-            $this->sampler = BinarySampler::createAsNeverSample();
-        }
+        $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
+
+        $currentTraceContext = $this->currentTraceContext ?: CurrentTraceContext::create();
 
         return new DefaultTracing(
-            $this->localEndpoint,
-            $this->reporter,
-            $this->sampler,
-            $this->usesTraceId128bits
+            $localEndpoint,
+            $reporter,
+            $sampler,
+            $this->usesTraceId128bits,
+            $currentTraceContext,
+            $this->isNoop
         );
     }
 }

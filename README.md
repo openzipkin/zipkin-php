@@ -107,7 +107,7 @@ Here's an example of a client span:
 ```php
 // before you send a request, add metadata that describes the operation
 $span = $tracer->newTrace()->setName('get')->setKind(Kind\CLIENT);
-$span->tag('clnt/finagle.version', '6.36.0');
+$span->tag('http.status_code', '200');
 $span->tag(Tags\HTTP_PATH, '/api');
 $span->setRemoteEndpoint(Remote::create('backend', 127 << 24 | 1, null, 8080);
 
@@ -261,54 +261,60 @@ or headers.
 `SamplingFlags|TraceContext` is usually only used with `$tracer->newChild(extracted)`, unless you are
 sharing span IDs between a client and a server.
 
-### Sharing span IDs between client and server
-
-A normal instrumentation pattern is creating a span representing the server
-side of an RPC. `Extractor::__invoke` might return a complete trace context when
-applied to an incoming client request. `$tracer->joinSpan` attempts to continue
-the this trace, using the same span ID if supported, or creating a child span
-if not. When span ID is shared, data reported includes a flag saying so.
-
-Here's an example of B3 propagation:
-
-```
-                              ┌───────────────────┐      ┌───────────────────┐
- Incoming Headers             │   TraceContext    │      │   TraceContext    │
-┌───────────────────┐(extract)│ ┌───────────────┐ │(join)│ ┌───────────────┐ │
-│ X─B3-TraceId      │─────────┼─┼> TraceId      │ │──────┼─┼> TraceId      │ │
-│                   │         │ │               │ │      │ │               │ │
-│ X─B3-ParentSpanId │─────────┼─┼> ParentSpanId │ │──────┼─┼> ParentSpanId │ │
-│                   │         │ │               │ │      │ │               │ │
-│ X─B3-SpanId       │─────────┼─┼> SpanId       │ │──────┼─┼> SpanId       │ │
-└───────────────────┘         │ │               │ │      │ │               │ │
-                              │ │               │ │      │ │  Shared: true │ │
-                              │ └───────────────┘ │      │ └───────────────┘ │
-                              └───────────────────┘      └───────────────────┘
-```
-
-Some propagation systems only forward the parent span ID. In this case, a new span ID is always provisioned and the incoming context determines the parent ID.
-
-Here's an example of AWS propagation:
-
-```
-                              ┌───────────────────┐      ┌───────────────────┐
- x-amzn-trace-id              │   TraceContext    │      │   TraceContext    │
-┌───────────────────┐(extract)│ ┌───────────────┐ │(join)│ ┌───────────────┐ │
-│ Root              │─────────┼─┼> TraceId      │ │──────┼─┼> TraceId      │ │
-│                   │         │ │               │ │      │ │               │ │
-│ Parent            │─────────┼─┼> SpanId       │ │──────┼─┼> ParentSpanId │ │
-└───────────────────┘         │ └───────────────┘ │      │ │               │ │
-                              └───────────────────┘      │ │  SpanId: New  │ │
-                                                         │ └───────────────┘ │
-                                                         └───────────────────┘
-```
-
 ### Implementing Propagation
 
 `Extractor` will output a `SamplingFlags|TraceContext` with one of the following:
 
 * `TraceContext` if trace and span IDs were present.
 * `SamplingFlags` if no identifiers were present
+
+## Current Span
+
+Zipkin supports a "current span" concept which represents the in-flight
+operation. `Tracer::currentSpan()` can be used to add custom tags to a
+span and `Tracer::nextSpan()` can be used to create a child of whatever
+is in-flight.
+
+A common use case for the current span is to instrument RPC clients. For example:
+
+```php
+/**
+  * This http clients composes an http client using PSR7
+  */
+class TraceClient implements ClientInterface
+{
+    public function request($method, $uri = '', array $options = [])
+    {
+        /* Gets the child Span of the current one */
+        $span = $this->tracer->nextSpan();
+        $span->setKind(Zipkin\Kind\CLIENT);
+        $span->tag(Tags\HTTP_PATH, $uri);
+        
+        try {
+            $response = $this->client->request($method, $uri, $options);
+            $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
+            
+            return $response;
+        catch (\Exception $e) {
+            $span->tag(Tags\Error, $response->getReasonPhrase());        
+            $span->tag(Tags\HTTP_STATUS_CODE, $e->getResponse->getStatusCode());
+            
+            throw $e;
+        } finally {
+            $span->finish();
+        }
+    }
+}
+```
+
+### Setting a span in scope manually
+
+When writing new instrumentation, it is important to place a span you
+created in scope as the current span.
+
+In edge cases, you may need to clear the current span temporarily. For
+example, launching a task that should not be associated with the current
+request. To do this, simply pass null to `openScope`.
 
 ## Tests
 

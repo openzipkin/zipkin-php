@@ -7,7 +7,7 @@ use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recording\Span;
 use Zipkin\Recording\SpanMap;
-use Zipkin\TraceContext;
+use Zipkin\Propagation\TraceContext;
 
 /**
  * @covers SpanMap

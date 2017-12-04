@@ -3,6 +3,7 @@
 namespace Zipkin;
 
 use Zipkin\Propagation\B3;
+use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\Propagation;
 use Zipkin\Reporter;
 
@@ -28,13 +29,15 @@ final class DefaultTracing implements Tracing
      * @param Reporter $reporter
      * @param Sampler $sampler
      * @param bool $usesTraceId128bits
+     * @param CurrentTraceContext $currentTraceContext
      * @param bool $isNoop
      */
     public function __construct(
         Endpoint $localEndpoint,
         Reporter $reporter,
         Sampler $sampler,
-        $usesTraceId128bits = false,
+        $usesTraceId128bits,
+        CurrentTraceContext $currentTraceContext,
         $isNoop = false
     ) {
         $this->tracer = new Tracer(
@@ -42,6 +45,7 @@ final class DefaultTracing implements Tracing
             $reporter,
             $sampler,
             $usesTraceId128bits,
+            $currentTraceContext,
             $isNoop
         );
 

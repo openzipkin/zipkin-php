@@ -2,6 +2,8 @@
 
 namespace Zipkin;
 
+use Zipkin\Propagation\TraceContext;
+
 interface Span
 {
     /**

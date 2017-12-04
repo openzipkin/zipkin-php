@@ -2,6 +2,7 @@
 
 namespace Zipkin;
 
+use Zipkin\Propagation\TraceContext;
 use Zipkin\Recording\SpanMap;
 
 class Recorder
