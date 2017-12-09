@@ -6,9 +6,6 @@ use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 use Zipkin\Endpoint;
 
-/**
- * @covers Endpoint
- */
 final class EndpointTest extends PHPUnit_Framework_TestCase
 {
     public function testEndpointFailsDueToInvalidServiceName()

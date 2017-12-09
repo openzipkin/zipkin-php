@@ -7,9 +7,6 @@ use PHPUnit_Framework_TestCase;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\TraceContext;
 
-/**
- * @covers TraceContext
- */
 final class TraceContextTest extends PHPUnit_Framework_TestCase
 {
     const TEST_TRACE_ID = 'bd7a977555f6b982';
