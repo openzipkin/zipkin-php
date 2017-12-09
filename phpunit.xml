@@ -23,4 +23,13 @@
         timeoutForMediumTests="10"
         timeoutForLargeTests="60"
         verbose="false">
+		<filter>
+			<whitelist processUncoveredFilesFromWhitelist="true">
+				<directory suffix=".php">./src</directory>
+				<exclude>
+					<directory>./vendor</directory>
+					<directory>./tests</directory>
+				</exclude>
+			</whitelist>
+		</filter>
 </phpunit>

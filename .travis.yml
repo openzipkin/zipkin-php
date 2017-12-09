@@ -8,6 +8,17 @@ php:
 install:
   - composer install
 
+after_install:
+  - composer require php-coveralls/php-coveralls
+
+before_script:
+  - mkdir -p build/logs
+
 script:
   - composer lint
-  - composer test
+  - composer test -- --coverage-clover=build/logs/clover.xml
+
+after_success:
+  - travis_retry php vendor/bin/coveralls
+  # Submit coverage report to codecov.io
+  - bash <(curl -s https://codecov.io/bash)
