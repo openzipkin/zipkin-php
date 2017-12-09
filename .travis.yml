@@ -7,9 +7,9 @@ php:
 
 install:
   - composer install
-
-after_install:
-  - composer require php-coveralls/php-coveralls
+  - wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+  - chmod +x coveralls.phar
+  - php coveralls.phar --version
 
 before_script:
   - mkdir -p build/logs
@@ -19,6 +19,5 @@ script:
   - composer test -- --coverage-clover=build/logs/clover.xml
 
 after_success:
-  - travis_retry php vendor/bin/coveralls
-  # Submit coverage report to codecov.io
+  - travis_retry php coveralls.phar -v
   - bash <(curl -s https://codecov.io/bash)
