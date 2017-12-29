@@ -9,8 +9,11 @@ use Zipkin\Propagation\TraceContext;
 
 final class TraceContextTest extends PHPUnit_Framework_TestCase
 {
+    const EMPTY_SAMPLED = null;
+    const EMPTY_DEBUG = false;
+
     const TEST_TRACE_ID = 'bd7a977555f6b982';
-    const TEST_PARENT_ID = 'bd7a977555f6b982';
+    const TEST_PARENT_ID = 'bd7a977555f6b983';
     const TEST_SPAN_ID = 'be2d01e33cc78d97';
 
     const TEST_INVALID_TRACE_ID = 'invalid_bd7a977555f6b982';
@@ -75,6 +78,31 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider boolProvider
      */
+    public function testChangeSampledSuccess($sampled, $debug)
+    {
+        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $traceContext = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            $samplingFlags->isSampled(),
+            $samplingFlags->isDebug()
+        );
+
+        $newSampled = !$sampled;
+
+        $newTraceContext = $traceContext->withSampled($newSampled);
+
+        $this->assertEquals($traceContext->getSpanId(), $newTraceContext->getSpanId());
+        $this->assertEquals($traceContext->getTraceId(), $newTraceContext->getTraceId());
+        $this->assertEquals($traceContext->getParentId(), $newTraceContext->getParentId());
+        $this->assertEquals($newSampled, $newTraceContext->isSampled());
+        $this->assertEquals($traceContext->isDebug(), $newTraceContext->isDebug());
+    }
+
+    /**
+     * @dataProvider boolProvider
+     */
     public function testCreateFailsDueToInvalidId($sampled, $debug)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -123,6 +151,64 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider boolProvider
+     */
+    public function testIsEqualSuccessOnEqualContexts($sampled, $debug)
+    {
+        $traceContext1 = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            $sampled,
+            $debug
+        );
+
+        $traceContext2 = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            $sampled,
+            $debug
+        );
+
+        $this->assertTrue($traceContext1->isEqual($traceContext2));
+    }
+
+    /**
+     * @dataProvider boolProvider
+     */
+    public function testIsEqualSuccessOnDifferentContexts($sampled, $debug)
+    {
+        $traceContext1 = TraceContext::create(
+            $this->maybeMutate(self::TEST_TRACE_ID),
+            $this->maybeMutate(self::TEST_SPAN_ID),
+            $this->maybeMutate(self::TEST_PARENT_ID),
+            $this->maybeMutate($sampled),
+            $this->maybeMutate($debug)
+        );
+
+        $traceContext2 = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            $sampled,
+            $debug
+        );
+
+        $this->assertFalse($traceContext1->isEqual($traceContext2));
+    }
+
+    /**
+     * @dataProvider boolProvider
+     */
+    public function testIsEmptyOnExpectedValues($sampled, $debug)
+    {
+        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $context = TraceContext::createAsRoot($samplingFlags);
+        $this->assertEquals($sampled === self::EMPTY_SAMPLED && $debug === self::EMPTY_DEBUG, $context->isEmpty());
+    }
+
     public function boolProvider()
     {
         return [
@@ -131,5 +217,24 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
             [false, true],
             [false, false],
         ];
+    }
+
+    private function maybeMutate($value)
+    {
+        $shouldMutate = (bool) mt_rand(0, 1);
+
+        if ($shouldMutate === false) {
+            return $value;
+        }
+
+        if ($value === (string) $value) {
+            $value = substr($value, 0, -1) . mt_rand(0, 9);
+        }
+
+        if ($value === (bool) $value) {
+            $value = !$value;
+        }
+
+        return $value;
     }
 }

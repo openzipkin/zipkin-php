@@ -71,9 +71,7 @@ final class B3 implements Propagation
                 $setter->put($carrier, self::SAMPLED_NAME, $traceContext->isSampled() ? '1' : '0');
             }
 
-            if ($traceContext->isDebug() !== null) {
-                $setter->put($carrier, self::FLAGS_NAME, '1');
-            }
+            $setter->put($carrier, self::FLAGS_NAME, $traceContext->isDebug() ? '1' : '0');
         };
     }
 
@@ -111,9 +109,7 @@ final class B3 implements Propagation
             $spanId = $getter->get($carrier, self::SPAN_ID_NAME);
 
             if ($spanId === null) {
-                return $isDebug === true
-                    ? DefaultSamplingFlags::createAsDebug()
-                    : DefaultSamplingFlags::create($isSampled, $isDebug);
+                return DefaultSamplingFlags::create($isSampled, $isDebug);
             }
 
             $parentSpanId = $getter->get($carrier, self::PARENT_SPAN_ID_NAME);

@@ -43,10 +43,10 @@ interface Propagation
     public function getInjector(Setter $setter);
 
     /**
-     * Returns the extractor as a callable having the signature function($carrier): TraceContext|SamplingFlags|null
-     * - return SamplingFlags if the context does not contain a traceID.
-     * - return TraceContext if the context contains a traceID and a spanID.
-     * - return null if the context contains a traceID but not a spanID.
+     * Returns the extractor as a callable having the signature function($carrier): TraceContext|SamplingFlags
+     * - return SamplingFlags being empty if the context does not hold traceId, not debug nor sampling decision
+     * - return SamplingFlags if the context does not contain a spanId.
+     * - return TraceContext if the context contains a traceId and a spanId.
      *
      * @param Getter $getter invoked for each propagation key to get.
      * @return callable
