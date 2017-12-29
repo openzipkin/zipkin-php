@@ -6,20 +6,23 @@ use InvalidArgumentException;
 
 final class DefaultSamplingFlags implements SamplingFlags
 {
+    const EMPTY_SAMPLED = null;
+    const EMPTY_DEBUG = false;
+
     /**
      * @var bool|null
      */
-    private $sampled;
+    private $isSampled;
 
     /**
      * @var bool
      */
-    private $debug;
+    private $isDebug;
 
-    private function __construct($sampled, $debug)
+    private function __construct($isSampled, $isDebug)
     {
-        $this->sampled = $sampled;
-        $this->debug = $debug;
+        $this->isSampled = $isSampled;
+        $this->isDebug = $isDebug;
     }
 
     /**
@@ -46,7 +49,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public static function createAsEmpty()
     {
-        return new self(null, false);
+        return new self(self::EMPTY_SAMPLED, self::EMPTY_DEBUG);
     }
 
     /**
@@ -78,7 +81,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public function isSampled()
     {
-        return $this->sampled;
+        return $this->isSampled;
     }
 
     /**
@@ -86,15 +89,25 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public function isDebug()
     {
-        return $this->debug;
+        return $this->isDebug;
+    }
+
+    /**
+     * @param SamplingFlags $samplingFlags
+     * @return bool
+     */
+    public function isEqual(SamplingFlags $samplingFlags)
+    {
+        return $this->isDebug() === $samplingFlags->isDebug()
+            && $this->isSampled() === $samplingFlags->isSampled();
     }
 
     /**
      * @return bool
      */
-    public function isEqual(SamplingFlags $samplingFlags)
+    public function isEmpty()
     {
-        return $this->debug === $samplingFlags->isDebug()
-            && $this->sampled === $samplingFlags->isSampled();
+        return $this->isSampled === self::EMPTY_SAMPLED
+            && $this->isDebug === self::EMPTY_DEBUG;
     }
 }

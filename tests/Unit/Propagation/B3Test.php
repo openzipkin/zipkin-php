@@ -56,8 +56,7 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $samplingFlags = $extractor($carrier);
 
         $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
-        $this->assertNull($samplingFlags->isSampled());
-        $this->assertFalse($samplingFlags->isDebug());
+        $this->assertTrue($samplingFlags->isEmpty());
     }
 
     /**
@@ -86,6 +85,7 @@ final class B3Test extends PHPUnit_Framework_TestCase
     {
         $isSampled = $this->randomBool();
 
+        $carrier[strtolower(self::TRACE_ID_NAME)] = self::TEST_TRACE_ID;
         $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled ? '1' : '0';
         $carrier[strtolower(self::FLAGS_NAME)] = '0';
 

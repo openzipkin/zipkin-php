@@ -8,6 +8,9 @@ use Zipkin\Propagation\SamplingFlags;
 
 final class TraceContext implements SamplingFlags
 {
+    const EMPTY_SAMPLED = null;
+    const EMPTY_DEBUG = false;
+
     /**
      * @var bool
      */
@@ -176,7 +179,7 @@ final class TraceContext implements SamplingFlags
     /**
      * The parent's {@link #spanId} or null if this the root span in a trace.
      *
-     * @return string
+     * @return string|null
      */
     public function getParentId()
     {
@@ -226,6 +229,21 @@ final class TraceContext implements SamplingFlags
      */
     public function isEqual(SamplingFlags $samplingFlags)
     {
-        // TODO: Implement isEqual() method.
+        return ($samplingFlags instanceof TraceContext)
+            && $this->traceId === $samplingFlags->traceId
+            && $this->spanId === $samplingFlags->spanId
+            && $this->parentId === $samplingFlags->parentId
+            && $this->isSampled === $samplingFlags->isSampled
+            && $this->isDebug === $samplingFlags->isDebug
+            && $this->usesTraceId128bits === $samplingFlags->usesTraceId128bits;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->isSampled === self::EMPTY_SAMPLED
+            && $this->isDebug === self::EMPTY_DEBUG;
     }
 }
