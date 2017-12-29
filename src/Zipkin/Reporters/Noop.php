@@ -5,7 +5,7 @@ namespace Zipkin\Reporters;
 use Zipkin\Recording\Span;
 use Zipkin\Reporter;
 
-final class NoopLogging implements Reporter
+final class Noop implements Reporter
 {
     /**
      * @param Span[] $spans

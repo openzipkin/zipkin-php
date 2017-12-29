@@ -4,7 +4,7 @@ namespace Zipkin;
 
 use Psr\Log\NullLogger;
 use Zipkin\Propagation\CurrentTraceContext;
-use Zipkin\Reporters\Logging;
+use Zipkin\Reporters\Log;
 use Zipkin\Samplers\BinarySampler;
 
 class TracingBuilder
@@ -148,7 +148,7 @@ class TracingBuilder
             }
         }
 
-        $reporter = ($this->reporter ?: new Logging(new NullLogger()));
+        $reporter = ($this->reporter ?: new Log(new NullLogger()));
 
         $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
 

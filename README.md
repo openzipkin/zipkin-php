@@ -20,21 +20,19 @@ composer require jcchavezs/zipkin
 ## Setup
 
 ```php
-use GuzzleHttp\Client;
 use Zipkin\Annotation;
 use Zipkin\Endpoint;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\TracingBuilder;
-use Zipkin\Reporters\HttpLogging;
+use Zipkin\Reporters\Http;
 
 $endpoint = Endpoint::createFromGlobals();
-$client = new Client();
 
 // Logger to stdout
 $logger = new \Monolog\Logger('log');
 $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
 
-$reporter = new HttpLogging($client, $logger);
+$reporter = new Http();
 $sampler = BinarySampler::createAsAlwaysSample();
 $tracing = TracingBuilder::create()
     ->havingLocalEndpoint($endpoint)
