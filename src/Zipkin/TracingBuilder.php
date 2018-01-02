@@ -114,7 +114,7 @@ class TracingBuilder
     /**
      * When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit)
      *
-     * @param $usesTraceId128bits
+     * @param bool $usesTraceId128bits
      * @return $this
      */
     public function havingTraceId128bits($usesTraceId128bits)

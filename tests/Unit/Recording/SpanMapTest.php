@@ -32,4 +32,33 @@ final class SpanMapTest extends PHPUnit_Framework_TestCase
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $this->assertNull($spanMap->get($context));
     }
+
+    public function testRemoveReturnsEmptyAfterRemoval()
+    {
+        $spanMap = SpanMap::create();
+        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+        $endpoint = Endpoint::createAsEmpty();
+        $spanMap->getOrCreate($context, $endpoint);
+        $spanMap->remove($context);
+        $this->assertNull($spanMap->get($context));
+    }
+
+    public function testRemoveAllReturnsEmptyAfterRemoval()
+    {
+        $spanMap = SpanMap::create();
+        $contexts = [];
+        $numberOfContexts = 3;
+
+        for ($i = 0; $i < $numberOfContexts; $i++) {
+            $contexts[$i] = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+            $endpoint = Endpoint::createAsEmpty();
+            $spanMap->getOrCreate($contexts[$i], $endpoint);
+        }
+
+        $spanMap->removeAll();
+
+        for ($i = 0; $i < $numberOfContexts; $i++) {
+            $this->assertNull($spanMap->get($contexts[$i]));
+        }
+    }
 }
