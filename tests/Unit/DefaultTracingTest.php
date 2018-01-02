@@ -7,7 +7,7 @@ use Zipkin\DefaultTracing;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\Propagation;
-use Zipkin\Reporters\NoopLogging;
+use Zipkin\Reporters\Noop;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Tracer;
 use Zipkin\Tracing;
@@ -17,7 +17,7 @@ final class DefaultTracingTest extends PHPUnit_Framework_TestCase
     public function testDefaultTracingCreationSuccess()
     {
         $localEndpoint = Endpoint::createAsEmpty();
-        $reporter = new NoopLogging();
+        $reporter = new Noop();
         $sampler = BinarySampler::createAsNeverSample();
         $isNoop = $this->randomBool();
 

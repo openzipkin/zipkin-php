@@ -4,7 +4,7 @@ namespace Zipkin;
 
 use Psr\Log\NullLogger;
 use Zipkin\Propagation\CurrentTraceContext;
-use Zipkin\Reporters\Logging;
+use Zipkin\Reporters\Log;
 use Zipkin\Samplers\BinarySampler;
 
 class TracingBuilder
@@ -114,7 +114,7 @@ class TracingBuilder
     /**
      * When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit)
      *
-     * @param $usesTraceId128bits
+     * @param bool $usesTraceId128bits
      * @return $this
      */
     public function havingTraceId128bits($usesTraceId128bits)
@@ -148,7 +148,7 @@ class TracingBuilder
             }
         }
 
-        $reporter = ($this->reporter ?: new Logging(new NullLogger()));
+        $reporter = ($this->reporter ?: new Log(new NullLogger()));
 
         $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
 

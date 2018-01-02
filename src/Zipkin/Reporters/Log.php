@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Zipkin\Recording\Span;
 use Zipkin\Reporter;
 
-final class Logging implements Reporter
+final class Log implements Reporter
 {
     private $logger;
 
