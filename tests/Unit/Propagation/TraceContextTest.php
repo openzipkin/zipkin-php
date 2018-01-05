@@ -20,6 +20,14 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
     const TEST_INVALID_PARENT_ID = 'invalid_bd7a977555f6b982';
     const TEST_INVALID_SPAN_ID = 'invalid_be2d01e33cc78d97';
 
+    private $hasAtLeastOneMutation;
+
+    protected function setUp()
+    {
+        /* Makes sure there is at least one mutation */
+        $this->hasAtLeastOneMutation = false;
+    }
+
     /**
      * @dataProvider boolProvider
      */
@@ -185,7 +193,7 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
             $this->maybeMutate(self::TEST_SPAN_ID),
             $this->maybeMutate(self::TEST_PARENT_ID),
             $this->maybeMutate($sampled),
-            $this->maybeMutate($debug)
+            $this->maybeMutate($debug, true)
         );
 
         $traceContext2 = TraceContext::create(
@@ -219,13 +227,19 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         ];
     }
 
-    private function maybeMutate($value)
+    private function maybeMutate($value, $final = false)
     {
-        $shouldMutate = (bool) mt_rand(0, 1);
+        if ($final && !$this->hasAtLeastOneMutation) {
+            $shouldMutate = true;
+        } else {
+            $shouldMutate = (bool) mt_rand(0, 1);
+        }
 
         if ($shouldMutate === false) {
             return $value;
         }
+
+        $this->hasAtLeastOneMutation = true;
 
         if ($value === (string) $value) {
             $value = substr($value, 0, -1) . mt_rand(0, 9);
