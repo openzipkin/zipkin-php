@@ -7,6 +7,10 @@ use RuntimeException;
 
 final class CurlFactory implements ClientFactory
 {
+    /**
+     * @return CurlFactory
+     * @throws \BadFunctionCallException if the curl extension is not installed.
+     */
     public static function create()
     {
         if (!function_exists('curl_init')) {
