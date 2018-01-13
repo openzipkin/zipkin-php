@@ -4,6 +4,9 @@ namespace Zipkin\Propagation;
 
 interface SamplingFlags
 {
+    const EMPTY_SAMPLED = null;
+    const EMPTY_DEBUG = false;
+
     /**
      * @return bool|null
      */
@@ -13,11 +16,6 @@ interface SamplingFlags
      * @return bool
      */
     public function isDebug();
-
-    /**
-     * @return bool
-     */
-    public function isEmpty();
 
     /**
      * @param SamplingFlags $samplingFlags

@@ -20,6 +20,8 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
     const TEST_INVALID_PARENT_ID = 'invalid_bd7a977555f6b982';
     const TEST_INVALID_SPAN_ID = 'invalid_be2d01e33cc78d97';
 
+    const IS_FINAL_MUTATION = true;
+
     private $hasAtLeastOneMutation;
 
     protected function setUp()
@@ -193,7 +195,7 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
             $this->maybeMutate(self::TEST_SPAN_ID),
             $this->maybeMutate(self::TEST_PARENT_ID),
             $this->maybeMutate($sampled),
-            $this->maybeMutate($debug, true)
+            $this->maybeMutate($debug, self::IS_FINAL_MUTATION)
         );
 
         $traceContext2 = TraceContext::create(
@@ -207,16 +209,6 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($traceContext1->isEqual($traceContext2));
     }
 
-    /**
-     * @dataProvider boolProvider
-     */
-    public function testIsEmptyOnExpectedValues($sampled, $debug)
-    {
-        $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
-        $context = TraceContext::createAsRoot($samplingFlags);
-        $this->assertEquals($sampled === self::EMPTY_SAMPLED && $debug === self::EMPTY_DEBUG, $context->isEmpty());
-    }
-
     public function boolProvider()
     {
         return [
@@ -227,9 +219,9 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
         ];
     }
 
-    private function maybeMutate($value, $final = false)
+    private function maybeMutate($value, $isFinalMutation = false)
     {
-        if ($final && !$this->hasAtLeastOneMutation) {
+        if ($isFinalMutation && !$this->hasAtLeastOneMutation) {
             $shouldMutate = true;
         } else {
             $shouldMutate = (bool) mt_rand(0, 1);
