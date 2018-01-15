@@ -8,11 +8,8 @@ use Zipkin\Propagation\SamplingFlags;
 
 final class TraceContext implements SamplingFlags
 {
-    const EMPTY_SAMPLED = null;
-    const EMPTY_DEBUG = false;
-
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isSampled;
 
@@ -65,8 +62,8 @@ final class TraceContext implements SamplingFlags
         $traceId,
         $spanId,
         $parentId = null,
-        $isSampled = null,
-        $isDebug = false,
+        $isSampled = SamplingFlags::EMPTY_SAMPLED,
+        $isDebug = SamplingFlags::EMPTY_DEBUG,
         $usesTraceId128bits = false
     ) {
         if (!self::isValidTraceId($traceId)) {
@@ -79,6 +76,16 @@ final class TraceContext implements SamplingFlags
 
         if ($parentId !== null && !self::isValidSpanId($parentId)) {
             throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
+        }
+
+        if ($isSampled !== null && $isSampled !== (bool) $isSampled) {
+            throw new InvalidArgumentException(
+                sprintf('is Sampled should be boolean or null, got %s', gettype($isSampled))
+            );
+        }
+
+        if ($isDebug !== (bool) $isDebug) {
+            throw new InvalidArgumentException(sprintf('isDebug should be boolean, got %s', gettype($isDebug)));
         }
 
         return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits);
@@ -236,14 +243,5 @@ final class TraceContext implements SamplingFlags
             && $this->isSampled === $samplingFlags->isSampled
             && $this->isDebug === $samplingFlags->isDebug
             && $this->usesTraceId128bits === $samplingFlags->usesTraceId128bits;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return $this->isSampled === self::EMPTY_SAMPLED
-            && $this->isDebug === self::EMPTY_DEBUG;
     }
 }

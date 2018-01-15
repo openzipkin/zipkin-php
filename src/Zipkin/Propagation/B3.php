@@ -88,7 +88,7 @@ final class B3 implements Propagation
         return function ($carrier) use ($getter) {
             $sampledString = $getter->get($carrier, self::SAMPLED_NAME);
 
-            $isSampled = null;
+            $isSampled = SamplingFlags::EMPTY_SAMPLED;
             if ($sampledString === '1' || strtolower($sampledString) === 'true') {
                 $isSampled = true;
             } elseif ($sampledString === '0' || strtolower($sampledString) === 'false') {
@@ -96,7 +96,9 @@ final class B3 implements Propagation
             }
 
             $isDebug = $getter->get($carrier, self::FLAGS_NAME);
-            if ($isDebug !== null) {
+            if ($isDebug === null) {
+                $isDebug = SamplingFlags::EMPTY_DEBUG;
+            } else {
                 $isDebug = ($isDebug === '1');
             }
 

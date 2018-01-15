@@ -56,7 +56,7 @@ final class B3Test extends PHPUnit_Framework_TestCase
         $samplingFlags = $extractor($carrier);
 
         $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
-        $this->assertTrue($samplingFlags->isEmpty());
+        $this->assertNull($samplingFlags->isSampled());
     }
 
     /**
@@ -64,7 +64,7 @@ final class B3Test extends PHPUnit_Framework_TestCase
      */
     public function testExtractorExtractsTheExpectedValuesForSamplingDebug($carrier)
     {
-        $isSampled = $this->randomBool();
+        $isSampled = $this->randomBoolean();
 
         $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled;
         $carrier[strtolower(self::FLAGS_NAME)] = '1';
@@ -83,7 +83,7 @@ final class B3Test extends PHPUnit_Framework_TestCase
      */
     public function testExtractorExtractsTheExpectedValuesForSampling($carrier)
     {
-        $isSampled = $this->randomBool();
+        $isSampled = $this->randomBoolean();
 
         $carrier[strtolower(self::TRACE_ID_NAME)] = self::TEST_TRACE_ID;
         $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled ? '1' : '0';
@@ -126,7 +126,7 @@ final class B3Test extends PHPUnit_Framework_TestCase
         ];
     }
 
-    private function randomBool()
+    private function randomBoolean()
     {
         return (mt_rand(0, 1) === 1);
     }

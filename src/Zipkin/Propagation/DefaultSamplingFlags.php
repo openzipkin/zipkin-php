@@ -6,9 +6,6 @@ use InvalidArgumentException;
 
 final class DefaultSamplingFlags implements SamplingFlags
 {
-    const EMPTY_SAMPLED = null;
-    const EMPTY_DEBUG = false;
-
     /**
      * @var bool|null
      */
@@ -26,22 +23,24 @@ final class DefaultSamplingFlags implements SamplingFlags
     }
 
     /**
-     * @param bool $sampled
-     * @param bool $debug
+     * @param bool|null $isSampled
+     * @param bool $isDebug
      * @throws InvalidArgumentException
      * @return DefaultSamplingFlags
      */
-    public static function create($sampled, $debug = false)
+    public static function create($isSampled, $isDebug = false)
     {
-        if ($sampled !== null && $sampled !== (bool) $sampled) {
-            throw new InvalidArgumentException(sprintf('sampled should be boolean, got %s', gettype($sampled)));
+        if ($isSampled !== null && $isSampled !== (bool) $isSampled) {
+            throw new InvalidArgumentException(
+                sprintf('isSampled should be boolean or null, got %s', gettype($isSampled))
+            );
         }
 
-        if ($debug !== (bool) $debug) {
-            throw new InvalidArgumentException(sprintf('debug should be boolean, got %s', gettype($debug)));
+        if ($isDebug !== (bool) $isDebug) {
+            throw new InvalidArgumentException(sprintf('isDebug should be boolean, got %s', gettype($isDebug)));
         }
 
-        return new self($sampled, $debug);
+        return new self($isSampled, $isDebug);
     }
 
     /**
@@ -49,7 +48,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public static function createAsEmpty()
     {
-        return new self(self::EMPTY_SAMPLED, self::EMPTY_DEBUG);
+        return new self(SamplingFlags::EMPTY_SAMPLED, SamplingFlags::EMPTY_DEBUG);
     }
 
     /**
@@ -100,14 +99,5 @@ final class DefaultSamplingFlags implements SamplingFlags
     {
         return $this->isDebug() === $samplingFlags->isDebug()
             && $this->isSampled() === $samplingFlags->isSampled();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return $this->isSampled === self::EMPTY_SAMPLED
-            && $this->isDebug === self::EMPTY_DEBUG;
     }
 }
