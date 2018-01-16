@@ -108,7 +108,7 @@ Here's an example of a client span:
 $span = $tracer->newTrace()->setName('get')->setKind(Kind\CLIENT);
 $span->tag('http.status_code', '200');
 $span->tag(Tags\HTTP_PATH, '/api');
-$span->setRemoteEndpoint(Remote::create('backend', 127 << 24 | 1, null, 8080);
+$span->setRemoteEndpoint(Endpoint::create('backend', 127 << 24 | 1, null, 8080);
 
 // when the request is scheduled, start the span
 $span->start();
