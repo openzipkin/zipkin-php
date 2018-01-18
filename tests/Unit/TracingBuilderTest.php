@@ -21,7 +21,10 @@ final class TracingBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(false, $tracing->isNoop());
     }
 
-    public function testCreatingTracingIncludesExpectedValues()
+    /**
+     * @dataProvider boolProvider
+     */
+    public function testCreatingTracingIncludesExpectedValues($isNoop)
     {
         $endpoint = Endpoint::createAsEmpty();
         $reporter = new Noop();
@@ -36,11 +39,19 @@ final class TracingBuilderTest extends PHPUnit_Framework_TestCase
             ->havingSampler($sampler)
             ->havingTraceId128bits($usesTraceId128bits)
             ->havingCurrentTraceContext($currentTraceContext)
-            ->beingNoop()
+            ->beingNoop($isNoop)
             ->build();
 
         $this->assertInstanceOf(Tracing::class, $tracing);
-        $this->assertEquals(true, $tracing->isNoop());
+        $this->assertEquals($isNoop, $tracing->isNoop());
+    }
+
+    public function boolProvider()
+    {
+        return [
+            [true],
+            [false]
+        ];
     }
 
     private function randomBool()

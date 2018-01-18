@@ -55,7 +55,9 @@ final class Http implements Reporter
             $client = $this->clientFactory->build($this->options);
             $client($payload);
         } catch (Exception $e) {
-            $this->logger->info($e->getMessage());
+            $this->logger->error(
+                sprintf('Failed to report spans: %s', $e->getMessage())
+            );
         }
     }
 }
