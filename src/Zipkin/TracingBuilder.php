@@ -123,15 +123,23 @@ class TracingBuilder
         return $this;
     }
 
+    /**
+     * @param CurrentTraceContext $currentTraceContext
+     * @return $this
+     */
     public function havingCurrentTraceContext(CurrentTraceContext $currentTraceContext)
     {
         $this->currentTraceContext = $currentTraceContext;
         return $this;
     }
 
-    public function beingNoop()
+    /**
+     * @param bool $isNoop
+     * @return $this
+     */
+    public function beingNoop($isNoop = true)
     {
-        $this->isNoop = true;
+        $this->isNoop = $isNoop;
         return $this;
     }
 
