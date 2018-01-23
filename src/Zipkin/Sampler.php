@@ -18,7 +18,7 @@ interface Sampler
     /**
      * Returns true if the trace ID should be measured.
      *
-     * @param int $traceId
+     * @param string $traceId
      * @return bool
      */
     public function isSampled($traceId);

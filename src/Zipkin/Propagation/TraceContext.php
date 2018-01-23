@@ -66,15 +66,15 @@ final class TraceContext implements SamplingFlags
         $isDebug = SamplingFlags::EMPTY_DEBUG,
         $usesTraceId128bits = false
     ) {
-        if (!self::isValidTraceId($traceId)) {
+        if (!Id\isValidTraceId($traceId)) {
             throw new InvalidArgumentException(sprintf('Invalid trace id, got %s', $traceId));
         }
 
-        if (!self::isValidSpanId($spanId)) {
+        if (!Id\isValidSpanId($spanId)) {
             throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
         }
 
-        if ($parentId !== null && !self::isValidSpanId($parentId)) {
+        if ($parentId !== null && !Id\isValidSpanId($parentId)) {
             throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
         }
 
@@ -102,11 +102,11 @@ final class TraceContext implements SamplingFlags
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
         }
 
-        $nextId = self::nextId();
+        $nextId = Id\generateNextId();
 
         $traceId = $nextId;
         if ($usesTraceId128bits) {
-            $traceId = self::traceIdWith128bits();
+            $traceId = Id\generateTraceIdWith128bits();
         }
 
         return new TraceContext(
@@ -125,7 +125,7 @@ final class TraceContext implements SamplingFlags
      */
     public static function createFromParent(TraceContext $parent)
     {
-        $nextId = self::nextId();
+        $nextId = Id\generateNextId();
 
         return new TraceContext(
             $parent->traceId,
@@ -207,27 +207,6 @@ final class TraceContext implements SamplingFlags
             $this->isDebug,
             $this->usesTraceId128bits
         );
-    }
-
-    private static function traceIdWith128bits()
-    {
-        return bin2hex(openssl_random_pseudo_bytes(16));
-    }
-
-    private static function nextId()
-    {
-        return bin2hex(openssl_random_pseudo_bytes(8));
-    }
-
-    private static function isValidTraceId($value)
-    {
-        return ctype_xdigit((string) $value) &&
-        (strlen((string) $value) === 16 || strlen((string) $value) === 32);
-    }
-
-    private static function isValidSpanId($value)
-    {
-        return ctype_xdigit((string) $value) && strlen((string) $value) === 16;
     }
 
     /**
