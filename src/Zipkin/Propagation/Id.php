@@ -25,7 +25,7 @@ function generateNextId()
 function isValidTraceId($value)
 {
     return ctype_xdigit((string) $value) &&
-        (strlen((string) $value) === 16 || strlen((string) $value) === 32);
+        strlen((string) $value) > 0 && strlen((string) $value) <= 32;
 }
 
 /**
@@ -34,5 +34,6 @@ function isValidTraceId($value)
  */
 function isValidSpanId($value)
 {
-    return ctype_xdigit((string) $value) && strlen((string) $value) === 16;
+    return ctype_xdigit((string) $value) &&
+        strlen((string) $value) > 0 && strlen((string) $value) <= 16;
 }

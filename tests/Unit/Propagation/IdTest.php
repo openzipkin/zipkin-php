@@ -32,9 +32,12 @@ final class IdTest extends PHPUnit_Framework_TestCase
     public function spanIdsDataProvider()
     {
         return [
-            ['50d1e105a060618', false],
+            ['', false],
+            ['1', true],
+            ['50d1e105a060618', true],
             ['050d1e105a060618', true],
             ['g50d1e105a060618', false],
+            ['050d1e105a060618a', false],
         ];
     }
 
@@ -49,11 +52,13 @@ final class IdTest extends PHPUnit_Framework_TestCase
     public function traceIdsDataProvider()
     {
         return [
-            ['50d1e105a060618', false],
+            ['', false],
+            ['1', true],
             ['050d1e105a060618', true],
             ['g50d1e105a060618', false],
             ['050d1e105a060618050d1e105a060618', true],
             ['050d1e105a060618g50d1e105a060618', false],
+            ['050d1e105a060618050d1e105a060618a', false],
         ];
     }
 }
