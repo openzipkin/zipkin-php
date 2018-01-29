@@ -211,6 +211,34 @@ final class TracerTest extends PHPUnit_Framework_TestCase
         $this->assertSameSamplingFlags($samplingFlags, $span->getContext());
     }
 
+    /**
+     * @dataProvider emptySamplingFlagsDataProvider
+     */
+    public function testNextSpanIsCreatedFromEmptySamplingFlags($sampler, $isNoop)
+    {
+        $samplingFlags = DefaultSamplingFlags::createAsEmpty();
+
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $this->reporter->reveal(),
+            $sampler,
+            false,
+            $this->currentTracerContext,
+            false
+        );
+
+        $span = $tracer->nextSpan($samplingFlags);
+        $this->assertEquals($isNoop, $span->isNoop());
+    }
+
+    public function emptySamplingFlagsDataProvider()
+    {
+        return [
+            [BinarySampler::createAsNeverSample(), true],
+            [BinarySampler::createAsAlwaysSample(), false],
+        ];
+    }
+
     public function samplingFlagsDataProvider()
     {
         return [
