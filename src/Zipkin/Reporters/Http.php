@@ -22,22 +22,15 @@ final class Http implements Reporter
     private $clientFactory;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var array
      */
     private $options;
 
     public function __construct(
         ClientFactory $requesterFactory = null,
-        LoggerInterface $logger = null,
         array $options = []
     ) {
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
-        $this->logger = $logger ?: new NullLogger() ;
         $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
     }
 
@@ -51,13 +44,7 @@ final class Http implements Reporter
             return $span->toArray();
         }, $spans));
 
-        try {
-            $client = $this->clientFactory->build($this->options);
-            $client($payload);
-        } catch (Exception $e) {
-            $this->logger->error(
-                sprintf('Failed to report spans: %s', $e->getMessage())
-            );
-        }
+        $client = $this->clientFactory->build($this->options);
+        $client($payload);
     }
 }
