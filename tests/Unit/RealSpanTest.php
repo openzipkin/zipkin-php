@@ -2,6 +2,7 @@
 
 namespace ZipkinTests\Unit;
 
+use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
@@ -73,7 +74,38 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
         $recorder = $this->prophesize(Recorder::class);
         $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();
         $span = RealSpan::create($context, $recorder->reveal());
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $span->annotate($value, $timestamp);
+    }
+
+    public function testAnnotateFailsDueToInvalidTimestamp()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $timestamp = 'invalid_timestamp';
+        $value = new \stdClass;
+        $context = TraceContext::createAsRoot();
+        $recorder = $this->prophesize(Recorder::class);
+        $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();
+        $span = RealSpan::create($context, $recorder->reveal());
+        $this->expectException(InvalidArgumentException::class);
+        $span->annotate($value, $timestamp);
+    }
+
+    public function testStartRealSpanFailsDueToInvalidTimestamp()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $context = TraceContext::createAsRoot();
+        $recorder = $this->prophesize(Recorder::class);
+        $span = RealSpan::create($context, $recorder->reveal());
+        $span->start('invalid_timestamp');
+    }
+
+    public function testFinishRealSpanFailsDueToInvalidTimestamp()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $context = TraceContext::createAsRoot();
+        $recorder = $this->prophesize(Recorder::class);
+        $span = RealSpan::create($context, $recorder->reveal());
+        $span->finish('invalid_timestamp');
     }
 }

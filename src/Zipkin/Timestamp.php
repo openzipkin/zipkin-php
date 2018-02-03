@@ -18,7 +18,9 @@ function now()
  * @param mixed $timestamp
  * @return bool
  */
-function is_valid_timestamp($timestamp)
+function isValid($timestamp)
 {
-    return ctype_digit((string) $timestamp) && strlen((string) $timestamp) === 16;
+    return ($timestamp === (int) $timestamp)
+        && ctype_digit((string) $timestamp)
+        && strlen((string) $timestamp) === 16;
 }
