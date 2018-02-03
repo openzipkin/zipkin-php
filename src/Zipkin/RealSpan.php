@@ -69,7 +69,7 @@ final class RealSpan implements Span
         if ($timestamp === null) {
             $timestamp = Timestamp\now();
         } else {
-            if (!Timestamp\is_valid_timestamp($timestamp)) {
+            if (!Timestamp\isValid($timestamp)) {
                 throw new InvalidArgumentException(
                     sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
                 );
@@ -147,7 +147,7 @@ final class RealSpan implements Span
             throw new InvalidArgumentException('Invalid annotation value');
         }
 
-        if (!Timestamp\is_valid_timestamp($timestamp)) {
+        if (!Timestamp\isValid($timestamp)) {
             throw new InvalidArgumentException(
                 sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
             );
@@ -191,7 +191,7 @@ final class RealSpan implements Span
      */
     public function finish($timestamp = null)
     {
-        if ($timestamp !== null && !Timestamp\is_valid_timestamp($timestamp)) {
+        if ($timestamp !== null && !Timestamp\isValid($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');
         }
 
