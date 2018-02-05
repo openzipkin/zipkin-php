@@ -1,11 +1,15 @@
 <?php
 
-namespace Zipkin;
+namespace Zipkin\Samplers;
 
 use InvalidArgumentException;
+use Zipkin\Sampler;
 
 final class PercentageSampler implements Sampler
 {
+    /**
+     * @var float
+     */
     private $rate;
 
     private function __construct($rate)
@@ -39,6 +43,6 @@ final class PercentageSampler implements Sampler
      */
     public function isSampled($traceId)
     {
-        return (mt_rand(0, 99) / 100) < $this->rate;
+        return (mt_rand(0, 99) / 100) <= $this->rate;
     }
 }
