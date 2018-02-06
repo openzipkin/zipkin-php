@@ -5,10 +5,8 @@ namespace ZipkinTests\Unit;
 use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 use Zipkin\Endpoint;
-use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\RealSpan;
 use Zipkin\Recorder;
-use Zipkin\Reporter;
 use Zipkin\Timestamp;
 use Zipkin\Annotations;
 use Zipkin\Propagation\TraceContext;
@@ -25,6 +23,15 @@ class RealSpanTest extends PHPUnit_Framework_TestCase
         $recorder = $this->prophesize(Recorder::class);
         $span = RealSpan::create($context, $recorder->reveal());
         $this->assertEquals($context, $span->getContext());
+    }
+
+    public function testStartSuccess()
+    {
+        $context = TraceContext::createAsRoot();
+        $recorder = $this->prophesize(Recorder::class);
+        $recorder->start($context, self::TEST_START_TIMESTAMP)->shouldBeCalled();
+        $span = RealSpan::create($context, $recorder->reveal());
+        $span->start(self::TEST_START_TIMESTAMP);
     }
 
     public function testSetNameSuccess()
