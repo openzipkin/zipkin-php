@@ -12,10 +12,6 @@ use Zipkin\Reporters\Http\CurlFactory;
 
 final class Http implements Reporter
 {
-    const DEFAULT_OPTIONS = [
-        'endpoint_url' => 'http://localhost:9411/api/v2/spans',
-    ];
-
     /**
      * @var CurlFactory
      */
@@ -31,7 +27,11 @@ final class Http implements Reporter
         array $options = []
     ) {
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
-        $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
+
+        $defaultOptions = [
+            'endpoint_url' => 'http://localhost:9411/api/v2/spans',
+        ];
+        $this->options = array_merge($defaultOptions, $options);
     }
 
     /**
