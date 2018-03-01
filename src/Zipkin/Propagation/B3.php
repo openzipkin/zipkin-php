@@ -2,6 +2,10 @@
 
 namespace Zipkin\Propagation;
 
+use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 use Zipkin\Propagation\TraceContext;
 
 /**
@@ -34,7 +38,17 @@ final class B3 implements Propagation
      * '1' implies sampled and is a request to override collection-tier sampling policy.
      */
     const FLAGS_NAME = 'X-B3-Flags';
-    
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(LoggerInterface $logger = null)
+    {
+        $this->logger = $logger ?: new NullLogger();
+    }
+
     /**
      * @return array|string[]
      */
@@ -83,7 +97,6 @@ final class B3 implements Propagation
         /**
          * @param mixed $carrier
          * @return TraceContext|SamplingFlags
-         * @throws \InvalidArgumentException
          */
         return function ($carrier) use ($getter) {
             $sampledString = $getter->get($carrier, self::SAMPLED_NAME);
@@ -116,7 +129,16 @@ final class B3 implements Propagation
 
             $parentSpanId = $getter->get($carrier, self::PARENT_SPAN_ID_NAME);
 
-            return TraceContext::create($traceId, $spanId, $parentSpanId, $isSampled, $isDebug);
+            try {
+                return TraceContext::create($traceId, $spanId, $parentSpanId, $isSampled, $isDebug);
+            } catch (InvalidTraceContextArgument $e) {
+                $this->logger->debug(sprintf(
+                    'Failed to extract propagated context: %s',
+                    $e->getMessage()
+                ));
+
+                return DefaultSamplingFlags::createAsEmpty();
+            }
         };
     }
 }

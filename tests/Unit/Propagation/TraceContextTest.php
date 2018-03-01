@@ -2,8 +2,8 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
+use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\TraceContext;
 
@@ -115,7 +115,7 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateFailsDueToInvalidId($sampled, $debug)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidTraceContextArgument::class);
         $this->expectExceptionMessage('Invalid trace id, got invalid_bd7a977555f6b982');
 
         TraceContext::create(
@@ -132,7 +132,7 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateFailsDueToInvalidSpanId($sampled, $debug)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidTraceContextArgument::class);
         $this->expectExceptionMessage('Invalid span id, got invalid_be2d01e33cc78d97');
 
         TraceContext::create(
@@ -149,7 +149,7 @@ final class TraceContextTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateFailsDueToInvalidParentSpanId($sampled, $debug)
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidTraceContextArgument::class);
         $this->expectExceptionMessage('Invalid parent span id, got invalid_bd7a977555f6b982');
 
         TraceContext::create(
