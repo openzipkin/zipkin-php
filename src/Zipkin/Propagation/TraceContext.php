@@ -2,9 +2,9 @@
 
 namespace Zipkin\Propagation;
 
-use InvalidArgumentException;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\SamplingFlags;
+use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 
 final class TraceContext implements SamplingFlags
 {
@@ -56,7 +56,7 @@ final class TraceContext implements SamplingFlags
      * @param bool $isDebug
      * @param bool $usesTraceId128bits
      * @return TraceContext
-     * @throws \InvalidArgumentException
+     * @throws InvalidTraceContextArgument
      */
     public static function create(
         $traceId,
@@ -67,25 +67,23 @@ final class TraceContext implements SamplingFlags
         $usesTraceId128bits = false
     ) {
         if (!Id\isValidTraceId($traceId)) {
-            throw new InvalidArgumentException(sprintf('Invalid trace id, got %s', $traceId));
+            throw InvalidTraceContextArgument::forTraceId($traceId);
         }
 
         if (!Id\isValidSpanId($spanId)) {
-            throw new InvalidArgumentException(sprintf('Invalid span id, got %s', $spanId));
+            throw InvalidTraceContextArgument::forSpanId($spanId);
         }
 
         if ($parentId !== null && !Id\isValidSpanId($parentId)) {
-            throw new InvalidArgumentException(sprintf('Invalid parent span id, got %s', $parentId));
+            throw InvalidTraceContextArgument::forParentSpanId($parentId);
         }
 
         if ($isSampled !== null && $isSampled !== (bool) $isSampled) {
-            throw new InvalidArgumentException(
-                sprintf('is Sampled should be boolean or null, got %s', gettype($isSampled))
-            );
+            throw InvalidTraceContextArgument::forSampled($isSampled);
         }
 
         if ($isDebug !== (bool) $isDebug) {
-            throw new InvalidArgumentException(sprintf('isDebug should be boolean, got %s', gettype($isDebug)));
+            throw InvalidTraceContextArgument::forDebug($isDebug);
         }
 
         return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits);
