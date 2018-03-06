@@ -2,9 +2,7 @@
 
 namespace Zipkin\Reporters;
 
-use Exception;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
+use RuntimeException;
 use Zipkin\Recording\Span;
 use Zipkin\Reporter;
 use Zipkin\Reporters\Http\ClientFactory;
@@ -26,12 +24,19 @@ final class Http implements Reporter
      */
     private $options;
 
+    /**
+     * @var Metrics
+     */
+    private $reportMetrics;
+
     public function __construct(
         ClientFactory $requesterFactory = null,
-        array $options = []
+        array $options = [],
+        Metrics $reporterMetrics = null
     ) {
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
         $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
+        $this->reportMetrics = $reporterMetrics;
     }
 
     /**
@@ -45,6 +50,12 @@ final class Http implements Reporter
         }, $spans));
 
         $client = $this->clientFactory->build($this->options);
-        $client($payload);
+
+        try {
+            $client($payload);
+            $this->reportMetrics->incrementSpans(count($spans));
+        } catch (RuntimeException $e) {
+            $this->reportMetrics->incrementSpansDropped(count($spans));
+        }
     }
 }
