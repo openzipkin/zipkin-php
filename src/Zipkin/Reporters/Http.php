@@ -45,17 +45,24 @@ final class Http implements Reporter
      */
     public function report(array $spans)
     {
+        $this->reportMetrics->incrementSpans(count($spans));
+        $this->reportMetrics->incrementMessages();
+
         $payload = json_encode(array_map(function (Span $span) {
             return $span->toArray();
         }, $spans));
+
+        $payloadLength = strlen($payload);
+        $this->reportMetrics->incrementSpanBytes($payloadLength);
+        $this->reportMetrics->incrementMessageBytes($payloadLength);
 
         $client = $this->clientFactory->build($this->options);
 
         try {
             $client($payload);
-            $this->reportMetrics->incrementSpans(count($spans));
         } catch (RuntimeException $e) {
             $this->reportMetrics->incrementSpansDropped(count($spans));
+            $this->reportMetrics->incrementMessagesDropped($e);
         }
     }
 }

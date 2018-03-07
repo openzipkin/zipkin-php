@@ -3,6 +3,7 @@
 namespace ZipkinTests\Unit\Reporters;
 
 use PHPUnit_Framework_TestCase;
+use Prophecy\Argument;
 use RuntimeException;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\TraceContext;
@@ -20,15 +21,19 @@ final class HttpTest extends PHPUnit_Framework_TestCase
         $context = TraceContext::createAsRoot();
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
+        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
         $metrics = $this->prophesize(Metrics::class);
         $metrics->incrementSpans(1)->shouldBeCalled();
+        $metrics->incrementMessages()->shouldBeCalled();
+        $metrics->incrementSpanBytes(strlen($payload))->shouldBeCalled();
+        $metrics->incrementMessageBytes(strlen($payload))->shouldBeCalled();
 
         $mockFactory = HttpMockFactory::createAsSuccess();
         $httpReporter = new Http($mockFactory, [], $metrics->reveal());
         $httpReporter->report([$span]);
 
         $this->assertEquals(
-            sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId()),
+            $payload,
             $mockFactory->retrieveContent()
         );
     }
@@ -38,8 +43,14 @@ final class HttpTest extends PHPUnit_Framework_TestCase
         $context = TraceContext::createAsRoot();
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
+        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
         $metrics = $this->prophesize(Metrics::class);
+        $metrics->incrementSpans(1)->shouldBeCalled();
+        $metrics->incrementMessages()->shouldBeCalled();
+        $metrics->incrementSpanBytes(strlen($payload))->shouldBeCalled();
+        $metrics->incrementMessageBytes(strlen($payload))->shouldBeCalled();
         $metrics->incrementSpansDropped(1)->shouldBeCalled();
+        $metrics->incrementMessagesDropped(Argument::type(RuntimeException::class))->shouldBeCalled();
 
         $mockFactory = HttpMockFactory::createAsFailing();
         $httpReporter = new Http($mockFactory, [], $metrics->reveal());
