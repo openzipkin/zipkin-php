@@ -7,6 +7,10 @@ use RuntimeException;
 
 final class CurlFactory implements ClientFactory
 {
+    private function __construct()
+    {
+    }
+
     /**
      * @return CurlFactory
      * @throws \BadFunctionCallException if the curl extension is not installed.

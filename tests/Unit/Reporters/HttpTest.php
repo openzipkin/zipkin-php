@@ -16,6 +16,12 @@ final class HttpTest extends PHPUnit_Framework_TestCase
     const PAYLOAD = '[{"id":"%s","name":null,"traceId":"%s","parentId":null,'
         . '"timestamp":null,"duration":null,"debug":false,"localEndpoint":{"serviceName":""}}]';
 
+    public function testCreateHttpReporterWithDefaultDependencies()
+    {
+        $httpReporter = new Http();
+        $this->assertInstanceOf(Http::class, $httpReporter);
+    }
+
     public function testHttpReporterSuccess()
     {
         $context = TraceContext::createAsRoot();
