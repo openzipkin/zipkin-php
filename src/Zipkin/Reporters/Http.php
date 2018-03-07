@@ -36,7 +36,7 @@ final class Http implements Reporter
     ) {
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
         $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
-        $this->reportMetrics = $reporterMetrics;
+        $this->reportMetrics = $reporterMetrics ?: new NoopMetrics();
     }
 
     /**
