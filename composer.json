@@ -2,6 +2,7 @@
     "name": "jcchavezs/zipkin",
     "description": "A Zipkin instrumentation for PHP",
     "type": "library",
+    "keywords": ["zipkin", "tracing", "openzipkin"],
     "license": "MIT",
     "authors": [
         {
