@@ -296,7 +296,7 @@ class TraceClient implements ClientInterface
             
             return $response;
         catch (\Exception $e) {
-            $span->tag(Tags\Error, $response->getReasonPhrase());        
+            $span->tag(Tags\ERROR, $response->getReasonPhrase());        
             $span->tag(Tags\HTTP_STATUS_CODE, $e->getResponse->getStatusCode());
             
             throw $e;
