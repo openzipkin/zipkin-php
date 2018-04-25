@@ -84,6 +84,9 @@ const HTTP_RESPONSE_SIZE = 'http.response.size';
  */
 const SQL_QUERY = 'sql.query';
 
+/**
+ * The value of "lc" is the component or namespace of a local span.
+ */
 const LOCAL_COMPONENT = 'lc';
 
 const ERROR = 'error';
