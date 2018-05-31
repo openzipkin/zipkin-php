@@ -12,9 +12,6 @@ use Zipkin\Reporters\Http\CurlFactory;
 
 final class CurlFactoryTest extends PHPUnit_Framework_TestCase
 {
-    /**
-     * @requires PHP 7.0
-     */
     public function testHttpReportingSuccess()
     {
         $t = $this;
@@ -27,26 +24,20 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
             }
         );
 
-        $pid = pcntl_fork();
+        $server->start();
 
-        if ($pid === -1) {
-            $this->fail('Error forking thread.');
-        } elseif ($pid) {
-            $server->start();
-        } else {
-            $server->waitForReady();
+        try {
+            $curlClient = CurlFactory::create()->build([
+                'endpoint_url' => $server->getUrl(),
+            ]);
 
-            try {
-                $curlClient = CurlFactory::create()->build([
-                    'endpoint_url' => $server->getUrl(),
-                ]);
+            $curlClient(json_encode([]));
+        } catch (Exception $e) {
+            $server->stop();
 
-                $curlClient(json_encode([]));
-            } catch (Exception $e) {
-                $this->fail($e->getMessage());
-            } finally {
-                $server->stop();
-            }
+            $this->fail($e->getMessage());
+        } finally {
+            $server->stop();
         }
     }
 
@@ -61,29 +52,23 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
             }
         );
 
-        $pid = pcntl_fork();
+        $server->start();
 
-        if ($pid === -1) {
-            $this->fail('Error forking thread.');
-        } elseif ($pid) {
-            $server->start();
-        } else {
-            $server->waitForReady();
+        try {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('Reporting of spans failed');
 
-            try {
-                $this->expectException(RuntimeException::class);
-                $this->expectExceptionMessage('Reporting of spans failed');
+            $curlClient = CurlFactory::create()->build([
+                'endpoint_url' => $server->getUrl(),
+            ]);
 
-                $curlClient = CurlFactory::create()->build([
-                    'endpoint_url' => $server->getUrl(),
-                ]);
+            $curlClient('');
 
-                $curlClient('');
+            $server->stop();
 
-                $this->fail('Runtime exception expected');
-            } finally {
-                $server->stop();
-            }
+            $this->fail('Runtime exception expected');
+        } finally {
+            $server->stop();
         }
     }
 
