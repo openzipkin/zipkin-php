@@ -41,9 +41,6 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testHttpReportingFailsDueToInvalidStatusCode()
     {
         $server = HttpTestServer::create(
