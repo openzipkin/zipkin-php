@@ -85,6 +85,6 @@ final class SpanMap
      */
     private function getHash(TraceContext $context)
     {
-        return spl_object_hash($context);
+        return crc32($context->getSpanId() . ($context->getParentId() ? $context->getParentId() : "-") . $context->getTraceId());
     }
 }
