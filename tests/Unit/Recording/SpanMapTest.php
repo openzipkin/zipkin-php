@@ -33,6 +33,23 @@ final class SpanMapTest extends PHPUnit_Framework_TestCase
         $this->assertNull($spanMap->get($context));
     }
 
+    public function testGetReturnsDifferentObjects()
+    {
+        $spanMap = SpanMap::create();
+        $endpoint = Endpoint::createAsEmpty();
+        $rootSpan = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+        $recordedSpans = [];
+        for ($i = 0; $i < 5; $i++) {
+            $context = TraceContext::createFromParent($rootSpan);
+            $recordedSpans[$i] = $spanMap->getOrCreate($context, $endpoint);
+        }
+        for ($i = 0; $i < count($recordedSpans); $i++) {
+            for ($j = $i + 1; $j < count($recordedSpans); $j++) {
+                $this->assertNotSame($recordedSpans[$i], $recordedSpans[$j]);
+            }
+        }
+    }
+
     public function testRemoveReturnsEmptyAfterRemoval()
     {
         $spanMap = SpanMap::create();
@@ -50,7 +67,7 @@ final class SpanMapTest extends PHPUnit_Framework_TestCase
         $numberOfContexts = 3;
 
         for ($i = 0; $i < $numberOfContexts; $i++) {
-            $contexts[$i] = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+            $contexts[$i] = TraceContext::createAsRoot();
             $endpoint = Endpoint::createAsEmpty();
             $spanMap->getOrCreate($contexts[$i], $endpoint);
         }
