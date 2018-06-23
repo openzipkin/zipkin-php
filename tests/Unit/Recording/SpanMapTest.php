@@ -44,7 +44,7 @@ final class SpanMapTest extends PHPUnit_Framework_TestCase
             $recordedSpans[$i] = $spanMap->getOrCreate($context, $endpoint);
         }
         for ($i = 0; $i < count($recordedSpans); $i++) {
-            for($j = $i + 1; $j < count($recordedSpans); $j++) {
+            for ($j = $i + 1; $j < count($recordedSpans); $j++) {
                 $this->assertNotSame($recordedSpans[$i], $recordedSpans[$j]);
             }
         }
@@ -67,7 +67,7 @@ final class SpanMapTest extends PHPUnit_Framework_TestCase
         $numberOfContexts = 3;
 
         for ($i = 0; $i < $numberOfContexts; $i++) {
-            $contexts[$i] = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
+            $contexts[$i] = TraceContext::createAsRoot();
             $endpoint = Endpoint::createAsEmpty();
             $spanMap->getOrCreate($contexts[$i], $endpoint);
         }
