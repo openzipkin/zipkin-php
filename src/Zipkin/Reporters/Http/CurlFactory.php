@@ -42,6 +42,7 @@ final class CurlFactory implements ClientFactory
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($payload),
             ]);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
 
             if (curl_exec($handle) === true) {
                 $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
