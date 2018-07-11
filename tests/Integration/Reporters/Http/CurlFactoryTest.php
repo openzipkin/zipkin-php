@@ -80,4 +80,37 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
 
         $curlClient('');
     }
+
+    public function testHttpReportingSilentlySendTraces()
+    {
+        $t = $this;
+
+        $server = HttpTestServer::create(
+            function (RequestInterface $request, ResponseInterface &$response) use ($t) {
+                $t->assertEquals('POST', $request->getMethod());
+                $t->assertEquals('application/json', $request->getHeader('Content-Type')[0]);
+                $response = $response->withStatus(202);
+                $response->getBody()->write('Accepted');
+            }
+        );
+
+        $server->start();
+
+        try {
+            $curlClient = CurlFactory::create()->build([
+                'endpoint_url' => $server->getUrl(),
+            ]);
+
+            ob_start();
+            $curlClient(json_encode([]));
+            $output = ob_get_clean();
+            $this->assertEmpty($output);
+        } catch (Exception $e) {
+            $server->stop();
+
+            $this->fail($e->getMessage());
+        } finally {
+            $server->stop();
+        }
+    }
 }
