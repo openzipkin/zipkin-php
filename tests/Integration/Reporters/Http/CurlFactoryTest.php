@@ -41,6 +41,37 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testHttpReportingSuccessWithExtraHeader()
+    {
+        $t = $this;
+
+        $server = HttpTestServer::create(
+            function (RequestInterface $request, ResponseInterface &$response) use ($t) {
+                $t->assertEquals('POST', $request->getMethod());
+                $t->assertEquals('application/json', $request->getHeader('Content-Type')[0]);
+                $t->assertEquals('user@example.com', $request->getHeader('From')[0]);
+                $response = $response->withStatus(202);
+            }
+        );
+
+        $server->start();
+
+        try {
+            $curlClient = CurlFactory::create()->build([
+                'endpoint_url' => $server->getUrl(),
+                'headers' => ['From' => 'user@example.com', 'Content-Type' => 'test'],
+            ]);
+
+            $curlClient(json_encode([]));
+        } catch (Exception $e) {
+            $server->stop();
+
+            $this->fail($e->getMessage());
+        } finally {
+            $server->stop();
+        }
+    }
+
     public function testHttpReportingFailsDueToInvalidStatusCode()
     {
         $server = HttpTestServer::create(
