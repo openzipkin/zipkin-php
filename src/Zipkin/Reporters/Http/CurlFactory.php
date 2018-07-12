@@ -45,7 +45,7 @@ final class CurlFactory implements ClientFactory
             ];
             $additionalHeaders = (isset($options['headers']) ? $options['headers'] : []);
             $headers = array_merge($additionalHeaders, $defaultHeaders);
-            $formattedHeaders = array_map( function ($key, $value) {
+            $formattedHeaders = array_map(function ($key, $value) {
                 return $key . ': ' . $value;
             }, array_keys($headers), $headers);
             curl_setopt($handle, CURLOPT_HTTPHEADER, $formattedHeaders);
