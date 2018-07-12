@@ -59,7 +59,7 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
         try {
             $curlClient = CurlFactory::create()->build([
                 'endpoint_url' => $server->getUrl(),
-                'headers' => ['From: user@example.com'],
+                'headers' => ['From' => 'user@example.com', 'Content-Type' => 'test'],
             ]);
 
             $curlClient(json_encode([]));

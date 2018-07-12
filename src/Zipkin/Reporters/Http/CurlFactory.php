@@ -40,11 +40,15 @@ final class CurlFactory implements ClientFactory
             curl_setopt($handle, CURLOPT_POSTFIELDS, $payload);
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
             $defaultHeaders = [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($payload),
+                'Content-Type' => 'application/json',
+                'Content-Length' => strlen($payload),
             ];
             $additionalHeaders = (isset($options['headers']) ? $options['headers'] : []);
-            curl_setopt($handle, CURLOPT_HTTPHEADER, array_merge($defaultHeaders, $additionalHeaders));
+            $headers = array_merge($additionalHeaders, $defaultHeaders);
+            $formattedHeaders = array_map( function ($key, $value) {
+                return $key . ': ' . $value;
+            }, array_keys($headers), $headers);
+            curl_setopt($handle, CURLOPT_HTTPHEADER, $formattedHeaders);
 
             if (curl_exec($handle) !== false) {
                 $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
