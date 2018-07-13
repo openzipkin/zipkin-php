@@ -32,10 +32,6 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
             ]);
 
             $curlClient(json_encode([]));
-        } catch (Exception $e) {
-            $server->stop();
-
-            $this->fail($e->getMessage());
         } finally {
             $server->stop();
         }
@@ -63,10 +59,6 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
             ]);
 
             $curlClient(json_encode([]));
-        } catch (Exception $e) {
-            $server->stop();
-
-            $this->fail($e->getMessage());
         } finally {
             $server->stop();
         }
@@ -134,14 +126,10 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
 
             ob_start();
             $curlClient(json_encode([]));
-            $output = ob_get_clean();
-            $this->assertEmpty($output);
-        } catch (Exception $e) {
-            $server->stop();
-
-            $this->fail($e->getMessage());
         } finally {
             $server->stop();
+            $output = ob_get_clean();
+            $this->assertEmpty($output);
         }
     }
 
@@ -166,14 +154,10 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
 
             ob_start();
             $curlClient('');
-
-            $server->stop();
-
-            $this->fail('Runtime exception expected');
         } finally {
+            $server->stop();
             $output = ob_get_clean();
             $this->assertEmpty($output);
-            $server->stop();
         }
     }
 }
