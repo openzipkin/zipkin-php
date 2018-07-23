@@ -215,13 +215,13 @@ sent along with it, encoded as request headers:
 │                  │                                       │                  │
 │   TraceContext   │           Http Request Headers        │   TraceContext   │
 │ ┌──────────────┐ │          ┌───────────────────┐        │ ┌──────────────┐ │
-│ │ TraceId      │ │          │ X─B3─TraceId      │        │ │ TraceId      │ │
+│ │ TraceId      │ │          │ X-B3-TraceId      │        │ │ TraceId      │ │
 │ │              │ │          │                   │        │ │              │ │
-│ │ ParentSpanId │ │ Extract  │ X─B3─ParentSpanId │ Inject │ │ ParentSpanId │ │
+│ │ ParentSpanId │ │ Extract  │ X-B3-ParentSpanId │ Inject │ │ ParentSpanId │ │
 │ │              ├─┼─────────>│                   ├────────┼>│              │ │
-│ │ SpanId       │ │          │ X─B3─SpanId       │        │ │ SpanId       │ │
+│ │ SpanId       │ │          │ X-B3-SpanId       │        │ │ SpanId       │ │
 │ │              │ │          │                   │        │ │              │ │
-│ │ Sampled      │ │          │ X─B3─Sampled      │        │ │ Sampled      │ │
+│ │ Sampled      │ │          │ X-B3-Sampled      │        │ │ Sampled      │ │
 │ └──────────────┘ │          └───────────────────┘        │ └──────────────┘ │
 │                  │                                       │                  │
 └──────────────────┘                                       └──────────────────┘
