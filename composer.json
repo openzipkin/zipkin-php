@@ -1,5 +1,5 @@
 {
-    "name": "jcchavezs/zipkin",
+    "name": "openzipkin/zipkin",
     "type": "library",
     "description": "A Zipkin instrumentation for PHP",
     "keywords": [
