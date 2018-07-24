@@ -39,12 +39,12 @@ final class CurlFactory implements ClientFactory
             curl_setopt($handle, CURLOPT_POST, 1);
             curl_setopt($handle, CURLOPT_POSTFIELDS, $payload);
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            $defaultHeaders = [
+            $requiredHeaders = [
                 'Content-Type' => 'application/json',
                 'Content-Length' => strlen($payload),
             ];
             $additionalHeaders = (isset($options['headers']) ? $options['headers'] : []);
-            $headers = array_merge($additionalHeaders, $defaultHeaders);
+            $headers = array_merge($additionalHeaders, $requiredHeaders);
             $formattedHeaders = array_map(function ($key, $value) {
                 return $key . ': ' . $value;
             }, array_keys($headers), $headers);

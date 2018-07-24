@@ -32,10 +32,6 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
             ]);
 
             $curlClient(json_encode([]));
-        } catch (Exception $e) {
-            $server->stop();
-
-            $this->fail($e->getMessage());
         } finally {
             $server->stop();
         }
@@ -63,10 +59,6 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
             ]);
 
             $curlClient(json_encode([]));
-        } catch (Exception $e) {
-            $server->stop();
-
-            $this->fail($e->getMessage());
         } finally {
             $server->stop();
         }
@@ -112,7 +104,7 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
         $curlClient('');
     }
 
-    public function testHttpReportingSilentlySendTraces()
+    public function testHttpReportingSilentlySendTracesSuccess()
     {
         $t = $this;
 
@@ -134,14 +126,38 @@ final class CurlFactoryTest extends PHPUnit_Framework_TestCase
 
             ob_start();
             $curlClient(json_encode([]));
-            $output = ob_get_clean();
-            $this->assertEmpty($output);
-        } catch (Exception $e) {
-            $server->stop();
-
-            $this->fail($e->getMessage());
         } finally {
             $server->stop();
+            $output = ob_get_clean();
+            $this->assertEmpty($output);
+        }
+    }
+
+    public function testHttpReportingSilentlySendTracesFailure()
+    {
+        $server = HttpTestServer::create(
+            function (RequestInterface $request, ResponseInterface &$response) {
+                $response = $response->withStatus(404);
+                $response->getBody()->write('Not Found');
+            }
+        );
+
+        $server->start();
+
+        try {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('Reporting of spans failed');
+
+            $curlClient = CurlFactory::create()->build([
+                'endpoint_url' => $server->getUrl(),
+            ]);
+
+            ob_start();
+            $curlClient('');
+        } finally {
+            $server->stop();
+            $output = ob_get_clean();
+            $this->assertEmpty($output);
         }
     }
 }
