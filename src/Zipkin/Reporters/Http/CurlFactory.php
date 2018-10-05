@@ -50,6 +50,10 @@ final class CurlFactory implements ClientFactory
             }, array_keys($headers), $headers);
             curl_setopt($handle, CURLOPT_HTTPHEADER, $formattedHeaders);
 
+            if (isset($options['timeout'])) {
+                curl_setopt($handle, CURLOPT_TIMEOUT, $options['timeout']);
+            }
+
             if (curl_exec($handle) !== false) {
                 $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
                 curl_close($handle);
