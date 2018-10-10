@@ -80,7 +80,9 @@ you will be a part of an existing trace. When this is the case, call
 `newChild` instead of `newTrace`
 
 ```php
-$span = $tracer->newChild($root->getContext())->setName('encode')->start();
+$span = $tracer->newChild($root->getContext());
+$span->setName('encode');
+$span->start();
 try {
   doSomethingExpensive();
 } finally {
@@ -106,7 +108,9 @@ Here's an example of a client span:
 
 ```php
 // before you send a request, add metadata that describes the operation
-$span = $tracer->newTrace()->setName('get')->setKind(Kind\CLIENT);
+$span = $tracer->newTrace();
+$span->setName('get');
+$span->setKind(Kind\CLIENT);
 $span->tag('http.status_code', '200');
 $span->tag(Tags\HTTP_PATH, '/api');
 $span->setRemoteEndpoint(Endpoint::create('backend', 127 << 24 | 1, null, 8080);
@@ -133,7 +137,8 @@ Here's how a client might model a one-way operation
 
 ```php
 // start a new span representing a client request
-$oneWaySend = $tracer->newChild($parent)->setKind(Kind\CLIENT);
+$oneWaySend = $tracer->newChild($parent);
+$oneWaySend->setKind(Kind\CLIENT);
 
 // Add the trace context to the request, so it can be propagated in-band
 $tracing->getPropagation()->getInjector(new RequestHeaders)
@@ -153,9 +158,9 @@ And here's how a server might handle this...
 $extractor = $tracing->getPropagation()->getExtractor(new RequestHeaders);
 
 // convert that context to a span which you can name and add tags to
-$oneWayReceive = $tracer->newChild($extractor($request))
-    ->setName('process-request')
-    ->setKind(Kind\SERVER)
+$oneWayReceive = $tracer->newChild($extractor($request));
+$oneWayReceive->setName('process-request');
+$oneWayReceive->setKind(Kind\SERVER);
     ... add tags etc.
 
 // start the server side and flush instead of finish
@@ -163,7 +168,9 @@ $oneWayReceive->start()->flush();
 
 // you should not modify this span anymore as it is complete. However,
 // you can create children to represent follow-up work.
-$next = $tracer->newChild($oneWayReceive->getContext())->setName('step2')->start();
+$next = $tracer->newChild($oneWayReceive->getContext());
+$next->setName('step2');
+$next->start();
 ```
 
 ## Sampling
@@ -250,7 +257,8 @@ Here's what server-side propagation might look like
 // configure a function that extracts the trace context from a request
 $extracted = $tracing->getPropagation()->extractor(new RequestHeaders);
 
-$span = $tracer->newChild($extracted)->setKind(Kind\SERVER);
+$span = $tracer->newChild($extracted)
+$span->setKind(Kind\SERVER);
 ```
 
 ### Extracting a propagated context
