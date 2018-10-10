@@ -66,7 +66,9 @@ the correct spot in the tree representing the distributed operation.
 When tracing local code, just run it inside a span
 
 ```php
-$span = $tracer->newTrace()->setName('encode')->start();
+$span = $tracer->newTrace();
+$span->setName('encode')
+$span->start();
 
 try {
   doSomethingExpensive();
@@ -148,7 +150,8 @@ $tracing->getPropagation()->getInjector(new RequestHeaders)
 $client->execute($request);
 
 // start the client side and flush instead of finish
-$oneWaySend->start()->flush();
+$oneWaySend->start()
+$oneWaySend->flush();
 ```
 
 And here's how a server might handle this...
