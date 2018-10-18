@@ -15,7 +15,7 @@ example, check [this repository](https://github.com/openzipkin/zipkin-php-exampl
 ## Installation
 
 ```bash
-composer require jcchavezs/zipkin
+composer require openzipkin/zipkin
 ```
 
 ## Setup
