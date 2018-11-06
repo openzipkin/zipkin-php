@@ -143,8 +143,8 @@ $oneWaySend = $tracer->newChild($parent);
 $oneWaySend->setKind(Kind\CLIENT);
 
 // Add the trace context to the request, so it can be propagated in-band
-$tracing->getPropagation()->getInjector(new RequestHeaders)
-                     ->inject($oneWaySend->getContext(), $request);
+$injector = $tracing->getPropagation()->getInjector(new RequestHeaders);
+$injector($oneWaySend->getContext(), $request);
 
 // fire off the request asynchronously, totally dropping any response
 $client->execute($request);
@@ -251,14 +251,15 @@ Here's what client-side propagation might look like
 $injector = $tracing->getPropagation()->getInjector(new RequestHeaders);
 
 // before a request is sent, add the current span's context to it
-$injector->inject($span->getContext(), $request);
+$injector($span->getContext(), $request);
 ```
 
 Here's what server-side propagation might look like
 
 ```php
 // configure a function that extracts the trace context from a request
-$extracted = $tracing->getPropagation()->extractor(new RequestHeaders);
+$extractor = $tracing->getPropagation()->extractor(new RequestHeaders);
+$extracted = $extractor($request)
 
 $span = $tracer->newChild($extracted)
 $span->setKind(Kind\SERVER);
