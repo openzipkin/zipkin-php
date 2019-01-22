@@ -115,7 +115,7 @@ $span->setName('get');
 $span->setKind(Kind\CLIENT);
 $span->tag('http.status_code', '200');
 $span->tag(Tags\HTTP_PATH, '/api');
-$span->setRemoteEndpoint(Endpoint::create('backend', 127 << 24 | 1, null, 8080);
+$span->setRemoteEndpoint(Endpoint::create('backend', 127 << 24 | 1, null, 8080));
 
 // when the request is scheduled, start the span
 $span->start();
