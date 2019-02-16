@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\DefaultTracing;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\CurrentTraceContext;
@@ -12,7 +12,7 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Tracer;
 use Zipkin\Tracing;
 
-final class DefaultTracingTest extends PHPUnit_Framework_TestCase
+final class DefaultTracingTest extends TestCase
 {
     public function testDefaultTracingCreationSuccess()
     {

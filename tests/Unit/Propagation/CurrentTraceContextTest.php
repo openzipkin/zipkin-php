@@ -2,11 +2,11 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\TraceContext;
 
-final class CurrentTraceContextTest extends PHPUnit_Framework_TestCase
+final class CurrentTraceContextTest extends TestCase
 {
     public function testCurrentTraceContextIsCreated()
     {
