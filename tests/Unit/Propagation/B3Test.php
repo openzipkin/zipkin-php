@@ -3,13 +3,13 @@
 namespace ZipkinTests\Unit\Propagation;
 
 use ArrayObject;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\B3;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\Map;
 use Zipkin\Propagation\TraceContext;
 
-final class B3Test extends PHPUnit_Framework_TestCase
+final class B3Test extends TestCase
 {
     const TRACE_ID_NAME = 'x-b3-Traceid';
     const SPAN_ID_NAME = 'x-b3-SpanId';

@@ -2,14 +2,14 @@
 
 namespace ZipkinTests\Unit\Recording;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recording\Span;
 use Zipkin\Recording\SpanMap;
 use Zipkin\Propagation\TraceContext;
 
-final class SpanMapTest extends PHPUnit_Framework_TestCase
+final class SpanMapTest extends TestCase
 {
     public function testCreateASpanMapSuccess()
     {

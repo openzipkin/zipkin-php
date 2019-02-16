@@ -3,10 +3,10 @@
 namespace ZipkinTests\Unit\Propagation;
 
 use GuzzleHttp\Psr7\Request;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\RequestHeaders;
 
-final class RequestHeadersTest extends PHPUnit_Framework_TestCase
+final class RequestHeadersTest extends TestCase
 {
     const TEST_KEY = 'key';
     const TEST_VALUE = 'value';

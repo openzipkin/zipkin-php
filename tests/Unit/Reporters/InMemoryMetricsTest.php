@@ -2,10 +2,10 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Reporters\InMemoryMetrics;
 
-final class InMemoryMetricsTest extends PHPUnit_Framework_TestCase
+final class InMemoryMetricsTest extends TestCase
 {
     public function testMetricsSpansSuccess()
     {

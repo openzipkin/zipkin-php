@@ -3,10 +3,10 @@
 namespace ZipkinTests\Unit;
 
 use InvalidArgumentException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Endpoint;
 
-final class EndpointTest extends PHPUnit_Framework_TestCase
+final class EndpointTest extends TestCase
 {
     public function testEndpointFailsDueToInvalidServiceName()
     {

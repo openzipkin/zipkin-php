@@ -2,12 +2,12 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\TraceContext;
 
-final class TraceContextTest extends PHPUnit_Framework_TestCase
+final class TraceContextTest extends TestCase
 {
     const EMPTY_SAMPLED = null;
     const EMPTY_DEBUG = false;

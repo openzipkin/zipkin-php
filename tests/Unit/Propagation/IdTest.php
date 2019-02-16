@@ -2,10 +2,10 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\Id;
 
-final class IdTest extends PHPUnit_Framework_TestCase
+final class IdTest extends TestCase
 {
     public function testNextIdSuccess()
     {

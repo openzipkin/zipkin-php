@@ -2,10 +2,10 @@
 
 namespace ZipkinTests\Unit\Samplers;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Samplers\BinarySampler;
 
-final class BinarySamplerTest extends PHPUnit_Framework_TestCase
+final class BinarySamplerTest extends TestCase
 {
     public function testAlwaysSample()
     {

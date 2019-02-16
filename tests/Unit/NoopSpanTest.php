@@ -2,11 +2,11 @@
 
 namespace ZipkinTests\Unit;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\NoopSpan;
 use Zipkin\Propagation\TraceContext;
 
-final class NoopSpanTest extends PHPUnit_Framework_TestCase
+final class NoopSpanTest extends TestCase
 {
     public function testCreateNoopSpanSuccess()
     {
