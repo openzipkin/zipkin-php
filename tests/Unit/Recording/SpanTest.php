@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit\Recording;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Kind;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
@@ -10,7 +10,7 @@ use Zipkin\Recording\Span;
 use Zipkin\Timestamp;
 use Zipkin\Propagation\TraceContext;
 
-final class SpanTest extends PHPUnit_Framework_TestCase
+final class SpanTest extends TestCase
 {
     public function testCreateSpanAsRootSuccess()
     {

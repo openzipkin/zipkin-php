@@ -2,11 +2,11 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Reporters\Metrics;
 use Zipkin\Reporters\NoopMetrics;
 
-final class NoopMetricsTest extends PHPUnit_Framework_TestCase
+final class NoopMetricsTest extends TestCase
 {
     public function testCreateNoopMetricsSuccess()
     {

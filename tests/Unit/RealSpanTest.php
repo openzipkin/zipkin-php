@@ -3,7 +3,7 @@
 namespace ZipkinTests\Unit;
 
 use InvalidArgumentException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Endpoint;
 use Zipkin\RealSpan;
 use Zipkin\Recorder;
@@ -11,7 +11,7 @@ use Zipkin\Timestamp;
 use Zipkin\Annotations;
 use Zipkin\Propagation\TraceContext;
 
-class RealSpanTest extends PHPUnit_Framework_TestCase
+class RealSpanTest extends TestCase
 {
     const TEST_NAME = 'test_span';
     const TEST_KIND = 'ab';

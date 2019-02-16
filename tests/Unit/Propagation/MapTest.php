@@ -3,13 +3,13 @@
 namespace ZipkinTests\Unit\Propagation;
 
 use ArrayObject;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use Zipkin\Propagation\Exceptions\InvalidPropagationCarrier;
 use Zipkin\Propagation\Exceptions\InvalidPropagationKey;
 use Zipkin\Propagation\Map;
 
-final class MapTest extends PHPUnit_Framework_TestCase
+final class MapTest extends TestCase
 {
     const TEST_KEY = 'test_key';
     const TEST_VALUE = 'test_value';

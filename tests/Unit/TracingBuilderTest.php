@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Reporters\Noop;
@@ -10,7 +10,7 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Tracing;
 use Zipkin\TracingBuilder;
 
-final class TracingBuilderTest extends PHPUnit_Framework_TestCase
+final class TracingBuilderTest extends TestCase
 {
     const SERVICE_NAME = 'service_name';
 

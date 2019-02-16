@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use RuntimeException;
 use Zipkin\Endpoint;
@@ -11,7 +11,7 @@ use Zipkin\Recording\Span;
 use Zipkin\Reporters\Http;
 use Zipkin\Reporters\Metrics;
 
-final class HttpTest extends PHPUnit_Framework_TestCase
+final class HttpTest extends TestCase
 {
     const PAYLOAD = '[{"id":"%s","name":null,"traceId":"%s","parentId":null,'
         . '"timestamp":null,"duration":null,"debug":false,"localEndpoint":{"serviceName":""}}]';

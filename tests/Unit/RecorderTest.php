@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recorder;
@@ -10,7 +10,7 @@ use Zipkin\Reporter;
 use function Zipkin\Timestamp\now;
 use Zipkin\Propagation\TraceContext;
 
-final class RecorderTest extends PHPUnit_Framework_TestCase
+final class RecorderTest extends TestCase
 {
     public function testGetTimestampReturnsNullWhenThereIsNoSuchTraceContext()
     {

@@ -2,9 +2,10 @@
 
 namespace ZipkinTests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Zipkin\Timestamp;
 
-final class TimestampTest extends \PHPUnit_Framework_TestCase
+final class TimestampTest extends TestCase
 {
     public function testNowHasTheExpectedLength()
     {

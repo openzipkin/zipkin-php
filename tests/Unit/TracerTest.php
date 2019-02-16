@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Zipkin\Endpoint;
 use Zipkin\NoopSpan;
@@ -16,7 +16,7 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Tracer;
 
-final class TracerTest extends PHPUnit_Framework_TestCase
+final class TracerTest extends TestCase
 {
     /**
      * @var ObjectProphecy|Reporter

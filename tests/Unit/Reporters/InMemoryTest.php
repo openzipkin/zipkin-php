@@ -2,12 +2,12 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zipkin\Reporters\InMemory;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\TracingBuilder;
 
-final class InMemoryTest extends PHPUnit_Framework_TestCase
+final class InMemoryTest extends TestCase
 {
     public function testReportOfSpans()
     {
