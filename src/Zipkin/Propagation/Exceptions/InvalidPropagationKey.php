@@ -10,9 +10,4 @@ final class InvalidPropagationKey extends InvalidArgumentException
     {
         return new self('Empty key');
     }
-
-    public static function forInvalidKey($key)
-    {
-        return new self(sprintf('Invalid key. Expected string, got %s', gettype($key)));
-    }
 }

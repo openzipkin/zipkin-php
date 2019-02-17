@@ -21,5 +21,5 @@ interface Sampler
      * @param string $traceId
      * @return bool
      */
-    public function isSampled($traceId);
+    public function isSampled(string $traceId): bool;
 }

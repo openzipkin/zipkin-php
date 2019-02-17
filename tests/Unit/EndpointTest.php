@@ -8,13 +8,6 @@ use Zipkin\Endpoint;
 
 final class EndpointTest extends TestCase
 {
-    public function testEndpointFailsDueToInvalidServiceName()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Service name must be a string, got int');
-        Endpoint::create(1);
-    }
-
     public function testEndpointFailsDueToInvalidIpv4()
     {
         $this->expectException(InvalidArgumentException::class);

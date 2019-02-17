@@ -11,7 +11,7 @@ final class RequestHeaders implements Getter, Setter
      *
      * @param RequestInterface $carrier
      */
-    public function get($carrier, $key)
+    public function get($carrier, string $key): ?string
     {
         $lKey = strtolower($key);
         return $carrier->hasHeader($lKey) ? $carrier->getHeader($lKey)[0] : null;
@@ -23,7 +23,7 @@ final class RequestHeaders implements Getter, Setter
      * @param RequestInterface $carrier
      * @throws \InvalidArgumentException for invalid header names or values.
      */
-    public function put(&$carrier, $key, $value)
+    public function put(&$carrier, string $key, string $value)
     {
         $lKey = strtolower($key);
         $carrier = $carrier->withAddedHeader($lKey, $value);

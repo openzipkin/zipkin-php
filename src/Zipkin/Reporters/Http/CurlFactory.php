@@ -15,7 +15,7 @@ final class CurlFactory implements ClientFactory
      * @return CurlFactory
      * @throws \BadFunctionCallException if the curl extension is not installed.
      */
-    public static function create()
+    public static function create(): self
     {
         if (!function_exists('curl_init')) {
             throw new BadFunctionCallException('cURL is not enabled');
@@ -27,7 +27,7 @@ final class CurlFactory implements ClientFactory
     /**
      * {@inheritdoc}
      */
-    public function build(array $options = [])
+    public function build(?array $options = []): callable
     {
         /**
          * @param string $payload

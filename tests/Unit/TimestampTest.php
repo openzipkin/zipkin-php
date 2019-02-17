@@ -16,7 +16,7 @@ final class TimestampTest extends TestCase
     /**
      * @dataProvider timestampProvider
      */
-    public function testIsValidHasProducesTheExpectedOutput($timestamp, $isValid)
+    public function testIsValidProducesTheExpectedOutput($timestamp, $isValid)
     {
         $this->assertEquals($isValid, Timestamp\isValid($timestamp));
     }
@@ -25,11 +25,9 @@ final class TimestampTest extends TestCase
     {
         return [
             [Timestamp\now(), true],
+            [-1, false],
             [1234567890123456, true],
             [123456789012345, false],
-            ['1234567890123456', false],
-            ['123456789012345a', false],
-            ['abcdefgh12345678', false]
         ];
     }
 }

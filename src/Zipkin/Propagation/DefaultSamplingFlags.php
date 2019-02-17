@@ -25,28 +25,17 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @param bool|null $isSampled
      * @param bool $isDebug
-     * @throws InvalidArgumentException
      * @return DefaultSamplingFlags
      */
-    public static function create($isSampled, $isDebug = false)
+    public static function create(?bool $isSampled, ?bool $isDebug = false): self
     {
-        if ($isSampled !== null && $isSampled !== (bool) $isSampled) {
-            throw new InvalidArgumentException(
-                sprintf('isSampled should be boolean or null, got %s', gettype($isSampled))
-            );
-        }
-
-        if ($isDebug !== (bool) $isDebug) {
-            throw new InvalidArgumentException(sprintf('isDebug should be boolean, got %s', gettype($isDebug)));
-        }
-
         return new self($isSampled, $isDebug);
     }
 
     /**
      * @return DefaultSamplingFlags
      */
-    public static function createAsEmpty()
+    public static function createAsEmpty(): self
     {
         return new self(SamplingFlags::EMPTY_SAMPLED, SamplingFlags::EMPTY_DEBUG);
     }
@@ -54,7 +43,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return DefaultSamplingFlags
      */
-    public static function createAsSampled()
+    public static function createAsSampled(): self
     {
         return new self(true, false);
     }
@@ -62,7 +51,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return DefaultSamplingFlags
      */
-    public static function createAsNotSampled()
+    public static function createAsNotSampled(): self
     {
         return new self(false, false);
     }
@@ -70,7 +59,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return DefaultSamplingFlags
      */
-    public static function createAsDebug()
+    public static function createAsDebug(): self
     {
         return new self(true, true);
     }
@@ -78,7 +67,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return bool|null
      */
-    public function isSampled()
+    public function isSampled(): ?bool
     {
         return $this->isSampled;
     }
@@ -86,7 +75,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     /**
      * @return bool
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return $this->isDebug;
     }
@@ -95,7 +84,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      * @param SamplingFlags $samplingFlags
      * @return bool
      */
-    public function isEqual(SamplingFlags $samplingFlags)
+    public function isEqual(SamplingFlags $samplingFlags): bool
     {
         return $this->isDebug() === $samplingFlags->isDebug()
             && $this->isSampled() === $samplingFlags->isSampled();

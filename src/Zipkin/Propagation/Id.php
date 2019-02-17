@@ -5,7 +5,7 @@ namespace Zipkin\Propagation\Id;
 /**
  * @return string
  */
-function generateTraceIdWith128bits()
+function generateTraceIdWith128bits(): string
 {
     return bin2hex(openssl_random_pseudo_bytes(16));
 }
@@ -13,7 +13,7 @@ function generateTraceIdWith128bits()
 /**
  * @return string
  */
-function generateNextId()
+function generateNextId(): string
 {
     return bin2hex(openssl_random_pseudo_bytes(8));
 }
@@ -22,18 +22,18 @@ function generateNextId()
  * @param string $value
  * @return bool
  */
-function isValidTraceId($value)
+function isValidTraceId(string $value): bool
 {
-    return ctype_xdigit((string) $value) &&
-        strlen((string) $value) > 0 && strlen((string) $value) <= 32;
+    return ctype_xdigit($value) &&
+        strlen($value) > 0 && strlen($value) <= 32;
 }
 
 /**
  * @param string $value
  * @return bool
  */
-function isValidSpanId($value)
+function isValidSpanId(string $value): bool
 {
-    return ctype_xdigit((string) $value) &&
-        strlen((string) $value) > 0 && strlen((string) $value) <= 16;
+    return ctype_xdigit($value) &&
+        strlen($value) > 0 && strlen($value) <= 16;
 }

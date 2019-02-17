@@ -13,12 +13,12 @@ interface Span
      *
      * @return bool
      */
-    public function isNoop();
+    public function isNoop(): bool;
 
     /**
      * @return TraceContext
      */
-    public function getContext();
+    public function getContext(): TraceContext;
 
     /**
      * Starts the span with an implicit timestamp.
@@ -29,7 +29,7 @@ interface Span
      * @param int|null $timestamp
      * @return void
      */
-    public function start($timestamp = null);
+    public function start(?int $timestamp = null);
 
     /**
      * Sets the string name for the logical operation this span represents.
@@ -37,7 +37,7 @@ interface Span
      * @param string $name
      * @return void
      */
-    public function setName($name);
+    public function setName(string $name);
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
@@ -49,7 +49,7 @@ interface Span
      * @param string $kind
      * @return void
      */
-    public function setKind($kind);
+    public function setKind(string $kind);
 
     /**
      * Tags give your span context for search, viewing and analysis. For example, a key
@@ -58,10 +58,10 @@ interface Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param $value String value, cannot be <code>null</code>.
+     * @param string $value value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag($key, $value);
+    public function tag(string $key, string $value);
 
     /**
      * Associates an event that explains latency with the current system time.
@@ -71,7 +71,7 @@ interface Span
      * @return void
      * @see Annotations
      */
-    public function annotate($value, $timestamp);
+    public function annotate(string $value, int $timestamp);
 
     /**
      * For a client span, this would be the server's address.
@@ -99,7 +99,7 @@ interface Span
      * @param int|null $timestamp
      * @return void
      */
-    public function finish($timestamp = null);
+    public function finish(?int $timestamp = null);
 
     /**
      * Reports the span, even if unfinished. Most users will not call this method.

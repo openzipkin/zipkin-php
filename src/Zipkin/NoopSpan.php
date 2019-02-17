@@ -17,7 +17,7 @@ final class NoopSpan implements Span
      * @param TraceContext $context
      * @return NoopSpan
      */
-    public static function create(TraceContext $context)
+    public static function create(TraceContext $context): self
     {
         return new self($context);
     }
@@ -29,7 +29,7 @@ final class NoopSpan implements Span
      *
      * @return bool
      */
-    public function isNoop()
+    public function isNoop(): bool
     {
         return true;
     }
@@ -37,7 +37,7 @@ final class NoopSpan implements Span
     /**
      * @return TraceContext
      */
-    public function getContext()
+    public function getContext(): TraceContext
     {
         return $this->context;
     }
@@ -51,7 +51,7 @@ final class NoopSpan implements Span
      * @param int|null $timestamp
      * @return void
      */
-    public function start($timestamp = null)
+    public function start(?int $timestamp = null)
     {
     }
 
@@ -61,7 +61,7 @@ final class NoopSpan implements Span
      * @param string $name
      * @return void
      */
-    public function setName($name)
+    public function setName(string $name)
     {
     }
 
@@ -73,7 +73,7 @@ final class NoopSpan implements Span
      * @param string $kind
      * @return void
      */
-    public function setKind($kind)
+    public function setKind(string $kind)
     {
     }
 
@@ -87,7 +87,7 @@ final class NoopSpan implements Span
      * @param $value String value, cannot be <code>null</code>.
      * @return void
      */
-    public function setTag($key, $value)
+    public function setTag(string $key, string $value)
     {
     }
 
@@ -99,7 +99,7 @@ final class NoopSpan implements Span
      * @return void
      * @see Annotations
      */
-    public function annotate($value, $timestamp)
+    public function annotate(string $value, int $timestamp)
     {
     }
 
@@ -133,7 +133,7 @@ final class NoopSpan implements Span
      * @param int|null $timestamp
      * @return void
      */
-    public function finish($timestamp = null)
+    public function finish(?int $timestamp = null)
     {
     }
 
@@ -160,10 +160,10 @@ final class NoopSpan implements Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param $value String value, cannot be <code>null</code>.
+     * @param string $value value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag($key, $value)
+    public function tag(string $key, string $value)
     {
     }
 }

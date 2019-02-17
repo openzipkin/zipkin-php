@@ -29,7 +29,7 @@ final class RealSpan implements Span
      * @param Recorder $recorder
      * @return RealSpan
      */
-    public static function create(TraceContext $context, Recorder $recorder)
+    public static function create(TraceContext $context, Recorder $recorder): self
     {
         return new self($context, $recorder);
     }
@@ -41,7 +41,7 @@ final class RealSpan implements Span
      *
      * @return bool
      */
-    public function isNoop()
+    public function isNoop(): bool
     {
         return false;
     }
@@ -49,7 +49,7 @@ final class RealSpan implements Span
     /**
      * @return TraceContext
      */
-    public function getContext()
+    public function getContext(): TraceContext
     {
         return $this->traceContext;
     }
@@ -64,7 +64,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function start($timestamp = null)
+    public function start(?int $timestamp = null)
     {
         if ($timestamp === null) {
             $timestamp = Timestamp\now();
@@ -84,16 +84,9 @@ final class RealSpan implements Span
      *
      * @param string $name
      * @return void
-     * @throws \InvalidArgumentException
      */
-    public function setName($name)
+    public function setName(string $name)
     {
-        if ($name !== (string) $name) {
-            throw new InvalidArgumentException(
-                sprintf('Invalid name. expected string, got %s', gettype($name))
-            );
-        }
-
         $this->recorder->setName($this->traceContext, $name);
     }
 
@@ -104,16 +97,9 @@ final class RealSpan implements Span
      *
      * @param string $kind
      * @return void
-     * @throws \InvalidArgumentException
      */
-    public function setKind($kind)
+    public function setKind(string $kind)
     {
-        if ($kind !== (string) $kind) {
-            throw new InvalidArgumentException(
-                sprintf('Invalid kind. expected string, got %s', gettype($kind))
-            );
-        }
-
         $this->recorder->setKind($this->traceContext, $kind);
     }
 
@@ -127,7 +113,7 @@ final class RealSpan implements Span
      * @param $value String value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag($key, $value)
+    public function tag(string $key, string $value)
     {
         $this->recorder->tag($this->traceContext, $key, $value);
     }
@@ -139,14 +125,10 @@ final class RealSpan implements Span
      * @param int|null $timestamp
      * @return void
      * @throws \InvalidArgumentException
-     * @see Annotations
+     * @see Zipkin\Annotations
      */
-    public function annotate($value, $timestamp = null)
+    public function annotate(string $value, ?int $timestamp = null)
     {
-        if (empty($value) || !is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
-            throw new InvalidArgumentException('Invalid annotation value');
-        }
-
         if (!Timestamp\isValid($timestamp)) {
             throw new InvalidArgumentException(
                 sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
@@ -189,7 +171,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function finish($timestamp = null)
+    public function finish(?int $timestamp = null)
     {
         if ($timestamp !== null && !Timestamp\isValid($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');

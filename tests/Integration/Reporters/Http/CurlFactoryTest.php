@@ -4,11 +4,11 @@ namespace ZipkinTests\Integration\Reporters\Http;
 
 use Exception;
 use HttpTest\HttpTestServer;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Zipkin\Reporters\Http\CurlFactory;
+use PHPUnit\Framework\TestCase;
 
 final class CurlFactoryTest extends TestCase
 {

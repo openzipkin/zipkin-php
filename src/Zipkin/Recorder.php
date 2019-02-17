@@ -44,7 +44,7 @@ class Recorder
         $this->spanMap = SpanMap::create();
     }
 
-    public static function createAsNoop()
+    public static function createAsNoop(): self
     {
         return new self(Endpoint::createAsEmpty(), null, true);
     }
@@ -53,7 +53,7 @@ class Recorder
      * @param TraceContext $context
      * @return int
      */
-    public function getTimestamp(TraceContext $context)
+    public function getTimestamp(TraceContext $context): ?int
     {
         $span = $this->spanMap->get($context);
 
@@ -68,7 +68,7 @@ class Recorder
      * @param TraceContext $context
      * @param int $timestamp
      */
-    public function start(TraceContext $context, $timestamp)
+    public function start(TraceContext $context, int $timestamp)
     {
         $span = $this->spanMap->getOrCreate($context, $this->endpoint);
         $span->start($timestamp);
@@ -79,7 +79,7 @@ class Recorder
      * @param string $name
      * @return void
      */
-    public function setName(TraceContext $context, $name)
+    public function setName(TraceContext $context, string $name)
     {
         if ($this->noop) {
             return;
@@ -93,7 +93,7 @@ class Recorder
      * @param TraceContext $context
      * @param string $kind
      */
-    public function setKind(TraceContext $context, $kind)
+    public function setKind(TraceContext $context, string $kind)
     {
         if ($this->noop) {
             return;
@@ -105,11 +105,11 @@ class Recorder
 
     /**
      * @param TraceContext $context
-     * @param $timestamp
-     * @param $value
+     * @param int $timestamp
+     * @param string $value
      * @throws \InvalidArgumentException
      */
-    public function annotate(TraceContext $context, $timestamp, $value)
+    public function annotate(TraceContext $context, int $timestamp, string $value)
     {
         if ($this->noop) {
             return;
@@ -124,7 +124,7 @@ class Recorder
      * @param string $key
      * @param string $value
      */
-    public function tag(TraceContext $context, $key, $value)
+    public function tag(TraceContext $context, string $key, string $value)
     {
         if ($this->noop) {
             return;
@@ -154,7 +154,7 @@ class Recorder
      * @param int $finishTimestamp
      * @return void
      */
-    public function finish(TraceContext $context, $finishTimestamp)
+    public function finish(TraceContext $context, int $finishTimestamp)
     {
         $span = $this->spanMap->get($context);
 

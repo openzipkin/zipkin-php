@@ -10,16 +10,16 @@ interface SamplingFlags
     /**
      * @return bool|null
      */
-    public function isSampled();
+    public function isSampled(): ?bool;
 
     /**
      * @return bool
      */
-    public function isDebug();
+    public function isDebug(): bool;
 
     /**
      * @param SamplingFlags $samplingFlags
      * @return bool
      */
-    public function isEqual(SamplingFlags $samplingFlags);
+    public function isEqual(SamplingFlags $samplingFlags): bool;
 }

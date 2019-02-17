@@ -32,14 +32,6 @@ final class MapTest extends TestCase
         $this->assertEquals(self::TEST_VALUE, $value);
     }
 
-    public function testPutToMapFailsDueToInvalidKey()
-    {
-        $carrier = new ArrayObject();
-        $map = new Map();
-        $this->expectException(InvalidPropagationKey::class);
-        $map->put($carrier, self::TEST_INVALID_KEY, self::TEST_VALUE);
-    }
-
     public function testPutToMapFailsDueToEmptyKey()
     {
         $carrier = new ArrayObject();
