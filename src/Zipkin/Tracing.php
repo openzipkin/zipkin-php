@@ -11,7 +11,7 @@ interface Tracing
      *
      * @return Tracer
      */
-    public function getTracer();
+    public function getTracer(): Tracer;
 
     /**
      * When a trace leaves the process, it needs to be propagated, usually via headers. This utility
@@ -19,7 +19,7 @@ interface Tracing
      *
      * @return Propagation
      */
-    public function getPropagation();
+    public function getPropagation(): Propagation;
 
     /**
      * When true, no recording is done and nothing is reported to zipkin. However, trace context is
@@ -28,5 +28,5 @@ interface Tracing
      * @return bool
      * @see Span#isNoop()
      */
-    public function isNoop();
+    public function isNoop(): bool;
 }

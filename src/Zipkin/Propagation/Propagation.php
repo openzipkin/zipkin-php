@@ -29,7 +29,7 @@ interface Propagation
     // The use cases of this are:
     // * allow pre-allocation of fields, especially in systems like gRPC Metadata
     // * allow a single-pass over an iterator (ex OpenTracing has no getter in TextMap)
-    public function getKeys();
+    public function getKeys(): array;
 
     /**
      * Returns a injector as a callable having the signature function(TraceContext $context, &$carrier): void
@@ -40,7 +40,7 @@ interface Propagation
      * @param Setter $setter invoked for each propagation key to add.
      * @return callable
      */
-    public function getInjector(Setter $setter);
+    public function getInjector(Setter $setter): callable;
 
     /**
      * Returns the extractor as a callable having the signature function($carrier): TraceContext|SamplingFlags
@@ -51,5 +51,5 @@ interface Propagation
      * @param Getter $getter invoked for each propagation key to get.
      * @return callable
      */
-    public function getExtractor(Getter $getter);
+    public function getExtractor(Getter $getter): callable;
 }

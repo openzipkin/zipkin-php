@@ -20,14 +20,4 @@ final class InvalidTraceContextArgument extends InvalidArgumentException
     {
         return new self(sprintf('Invalid parent span id, got %s', $parentId));
     }
-
-    public static function forSampled($isSampled)
-    {
-        return new self(sprintf('is Sampled should be boolean or null, got %s', gettype($isSampled)));
-    }
-
-    public static function forDebug($isDebug)
-    {
-        return new self(sprintf('isDebug should be boolean, got %s', gettype($isDebug)));
-    }
 }

@@ -21,7 +21,7 @@ final class SpanMap
      * @param TraceContext $context
      * @return Span|null
      */
-    public function get(TraceContext $context)
+    public function get(TraceContext $context): ?Span
     {
         $contextHash = $this->getHash($context);
 
@@ -37,7 +37,7 @@ final class SpanMap
      * @param Endpoint $endpoint
      * @return Span
      */
-    public function getOrCreate(TraceContext $context, Endpoint $endpoint)
+    public function getOrCreate(TraceContext $context, Endpoint $endpoint): Span
     {
         $contextHash = $this->getHash($context);
 
@@ -49,10 +49,10 @@ final class SpanMap
     }
 
     /**
-     * @param $context
+     * @param TraceContext $context
      * @return Span|null
      */
-    public function remove($context)
+    public function remove(TraceContext $context): ?Span
     {
         $contextHash = $this->getHash($context);
 
@@ -70,7 +70,7 @@ final class SpanMap
     /**
      * @return Span[]
      */
-    public function removeAll()
+    public function removeAll(): array
     {
         $spans = $this->map;
 
@@ -83,7 +83,7 @@ final class SpanMap
      * @param TraceContext $context
      * @return string
      */
-    private function getHash(TraceContext $context)
+    private function getHash(TraceContext $context): string
     {
         return crc32($context->getSpanId() . $context->getTraceId());
     }

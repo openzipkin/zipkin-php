@@ -73,23 +73,11 @@ class RealSpanTest extends TestCase
         $span->annotate($value, $timestamp);
     }
 
-    public function testAnnotateFailsDueToInvalidValue()
-    {
-        $timestamp = Timestamp\now();
-        $value = new \stdClass;
-        $context = TraceContext::createAsRoot();
-        $recorder = $this->prophesize(Recorder::class);
-        $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
-        $this->expectException(InvalidArgumentException::class);
-        $span->annotate($value, $timestamp);
-    }
-
     public function testAnnotateFailsDueToInvalidTimestamp()
     {
         $this->expectException(InvalidArgumentException::class);
-        $timestamp = 'invalid_timestamp';
-        $value = new \stdClass;
+        $timestamp = -1;
+        $value = Annotations\WIRE_SEND;
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();
@@ -104,15 +92,6 @@ class RealSpanTest extends TestCase
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $span = RealSpan::create($context, $recorder->reveal());
-        $span->start('invalid_timestamp');
-    }
-
-    public function testFinishRealSpanFailsDueToInvalidTimestamp()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $context = TraceContext::createAsRoot();
-        $recorder = $this->prophesize(Recorder::class);
-        $span = RealSpan::create($context, $recorder->reveal());
-        $span->finish('invalid_timestamp');
+        $span->start(-1);
     }
 }

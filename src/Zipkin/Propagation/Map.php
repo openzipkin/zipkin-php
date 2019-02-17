@@ -12,7 +12,7 @@ final class Map implements Getter, Setter
      * {@inheritdoc}
      * @param array|ArrayAccess $carrier
      */
-    public function get($carrier, $key)
+    public function get($carrier, string $key): ?string
     {
         $lKey = strtolower($key);
 
@@ -31,12 +31,8 @@ final class Map implements Getter, Setter
      * {@inheritdoc}
      * @param array|ArrayAccess $carrier
      */
-    public function put(&$carrier, $key, $value)
+    public function put(&$carrier, string $key, string $value)
     {
-        if ($key !== (string) $key) {
-            throw InvalidPropagationKey::forInvalidKey($key);
-        }
-
         if ($key === '') {
             throw InvalidPropagationKey::forEmptyKey();
         }

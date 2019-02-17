@@ -8,5 +8,5 @@ interface ClientFactory
      * @param array $options
      * @return callable
      */
-    public function build(array $options);
+    public function build(array $options): callable;
 }

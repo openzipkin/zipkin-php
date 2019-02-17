@@ -29,7 +29,7 @@ final class CurrentTraceContext
      * @param TraceContext|null $currentContext
      * @return CurrentTraceContext
      */
-    public static function create(TraceContext $currentContext = null)
+    public static function create(?TraceContext $currentContext = null): self
     {
         return new self($currentContext);
     }
@@ -39,7 +39,7 @@ final class CurrentTraceContext
      *
      * @return TraceContext|null
      */
-    public function getContext()
+    public function getContext(): ?TraceContext
     {
         return $this->context;
     }
@@ -51,7 +51,7 @@ final class CurrentTraceContext
      * @param TraceContext|null $currentContext
      * @return callable The scope closed
      */
-    public function createScopeAndRetrieveItsCloser(TraceContext $currentContext = null)
+    public function createScopeAndRetrieveItsCloser(?TraceContext $currentContext = null): callable
     {
         $previous = $this->context;
         $self = $this;

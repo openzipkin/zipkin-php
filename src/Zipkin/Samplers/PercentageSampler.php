@@ -22,14 +22,8 @@ final class PercentageSampler implements Sampler
      * @return PercentageSampler
      * @throws InvalidArgumentException
      */
-    public static function create($rate)
+    public static function create(float $rate): self
     {
-        if (!is_float($rate)) {
-            throw new InvalidArgumentException(
-                sprintf('Invalid rate. Expect a float value, got %s', gettype($rate))
-            );
-        }
-
         if ($rate > 1 || $rate < 0) {
             throw new InvalidArgumentException(
                 sprintf('Invalid rate. Expected a value between 0 and 1, got %f', $rate)
@@ -41,7 +35,7 @@ final class PercentageSampler implements Sampler
     /**
      * {@inheritdoc}
      */
-    public function isSampled($traceId)
+    public function isSampled(string $traceId): bool
     {
         return (mt_rand(0, 99) / 100) <= $this->rate;
     }

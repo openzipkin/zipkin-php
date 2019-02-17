@@ -44,7 +44,7 @@ class TracingBuilder
      */
     private $isNoop = false;
 
-    public static function create()
+    public static function create(): self
     {
         return new self();
     }
@@ -56,7 +56,7 @@ class TracingBuilder
      * @param string $localServiceName name of the service being traced. Defaults to "unknown".
      * @return $this
      */
-    public function havingLocalServiceName($localServiceName)
+    public function havingLocalServiceName(string $localServiceName): self
     {
         $this->localServiceName = $localServiceName;
         return $this;
@@ -66,7 +66,7 @@ class TracingBuilder
      * @param Endpoint $endpoint Endpoint of the local service being traced. Defaults to site local.
      * @return $this
      */
-    public function havingLocalEndpoint(Endpoint $endpoint)
+    public function havingLocalEndpoint(Endpoint $endpoint): self
     {
         $this->localEndpoint = $endpoint;
         return $this;
@@ -92,7 +92,7 @@ class TracingBuilder
      * @param Reporter $reporter
      * @return $this
      */
-    public function havingReporter(Reporter $reporter)
+    public function havingReporter(Reporter $reporter): self
     {
         $this->reporter = $reporter;
         return $this;
@@ -105,7 +105,7 @@ class TracingBuilder
      * @param Sampler $sampler
      * @return $this
      */
-    public function havingSampler(Sampler $sampler)
+    public function havingSampler(Sampler $sampler): self
     {
         $this->sampler = $sampler;
         return $this;
@@ -117,7 +117,7 @@ class TracingBuilder
      * @param bool $usesTraceId128bits
      * @return $this
      */
-    public function havingTraceId128bits($usesTraceId128bits)
+    public function havingTraceId128bits(bool $usesTraceId128bits): self
     {
         $this->usesTraceId128bits = $usesTraceId128bits;
         return $this;
@@ -127,7 +127,7 @@ class TracingBuilder
      * @param CurrentTraceContext $currentTraceContext
      * @return $this
      */
-    public function havingCurrentTraceContext(CurrentTraceContext $currentTraceContext)
+    public function havingCurrentTraceContext(CurrentTraceContext $currentTraceContext): self
     {
         $this->currentTraceContext = $currentTraceContext;
         return $this;
@@ -137,7 +137,7 @@ class TracingBuilder
      * @param bool $isNoop
      * @return $this
      */
-    public function beingNoop($isNoop = true)
+    public function beingNoop(bool $isNoop = true): self
     {
         $this->isNoop = $isNoop;
         return $this;
@@ -146,7 +146,7 @@ class TracingBuilder
     /**
      * @return DefaultTracing
      */
-    public function build()
+    public function build(): Tracing
     {
         $localEndpoint = $this->localEndpoint;
         if ($localEndpoint === null) {
