@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 use Zipkin\Endpoint;
 use Zipkin\RealSpan;
 use Zipkin\Recorder;
-use Zipkin\Timestamp;
-use Zipkin\Annotations;
+use function Zipkin\Timestamp\now;
+use const Zipkin\Annotations\WIRE_SEND;
 use Zipkin\Propagation\TraceContext;
 
 class RealSpanTest extends TestCase
@@ -64,8 +64,8 @@ class RealSpanTest extends TestCase
 
     public function testAnnotateSuccess()
     {
-        $timestamp = Timestamp\now();
-        $value = Annotations\WIRE_SEND;
+        $timestamp = now();
+        $value = WIRE_SEND;
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->annotate($context, $timestamp, $value)->shouldBeCalled();
@@ -77,7 +77,7 @@ class RealSpanTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $timestamp = -1;
-        $value = Annotations\WIRE_SEND;
+        $value = WIRE_SEND;
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();

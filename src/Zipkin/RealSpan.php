@@ -4,7 +4,8 @@ namespace Zipkin;
 
 use InvalidArgumentException;
 use Zipkin\Propagation\TraceContext;
-use Zipkin\Timestamp;
+use function Zipkin\Timestamp\now;
+use function Zipkin\Timestamp\isValid;
 
 final class RealSpan implements Span
 {
@@ -67,9 +68,9 @@ final class RealSpan implements Span
     public function start(?int $timestamp = null)
     {
         if ($timestamp === null) {
-            $timestamp = Timestamp\now();
+            $timestamp = now();
         } else {
-            if (!Timestamp\isValid($timestamp)) {
+            if (!isValid($timestamp)) {
                 throw new InvalidArgumentException(
                     sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
                 );
@@ -110,7 +111,7 @@ final class RealSpan implements Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param $value String value, cannot be <code>null</code>.
+     * @param string $value, cannot be <code>null</code>.
      * @return void
      */
     public function tag(string $key, string $value)
@@ -129,7 +130,7 @@ final class RealSpan implements Span
      */
     public function annotate(string $value, ?int $timestamp = null)
     {
-        if (!Timestamp\isValid($timestamp)) {
+        if (!isValid($timestamp)) {
             throw new InvalidArgumentException(
                 sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
             );
@@ -178,7 +179,7 @@ final class RealSpan implements Span
         }
 
         if ($timestamp === null) {
-            $timestamp = Timestamp\now();
+            $timestamp = now();
         }
 
         $this->recorder->finish($this->traceContext, $timestamp);

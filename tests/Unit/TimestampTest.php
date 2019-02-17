@@ -3,13 +3,14 @@
 namespace ZipkinTests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Zipkin\Timestamp;
+use function Zipkin\Timestamp\now;
+use function Zipkin\Timestamp\isValid;
 
 final class TimestampTest extends TestCase
 {
     public function testNowHasTheExpectedLength()
     {
-        $now = Timestamp\now();
+        $now = now();
         $this->assertEquals(16, strlen((string) $now));
     }
 
@@ -18,13 +19,13 @@ final class TimestampTest extends TestCase
      */
     public function testIsValidProducesTheExpectedOutput($timestamp, $isValid)
     {
-        $this->assertEquals($isValid, Timestamp\isValid($timestamp));
+        $this->assertEquals($isValid, isValid($timestamp));
     }
 
     public function timestampProvider()
     {
         return [
-            [Timestamp\now(), true],
+            [now(), true],
             [-1, false],
             [1234567890123456, true],
             [123456789012345, false],

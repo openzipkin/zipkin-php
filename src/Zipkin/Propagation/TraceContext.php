@@ -5,6 +5,7 @@ namespace Zipkin\Propagation;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
+use function Zipkin\Propagation\Id\generateTraceIdWith128bits;
 
 final class TraceContext implements SamplingFlags
 {
@@ -96,7 +97,7 @@ final class TraceContext implements SamplingFlags
 
         $traceId = $nextId;
         if ($usesTraceId128bits) {
-            $traceId = Id\generateTraceIdWith128bits();
+            $traceId = generateTraceIdWith128bits();
         }
 
         return new self(
