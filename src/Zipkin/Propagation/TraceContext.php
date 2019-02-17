@@ -59,13 +59,13 @@ final class TraceContext implements SamplingFlags
      * @throws InvalidTraceContextArgument
      */
     public static function create(
-        $traceId,
-        $spanId,
-        $parentId = null,
-        $isSampled = SamplingFlags::EMPTY_SAMPLED,
-        $isDebug = SamplingFlags::EMPTY_DEBUG,
-        $usesTraceId128bits = false
-    ) {
+        string $traceId,
+        string $spanId,
+        ?string $parentId = null,
+        ?bool $isSampled = SamplingFlags::EMPTY_SAMPLED,
+        bool $isDebug = SamplingFlags::EMPTY_DEBUG,
+        bool $usesTraceId128bits = false
+    ): TraceContext {
         if (!Id\isValidTraceId($traceId)) {
             throw InvalidTraceContextArgument::forTraceId($traceId);
         }
@@ -78,14 +78,6 @@ final class TraceContext implements SamplingFlags
             throw InvalidTraceContextArgument::forParentSpanId($parentId);
         }
 
-        if ($isSampled !== null && $isSampled !== (bool) $isSampled) {
-            throw InvalidTraceContextArgument::forSampled($isSampled);
-        }
-
-        if ($isDebug !== (bool) $isDebug) {
-            throw InvalidTraceContextArgument::forDebug($isDebug);
-        }
-
         return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits);
     }
 
@@ -94,7 +86,7 @@ final class TraceContext implements SamplingFlags
      * @param bool $usesTraceId128bits
      * @return TraceContext
      */
-    public static function createAsRoot(SamplingFlags $samplingFlags = null, $usesTraceId128bits = false)
+    public static function createAsRoot(?SamplingFlags $samplingFlags = null, ?bool $usesTraceId128bits = false): self
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
@@ -107,7 +99,7 @@ final class TraceContext implements SamplingFlags
             $traceId = Id\generateTraceIdWith128bits();
         }
 
-        return new TraceContext(
+        return new self(
             $traceId,
             $nextId,
             null,
@@ -138,7 +130,7 @@ final class TraceContext implements SamplingFlags
     /**
      * @return bool|null
      */
-    public function isSampled()
+    public function isSampled(): ?bool
     {
         return $this->isSampled;
     }
@@ -146,7 +138,7 @@ final class TraceContext implements SamplingFlags
     /**
      * @return bool
      */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return $this->isDebug;
     }
@@ -154,7 +146,7 @@ final class TraceContext implements SamplingFlags
     /**
      * @return bool
      */
-    public function usesTraceId128bits()
+    public function usesTraceId128bits(): bool
     {
         return $this->usesTraceId128bits;
     }
@@ -164,7 +156,7 @@ final class TraceContext implements SamplingFlags
      *
      * @return string
      */
-    public function getTraceId()
+    public function getTraceId(): string
     {
         return $this->traceId;
     }
@@ -176,7 +168,7 @@ final class TraceContext implements SamplingFlags
      *
      * @return string
      */
-    public function getSpanId()
+    public function getSpanId(): string
     {
         return $this->spanId;
     }
@@ -186,7 +178,7 @@ final class TraceContext implements SamplingFlags
      *
      * @return string|null
      */
-    public function getParentId()
+    public function getParentId(): ?string
     {
         return $this->parentId;
     }
@@ -195,7 +187,7 @@ final class TraceContext implements SamplingFlags
      * @param string $isSampled
      * @return TraceContext
      */
-    public function withSampled($isSampled)
+    public function withSampled($isSampled): TraceContext
     {
         return new TraceContext(
             $this->traceId,
@@ -211,7 +203,7 @@ final class TraceContext implements SamplingFlags
      * @param SamplingFlags $samplingFlags
      * @return bool
      */
-    public function isEqual(SamplingFlags $samplingFlags)
+    public function isEqual(SamplingFlags $samplingFlags): bool
     {
         return ($samplingFlags instanceof TraceContext)
             && $this->traceId === $samplingFlags->traceId

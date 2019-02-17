@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/openzipkin/zipkin-php.svg?branch=master)](https://travis-ci.org/openzipkin/zipkin-php)
 [![Latest Stable Version](https://poser.pugx.org/openzipkin/zipkin/v/stable)](https://packagist.org/packages/openzipkin/zipkin)
 [![Coverage Status](https://coveralls.io/repos/github/openzipkin/zipkin-php/badge.svg)](https://coveralls.io/github/openzipkin/zipkin-php)
-[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%205.6-8892BF.svg)](https://php.net/)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.1-8892BF.svg)](https://php.net/)
 [![Total Downloads](https://poser.pugx.org/openzipkin/zipkin/downloads)](https://packagist.org/packages/openzipkin/zipkin)
 [![License](https://img.shields.io/packagist/l/openzipkin/zipkin.svg)](https://github.com/openzipkin/zipkin-php/blob/master/LICENSE)
 

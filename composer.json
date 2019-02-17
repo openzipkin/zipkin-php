@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": "^5.6 || ^7.0",
+        "php": "^7.1",
         "ext-curl": "*",
         "psr/http-message": "~1.0",
         "psr/log": "^1.0"
@@ -23,7 +23,8 @@
     "require-dev": {
         "guzzlehttp/psr7": "^1.4",
         "jcchavezs/httptest": "~0.2",
-        "phpunit/phpunit": "^5.7",
+        "phpstan/phpstan": "^0.10.6",
+        "phpunit/phpunit": "~5.7.19",
         "squizlabs/php_codesniffer": "3.*"
     },
     "config": {
@@ -50,6 +51,7 @@
     "scripts": {
         "fix-lint": "phpcbf --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
         "lint": "phpcs --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
-        "test": "phpunit tests"
+        "test": "phpunit tests",
+        "static-check": "phpstan analyse src tests"
     }
 }

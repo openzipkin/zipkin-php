@@ -16,12 +16,12 @@ final class BinarySampler implements Sampler
         $this->isSampled = $isSampled;
     }
 
-    public static function createAsAlwaysSample()
+    public static function createAsAlwaysSample(): self
     {
         return new self(true);
     }
 
-    public static function createAsNeverSample()
+    public static function createAsNeverSample(): self
     {
         return new self(false);
     }
@@ -29,7 +29,7 @@ final class BinarySampler implements Sampler
     /**
      * {@inheritdoc}
      */
-    public function isSampled($traceId)
+    public function isSampled(string $traceId): bool
     {
         return $this->isSampled;
     }

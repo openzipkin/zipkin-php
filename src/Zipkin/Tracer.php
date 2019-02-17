@@ -48,9 +48,9 @@ final class Tracer
         Endpoint $localEndpoint,
         Reporter $reporter,
         Sampler $sampler,
-        $usesTraceId128bits,
+        bool $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
-        $isNoop
+        bool $isNoop
     ) {
         $this->recorder = new Recorder($localEndpoint, $reporter, $isNoop);
         $this->sampler = $sampler;
@@ -81,7 +81,7 @@ final class Tracer
      * @param SamplingFlags $samplingFlags
      * @return Span
      */
-    public function newTrace(SamplingFlags $samplingFlags = null)
+    public function newTrace(SamplingFlags $samplingFlags = null): Span
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
@@ -98,7 +98,7 @@ final class Tracer
      * @return Span
      * @throws \RuntimeException
      */
-    public function newChild(TraceContext $parent)
+    public function newChild(TraceContext $parent): Span
     {
         return $this->nextSpan($parent);
     }
@@ -125,7 +125,7 @@ final class Tracer
      * @param TraceContext $context
      * @return Span
      */
-    public function joinSpan(TraceContext $context)
+    public function joinSpan(TraceContext $context): Span
     {
         return $this->toSpan($context);
     }
@@ -139,11 +139,11 @@ final class Tracer
      * finish the span. Not only is it safe to call the closer, you must call the closer to end the scope, or
      * risk leaking resources associated with the scope.
      *
-     * @param $span span to place into scope or null to clear the scope
+     * @param Span $span to place into scope or null to clear the scope
      *
      * @return callable The scope closer
      */
-    public function openScope(Span $span = null)
+    public function openScope(?Span $span = null): callable
     {
         return $this->currentTraceContext->createScopeAndRetrieveItsCloser(
             $span === null ? null : $span->getContext()
@@ -155,7 +155,7 @@ final class Tracer
      *
      * @return Span|null
      */
-    public function getCurrentSpan()
+    public function getCurrentSpan(): ?Span
     {
         $currentContext = $this->currentTraceContext->getContext();
         return $currentContext === null ? null : $this->toSpan($currentContext);
@@ -197,7 +197,7 @@ final class Tracer
      * @return Span
      * @throws \RuntimeException
      */
-    public function nextSpan(SamplingFlags $contextOrFlags = null)
+    public function nextSpan(?SamplingFlags $contextOrFlags = null): Span
     {
         if ($contextOrFlags === null) {
             $parent = $this->currentTraceContext->getContext();
@@ -222,7 +222,7 @@ final class Tracer
      * @param SamplingFlags|TraceContext $contextOrFlags
      * @return TraceContext
      */
-    private function newRootContext(SamplingFlags $contextOrFlags)
+    private function newRootContext(SamplingFlags $contextOrFlags): TraceContext
     {
         $context = TraceContext::createAsRoot($contextOrFlags, $this->usesTraceId128bits);
 
@@ -237,7 +237,7 @@ final class Tracer
      * @param TraceContext $context
      * @return Span
      */
-    private function ensureSampled(TraceContext $context)
+    private function ensureSampled(TraceContext $context): Span
     {
         if ($context->isSampled() === null) {
             $context = $context->withSampled($this->sampler->isSampled($context->getTraceId()));
@@ -252,7 +252,7 @@ final class Tracer
      * @param TraceContext $context
      * @return Span
      */
-    private function toSpan(TraceContext $context)
+    private function toSpan(TraceContext $context): Span
     {
         if (!$this->isNoop && $context->isSampled()) {
             return RealSpan::create($context, $this->recorder);

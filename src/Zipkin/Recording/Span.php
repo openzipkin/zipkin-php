@@ -132,7 +132,7 @@ final class Span
      * @param Endpoint $localEndpoint
      * @return Span
      */
-    public static function createFromContext(TraceContext $context, Endpoint $localEndpoint)
+    public static function createFromContext(TraceContext $context, Endpoint $localEndpoint): Span
     {
         return new self(
             $context->getTraceId(),
@@ -146,7 +146,7 @@ final class Span
     /**
      * @return int
      */
-    public function getTimestamp()
+    public function getTimestamp(): int
     {
         return $this->timestamp;
     }
@@ -155,7 +155,7 @@ final class Span
      * @param int $timestamp
      * @return void
      */
-    public function start($timestamp)
+    public function start(int $timestamp)
     {
         $this->timestamp = $timestamp;
     }
@@ -164,7 +164,7 @@ final class Span
      * @param string $name
      * @return void
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -173,7 +173,7 @@ final class Span
      * @param string $kind
      * @return void
      */
-    public function setKind($kind)
+    public function setKind(string $kind)
     {
         $this->kind = $kind;
     }
@@ -181,9 +181,8 @@ final class Span
     /**
      * @param int $timestamp
      * @param string $value
-     * @throws \InvalidArgumentException
      */
-    public function annotate($timestamp, $value)
+    public function annotate(int $timestamp, string $value)
     {
         $this->annotations[] = [
             'value' => $value,
@@ -195,7 +194,7 @@ final class Span
      * @param string $key
      * @param string $value
      */
-    public function tag($key, $value)
+    public function tag(string $key, string $value)
     {
         $this->tags[$key] = $value;
     }
@@ -214,7 +213,7 @@ final class Span
      *
      * @param int|null $finishTimestamp
      */
-    public function finish($finishTimestamp = null)
+    public function finish(?int $finishTimestamp = null)
     {
         if ($this->finished) {
             return;
@@ -230,7 +229,7 @@ final class Span
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $spanAsArray = [
             'id' => (string) $this->spanId,
@@ -265,7 +264,7 @@ final class Span
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return json_encode($this->toArray());
     }

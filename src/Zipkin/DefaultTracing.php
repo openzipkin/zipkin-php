@@ -56,7 +56,7 @@ final class DefaultTracing implements Tracing
     /**
      * @return Tracer
      */
-    public function getTracer()
+    public function getTracer(): Tracer
     {
         return $this->tracer;
     }
@@ -64,7 +64,7 @@ final class DefaultTracing implements Tracing
     /**
      * @return Propagation
      */
-    public function getPropagation()
+    public function getPropagation(): Propagation
     {
         return $this->propagation;
     }
@@ -76,7 +76,7 @@ final class DefaultTracing implements Tracing
      * @return bool
      * @see Span#isNoop()
      */
-    public function isNoop()
+    public function isNoop(): bool
     {
         return $this->isNoop;
     }
