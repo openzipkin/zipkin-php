@@ -3,20 +3,23 @@
 namespace ZipkinTests\Unit\Propagation;
 
 use PHPUnit\Framework\TestCase;
-use Zipkin\Propagation\Id;
+use function Zipkin\Propagation\Id\generateNextId;
+use function Zipkin\Propagation\Id\generateTraceIdWith128bits;
+use function Zipkin\Propagation\Id\isValidSpanId;
+use function Zipkin\Propagation\Id\isValidTraceId;
 
 final class IdTest extends TestCase
 {
     public function testNextIdSuccess()
     {
-        $nextId = Id\generateNextId();
+        $nextId = generateNextId();
         $this->assertTrue(ctype_xdigit($nextId));
         $this->assertEquals(16, strlen($nextId));
     }
 
     public function testTraceIdWith128bitsSuccess()
     {
-        $nextId = Id\generateTraceIdWith128bits();
+        $nextId = generateTraceIdWith128bits();
         $this->assertTrue(ctype_xdigit($nextId));
         $this->assertEquals(32, strlen($nextId));
     }
@@ -26,7 +29,7 @@ final class IdTest extends TestCase
      */
     public function testIsValidSpanIdSuccess($spanId, $isValid)
     {
-        $this->assertEquals($isValid, Id\isValidSpanId($spanId));
+        $this->assertEquals($isValid, isValidSpanId($spanId));
     }
 
     public function spanIdsDataProvider()
@@ -46,7 +49,7 @@ final class IdTest extends TestCase
      */
     public function testIsValidTraceIdSuccess($traceId, $isValid)
     {
-        $this->assertEquals($isValid, Id\isValidTraceId($traceId));
+        $this->assertEquals($isValid, isValidTraceId($traceId));
     }
 
     public function traceIdsDataProvider()

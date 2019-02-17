@@ -15,7 +15,7 @@ final class Http implements Reporter
     ];
 
     /**
-     * @var CurlFactory
+     * @var ClientFactory
      */
     private $clientFactory;
 
@@ -30,7 +30,7 @@ final class Http implements Reporter
     private $reportMetrics;
 
     public function __construct(
-        ClientFactory $requesterFactory = null,
+        ?ClientFactory $requesterFactory = null,
         array $options = [],
         Metrics $reporterMetrics = null
     ) {
@@ -48,6 +48,11 @@ final class Http implements Reporter
         $payload = json_encode(array_map(function (Span $span) {
             return $span->toArray();
         }, $spans));
+
+        if ($payload === false) {
+            $this->reportMetrics->incrementSpansDropped(count($spans));
+            return;
+        }
 
         $this->reportMetrics->incrementSpans(count($spans));
         $this->reportMetrics->incrementMessages();
