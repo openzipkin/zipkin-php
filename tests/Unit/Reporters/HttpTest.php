@@ -2,14 +2,15 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use RuntimeException;
 use Zipkin\Endpoint;
-use Zipkin\Propagation\TraceContext;
+use RuntimeException;
+use Prophecy\Argument;
 use Zipkin\Recording\Span;
 use Zipkin\Reporters\Http;
+use Psr\Log\LoggerInterface;
 use Zipkin\Reporters\Metrics;
+use PHPUnit\Framework\TestCase;
+use Zipkin\Propagation\TraceContext;
 
 final class HttpTest extends TestCase
 {
@@ -28,14 +29,11 @@ final class HttpTest extends TestCase
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
         $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
-        $metrics = $this->prophesize(Metrics::class);
-        $metrics->incrementSpans(1)->shouldBeCalled();
-        $metrics->incrementMessages()->shouldBeCalled();
-        $metrics->incrementSpanBytes(strlen($payload))->shouldBeCalled();
-        $metrics->incrementMessageBytes(strlen($payload))->shouldBeCalled();
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->error()->shouldNotBeCalled();
 
         $mockFactory = HttpMockFactory::createAsSuccess();
-        $httpReporter = new Http($mockFactory, [], $metrics->reveal());
+        $httpReporter = new Http($mockFactory, [], $logger->reveal());
         $httpReporter->report([$span]);
 
         $this->assertEquals(
@@ -50,16 +48,11 @@ final class HttpTest extends TestCase
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
         $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
-        $metrics = $this->prophesize(Metrics::class);
-        $metrics->incrementSpans(1)->shouldBeCalled();
-        $metrics->incrementMessages()->shouldBeCalled();
-        $metrics->incrementSpanBytes(strlen($payload))->shouldBeCalled();
-        $metrics->incrementMessageBytes(strlen($payload))->shouldBeCalled();
-        $metrics->incrementSpansDropped(1)->shouldBeCalled();
-        $metrics->incrementMessagesDropped(Argument::type(RuntimeException::class))->shouldBeCalled();
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->error(HttpMockFactory::ERROR_MESSAGE)->shouldBeCalled();
 
         $mockFactory = HttpMockFactory::createAsFailing();
-        $httpReporter = new Http($mockFactory, [], $metrics->reveal());
+        $httpReporter = new Http($mockFactory, [], $logger->reveal());
         $httpReporter->report([$span]);
     }
 }

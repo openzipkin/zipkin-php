@@ -7,6 +7,8 @@ use Zipkin\Reporters\Http\ClientFactory;
 
 final class HttpMockFactory implements ClientFactory
 {
+    public const ERROR_MESSAGE = 'Failed to report over http.';
+
     /**
      * @var string
      */
@@ -42,7 +44,7 @@ final class HttpMockFactory implements ClientFactory
 
         return function ($payload) use (&$self) {
             if ($self->shouldFail) {
-                throw new RuntimeException('Failed to report over http.');
+                throw new RuntimeException(self::ERROR_MESSAGE);
             }
 
             $self->content = $payload;
