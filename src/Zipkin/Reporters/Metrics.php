@@ -40,7 +40,7 @@ interface Metrics
 
     /**
      * Increments count of messages that could not be sent. Ex host unavailable, or peer disconnect.
-     * @param \Throwable|\Exception $cause
+     * @param \Throwable $cause
      * @return void
      */
     public function incrementMessagesDropped($cause);
@@ -67,7 +67,7 @@ interface Metrics
      * <p>This is a function of span bytes per message and overhead</p>
      *
      * @see Sender#messageSizeInBytes
-     * @param $quantity
+     * @param int $quantity
      * @return void
      */
     public function incrementMessageBytes($quantity);

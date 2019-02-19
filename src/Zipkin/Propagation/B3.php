@@ -110,11 +110,10 @@ final class B3 implements Propagation
                 }
             }
 
-            $isDebug = $getter->get($carrier, self::FLAGS_NAME);
-            if ($isDebug === null) {
-                $isDebug = SamplingFlags::EMPTY_DEBUG;
-            } else {
-                $isDebug = ($isDebug === '1');
+            $isDebug = SamplingFlags::EMPTY_DEBUG;
+            $isDebugRaw = $getter->get($carrier, self::FLAGS_NAME);
+            if ($isDebugRaw !== null) {
+                $isDebug = ($isDebugRaw === '1');
             }
 
             $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
