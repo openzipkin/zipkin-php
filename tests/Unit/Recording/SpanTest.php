@@ -7,7 +7,7 @@ use Zipkin\Kind;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recording\Span;
-use Zipkin\Timestamp;
+use function Zipkin\Timestamp\now;
 use Zipkin\Propagation\TraceContext;
 
 final class SpanTest extends TestCase
@@ -25,7 +25,7 @@ final class SpanTest extends TestCase
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $endpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $endpoint);
-        $timestamp = Timestamp\now();
+        $timestamp = now();
         $span->start($timestamp);
         $this->assertEquals($timestamp, $span->getTimestamp());
     }
@@ -40,7 +40,7 @@ final class SpanTest extends TestCase
 
         $localEndpoint = Endpoint::create('test_service_name', '127.0.0.1', null, 3333);
         $span = Span::createFromContext($context, $localEndpoint);
-        $timestamp = Timestamp\now();
+        $timestamp = now();
 
         $span->start($timestamp);
         $span->setKind(Kind\CLIENT);

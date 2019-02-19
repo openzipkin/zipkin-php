@@ -7,6 +7,9 @@ use Zipkin\Propagation\TraceContext;
 
 final class SpanMap
 {
+    /**
+     * @var Span[]
+     */
     private $map = [];
 
     /**
@@ -81,9 +84,9 @@ final class SpanMap
 
     /**
      * @param TraceContext $context
-     * @return string
+     * @return int
      */
-    private function getHash(TraceContext $context): string
+    private function getHash(TraceContext $context): int
     {
         return crc32($context->getSpanId() . $context->getTraceId());
     }

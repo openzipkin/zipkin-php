@@ -149,18 +149,18 @@ class TracingBuilder
     public function build(): Tracing
     {
         $localEndpoint = $this->localEndpoint;
-        if ($localEndpoint === null) {
+        if ($this->localEndpoint === null) {
             $localEndpoint = Endpoint::createFromGlobals();
             if ($this->localServiceName !== null) {
                 $localEndpoint->withServiceName($this->localServiceName);
             }
         }
 
-        $reporter = ($this->reporter ?: new Log(new NullLogger()));
+        $reporter = $this->reporter ?? new Log(new NullLogger());
 
-        $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
+        $sampler = $this->sampler ?? BinarySampler::createAsNeverSample();
 
-        $currentTraceContext = $this->currentTraceContext ?: CurrentTraceContext::create();
+        $currentTraceContext = $this->currentTraceContext ?? CurrentTraceContext::create();
 
         return new DefaultTracing(
             $localEndpoint,

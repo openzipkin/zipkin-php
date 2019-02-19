@@ -81,7 +81,7 @@ final class Span
      * statements, annotations are often codes: for example SERVER_RECV("sr").
      * Annotations are sorted ascending by timestamp.
      *
-     * @var string[][]
+     * @var array[]
      */
     private $annotations = [];
 
