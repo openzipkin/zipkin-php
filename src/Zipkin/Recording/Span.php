@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Recording;
 
 use Zipkin\Endpoint;
@@ -81,7 +83,7 @@ final class Span
      * statements, annotations are often codes: for example SERVER_RECV("sr").
      * Annotations are sorted ascending by timestamp.
      *
-     * @var array[]
+     * @var array<array>
      */
     private $annotations = [];
 
@@ -155,7 +157,7 @@ final class Span
      * @param int $timestamp
      * @return void
      */
-    public function start(int $timestamp)
+    public function start(int $timestamp): void
     {
         $this->timestamp = $timestamp;
     }
@@ -164,7 +166,7 @@ final class Span
      * @param string $name
      * @return void
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -173,7 +175,7 @@ final class Span
      * @param string $kind
      * @return void
      */
-    public function setKind(string $kind)
+    public function setKind(string $kind): void
     {
         $this->kind = $kind;
     }
@@ -182,7 +184,7 @@ final class Span
      * @param int $timestamp
      * @param string $value
      */
-    public function annotate(int $timestamp, string $value)
+    public function annotate(int $timestamp, string $value): void
     {
         $this->annotations[] = [
             'value' => $value,
@@ -194,7 +196,7 @@ final class Span
      * @param string $key
      * @param string $value
      */
-    public function tag(string $key, string $value)
+    public function tag(string $key, string $value): void
     {
         $this->tags[$key] = $value;
     }
@@ -203,7 +205,7 @@ final class Span
      * @param Endpoint $remoteEndpoint
      * @return void
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint)
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
         $this->remoteEndpoint = $remoteEndpoint;
     }
@@ -213,7 +215,7 @@ final class Span
      *
      * @param int|null $finishTimestamp
      */
-    public function finish(?int $finishTimestamp = null)
+    public function finish(?int $finishTimestamp = null): void
     {
         if ($this->finished) {
             return;

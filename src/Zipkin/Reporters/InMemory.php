@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Reporters;
 
 use Zipkin\Reporter;
@@ -12,7 +14,7 @@ final class InMemory implements Reporter
      */
     private $spans = [];
 
-    public function report(array $spans)
+    public function report(array $spans): void
     {
         $this->spans = array_merge($this->spans, $spans);
     }
@@ -20,7 +22,7 @@ final class InMemory implements Reporter
     /**
      * @return array|Span[]
      */
-    public function flush()
+    public function flush(): array
     {
         $spans = $this->spans;
         $this->spans = [];

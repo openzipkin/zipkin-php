@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
@@ -68,7 +70,7 @@ class Recorder
      * @param TraceContext $context
      * @param int $timestamp
      */
-    public function start(TraceContext $context, int $timestamp)
+    public function start(TraceContext $context, int $timestamp): void
     {
         $span = $this->spanMap->getOrCreate($context, $this->endpoint);
         $span->start($timestamp);
@@ -79,7 +81,7 @@ class Recorder
      * @param string $name
      * @return void
      */
-    public function setName(TraceContext $context, string $name)
+    public function setName(TraceContext $context, string $name): void
     {
         if ($this->noop) {
             return;
@@ -93,7 +95,7 @@ class Recorder
      * @param TraceContext $context
      * @param string $kind
      */
-    public function setKind(TraceContext $context, string $kind)
+    public function setKind(TraceContext $context, string $kind): void
     {
         if ($this->noop) {
             return;
@@ -109,7 +111,7 @@ class Recorder
      * @param string $value
      * @throws \InvalidArgumentException
      */
-    public function annotate(TraceContext $context, int $timestamp, string $value)
+    public function annotate(TraceContext $context, int $timestamp, string $value): void
     {
         if ($this->noop) {
             return;
@@ -124,7 +126,7 @@ class Recorder
      * @param string $key
      * @param string $value
      */
-    public function tag(TraceContext $context, string $key, string $value)
+    public function tag(TraceContext $context, string $key, string $value): void
     {
         if ($this->noop) {
             return;
@@ -139,7 +141,7 @@ class Recorder
      * @param Endpoint $remoteEndpoint
      * @return void
      */
-    public function setRemoteEndpoint(TraceContext $context, Endpoint $remoteEndpoint)
+    public function setRemoteEndpoint(TraceContext $context, Endpoint $remoteEndpoint): void
     {
         if ($this->noop) {
             return;
@@ -154,7 +156,7 @@ class Recorder
      * @param int $finishTimestamp
      * @return void
      */
-    public function finish(TraceContext $context, int $finishTimestamp)
+    public function finish(TraceContext $context, int $finishTimestamp): void
     {
         $span = $this->spanMap->get($context);
 
@@ -167,7 +169,7 @@ class Recorder
      * @param TraceContext $context
      * @return void
      */
-    public function abandon(TraceContext $context)
+    public function abandon(TraceContext $context): void
     {
         $this->spanMap->remove($context);
     }
@@ -176,7 +178,7 @@ class Recorder
      * @param TraceContext $context
      * @return void
      */
-    public function flush(TraceContext $context)
+    public function flush(TraceContext $context): void
     {
         $span = $this->spanMap->remove($context);
 
@@ -189,7 +191,7 @@ class Recorder
     /**
      * @return void
      */
-    public function flushAll()
+    public function flushAll(): void
     {
         $this->reporter->report($this->spanMap->removeAll());
     }

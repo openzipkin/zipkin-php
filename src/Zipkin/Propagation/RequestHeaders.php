@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Propagation;
 
 use Psr\Http\Message\RequestInterface;
@@ -23,7 +25,7 @@ final class RequestHeaders implements Getter, Setter
      * @param RequestInterface $carrier
      * @throws \InvalidArgumentException for invalid header names or values.
      */
-    public function put(&$carrier, string $key, string $value)
+    public function put(&$carrier, string $key, string $value): void
     {
         $lKey = strtolower($key);
         $carrier = $carrier->withAddedHeader($lKey, $value);

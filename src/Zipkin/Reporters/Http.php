@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Reporters;
 
 use RuntimeException;
@@ -43,7 +45,7 @@ final class Http implements Reporter
      * @param Span[] $spans
      * @return void
      */
-    public function report(array $spans)
+    public function report(array $spans): void
     {
         $payload = json_encode(array_map(function (Span $span) {
             return $span->toArray();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Reporters\Http;
 
 use BadFunctionCallException;
@@ -34,8 +36,13 @@ final class CurlFactory implements ClientFactory
          * @throws RuntimeException
          * @return void
          */
-        return function ($payload) use ($options) {
+        return static function ($payload) use ($options) {
             $handle = curl_init($options['endpoint_url']);
+            if ($handle === false) {
+                return static function () {
+                };
+            }
+
             curl_setopt($handle, CURLOPT_POST, 1);
             curl_setopt($handle, CURLOPT_POSTFIELDS, $payload);
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);

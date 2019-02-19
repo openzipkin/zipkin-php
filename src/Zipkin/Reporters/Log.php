@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Reporters;
 
 use Psr\Log\LoggerInterface;
@@ -21,7 +23,7 @@ final class Log implements Reporter
     /**
      * @param Span[] $spans
      */
-    public function report(array $spans)
+    public function report(array $spans): void
     {
         foreach ($spans as $span) {
             $this->logger->info($span->__toString());
