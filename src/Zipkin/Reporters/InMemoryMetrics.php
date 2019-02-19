@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Reporters;
 
 final class InMemoryMetrics implements Metrics

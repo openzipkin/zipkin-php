@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
@@ -51,7 +53,7 @@ final class NoopSpan implements Span
      * @param int|null $timestamp
      * @return void
      */
-    public function start(?int $timestamp = null)
+    public function start(?int $timestamp = null): void
     {
     }
 
@@ -61,7 +63,7 @@ final class NoopSpan implements Span
      * @param string $name
      * @return void
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
     }
 
@@ -73,7 +75,7 @@ final class NoopSpan implements Span
      * @param string $kind
      * @return void
      */
-    public function setKind(string $kind)
+    public function setKind(string $kind): void
     {
     }
 
@@ -87,7 +89,7 @@ final class NoopSpan implements Span
      * @param string $value value, cannot be <code>null</code>.
      * @return void
      */
-    public function setTag(string $key, string $value)
+    public function setTag(string $key, string $value): void
     {
     }
 
@@ -99,7 +101,7 @@ final class NoopSpan implements Span
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp)
+    public function annotate(string $value, int $timestamp): void
     {
     }
 
@@ -111,7 +113,7 @@ final class NoopSpan implements Span
      * @param Endpoint $remoteEndpoint
      * @return void
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint)
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
     }
 
@@ -120,7 +122,7 @@ final class NoopSpan implements Span
      *
      * @return void
      */
-    public function abandon()
+    public function abandon(): void
     {
     }
 
@@ -133,7 +135,7 @@ final class NoopSpan implements Span
      * @param int|null $timestamp
      * @return void
      */
-    public function finish(?int $timestamp = null)
+    public function finish(?int $timestamp = null): void
     {
     }
 
@@ -149,7 +151,7 @@ final class NoopSpan implements Span
      *
      * @return void
      */
-    public function flush()
+    public function flush(): void
     {
     }
 
@@ -163,7 +165,7 @@ final class NoopSpan implements Span
      * @param string $value value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag(string $key, string $value)
+    public function tag(string $key, string $value): void
     {
     }
 }

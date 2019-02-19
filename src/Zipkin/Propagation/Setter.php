@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Propagation;
 
 interface Setter
@@ -12,5 +14,5 @@ interface Setter
      * @param string $value
      * @return void
      */
-    public function put(&$carrier, string $key, string $value);
+    public function put(&$carrier, string $key, string $value): void;
 }
