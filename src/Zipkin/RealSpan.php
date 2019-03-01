@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin;
 
 use InvalidArgumentException;
@@ -65,7 +67,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function start(?int $timestamp = null)
+    public function start(?int $timestamp = null): void
     {
         if ($timestamp === null) {
             $timestamp = now();
@@ -86,7 +88,7 @@ final class RealSpan implements Span
      * @param string $name
      * @return void
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->recorder->setName($this->traceContext, $name);
     }
@@ -99,7 +101,7 @@ final class RealSpan implements Span
      * @param string $kind
      * @return void
      */
-    public function setKind(string $kind)
+    public function setKind(string $kind): void
     {
         $this->recorder->setKind($this->traceContext, $kind);
     }
@@ -114,7 +116,7 @@ final class RealSpan implements Span
      * @param string $value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag(string $key, string $value)
+    public function tag(string $key, string $value): void
     {
         $this->recorder->tag($this->traceContext, $key, $value);
     }
@@ -128,7 +130,7 @@ final class RealSpan implements Span
      * @throws \InvalidArgumentException
      * @see Zipkin\Annotations
      */
-    public function annotate(string $value, ?int $timestamp = null)
+    public function annotate(string $value, ?int $timestamp = null): void
     {
         if (!isValid($timestamp)) {
             throw new InvalidArgumentException(
@@ -147,7 +149,7 @@ final class RealSpan implements Span
      * @param Endpoint $remoteEndpoint
      * @return void
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint)
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
         $this->recorder->setRemoteEndpoint($this->traceContext, $remoteEndpoint);
     }
@@ -157,7 +159,7 @@ final class RealSpan implements Span
      *
      * @return void
      */
-    public function abandon()
+    public function abandon(): void
     {
         $this->recorder->abandon($this->traceContext);
     }
@@ -172,7 +174,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function finish(?int $timestamp = null)
+    public function finish(?int $timestamp = null): void
     {
         if ($timestamp !== null && !Timestamp\isValid($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');
@@ -197,7 +199,7 @@ final class RealSpan implements Span
      *
      * @return void
      */
-    public function flush()
+    public function flush(): void
     {
         $this->recorder->flush($this->traceContext);
     }

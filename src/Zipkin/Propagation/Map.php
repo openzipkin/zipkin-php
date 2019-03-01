@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Propagation;
 
 use ArrayAccess;
@@ -31,7 +33,7 @@ final class Map implements Getter, Setter
      * {@inheritdoc}
      * @param array|ArrayAccess $carrier
      */
-    public function put(&$carrier, string $key, string $value)
+    public function put(&$carrier, string $key, string $value): void
     {
         if ($key === '') {
             throw InvalidPropagationKey::forEmptyKey();

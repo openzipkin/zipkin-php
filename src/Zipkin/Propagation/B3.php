@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Propagation;
 
 use InvalidArgumentException;
@@ -99,19 +101,23 @@ final class B3 implements Propagation
          * @return TraceContext|SamplingFlags
          */
         return function ($carrier) use ($getter) {
-            $sampledString = $getter->get($carrier, self::SAMPLED_NAME);
+            $isSampledRaw = $getter->get($carrier, self::SAMPLED_NAME);
 
             $isSampled = SamplingFlags::EMPTY_SAMPLED;
-            if ($sampledString !== null) {
-                if ($sampledString === '1' || strtolower($sampledString) === 'true') {
+            if ($isSampledRaw !== null) {
+                if ($isSampledRaw === '1' || strtolower($isSampledRaw) === 'true') {
                     $isSampled = true;
-                } elseif ($sampledString === '0' || strtolower($sampledString) === 'false') {
+                } elseif ($isSampledRaw === '0' || strtolower($isSampledRaw) === 'false') {
                     $isSampled = false;
                 }
             }
 
-            $isDebug = SamplingFlags::EMPTY_DEBUG;
             $isDebugRaw = $getter->get($carrier, self::FLAGS_NAME);
+            
+            /**
+             * @var bool|null
+             */
+            $isDebug = SamplingFlags::EMPTY_DEBUG;
             if ($isDebugRaw !== null) {
                 $isDebug = ($isDebugRaw === '1');
             }

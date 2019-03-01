@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
@@ -29,7 +31,7 @@ interface Span
      * @param int|null $timestamp
      * @return void
      */
-    public function start(?int $timestamp = null);
+    public function start(?int $timestamp = null): void;
 
     /**
      * Sets the string name for the logical operation this span represents.
@@ -37,7 +39,7 @@ interface Span
      * @param string $name
      * @return void
      */
-    public function setName(string $name);
+    public function setName(string $name): void;
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
@@ -49,7 +51,7 @@ interface Span
      * @param string $kind
      * @return void
      */
-    public function setKind(string $kind);
+    public function setKind(string $kind): void;
 
     /**
      * Tags give your span context for search, viewing and analysis. For example, a key
@@ -61,7 +63,7 @@ interface Span
      * @param string $value value, cannot be <code>null</code>.
      * @return void
      */
-    public function tag(string $key, string $value);
+    public function tag(string $key, string $value): void;
 
     /**
      * Associates an event that explains latency with the current system time.
@@ -71,7 +73,7 @@ interface Span
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp);
+    public function annotate(string $value, int $timestamp): void;
 
     /**
      * For a client span, this would be the server's address.
@@ -81,14 +83,14 @@ interface Span
      * @param Endpoint $remoteEndpoint
      * @return void
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint);
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void;
 
     /**
      * Throws away the current span without reporting it.
      *
      * @return void
      */
-    public function abandon();
+    public function abandon(): void;
 
     /**
      * Like {@link #finish()}, except with a given timestamp in microseconds.
@@ -99,7 +101,7 @@ interface Span
      * @param int|null $timestamp
      * @return void
      */
-    public function finish(?int $timestamp = null);
+    public function finish(?int $timestamp = null): void;
 
     /**
      * Reports the span, even if unfinished. Most users will not call this method.
@@ -113,5 +115,5 @@ interface Span
      *
      * @return void
      */
-    public function flush();
+    public function flush(): void;
 }

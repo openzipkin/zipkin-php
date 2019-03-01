@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin\Propagation;
 
 use Zipkin\Propagation\DefaultSamplingFlags;
@@ -114,7 +116,7 @@ final class TraceContext implements SamplingFlags
      * @param TraceContext $parent
      * @return TraceContext
      */
-    public static function createFromParent(TraceContext $parent)
+    public static function createFromParent(TraceContext $parent): self
     {
         $nextId = Id\generateNextId();
 

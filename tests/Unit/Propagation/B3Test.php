@@ -66,7 +66,7 @@ final class B3Test extends TestCase
     {
         $isSampled = $this->randomBoolean();
 
-        $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled;
+        $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled ? '1' : '0';
         $carrier[strtolower(self::FLAGS_NAME)] = '1';
 
         $getter = new Map();
@@ -126,7 +126,7 @@ final class B3Test extends TestCase
         ];
     }
 
-    private function randomBoolean()
+    private function randomBoolean(): bool
     {
         return (mt_rand(0, 1) === 1);
     }
