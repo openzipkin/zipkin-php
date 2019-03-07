@@ -7,10 +7,7 @@
 [![Total Downloads](https://poser.pugx.org/openzipkin/zipkin/downloads)](https://packagist.org/packages/openzipkin/zipkin)
 [![License](https://img.shields.io/packagist/l/openzipkin/zipkin.svg)](https://github.com/openzipkin/zipkin-php/blob/master/LICENSE)
 
-This is a **production ready** PHP library for Zipkin.
-
-This is a simple example of usage, for a more complete frontend/backend 
-example, check [this repository](https://github.com/openzipkin/zipkin-php-example).
+Zipkin PHP is the official PHP Tracer implementation for Zipkin, supported by the OpenZipkin community.
 
 ## Installation
 
@@ -47,6 +44,8 @@ $tracer = $tracing->getTracer();
 
 $tracer->flush();
 ```
+
+**Obs.** for a more complete frontend/backend example, check [this repository](https://github.com/openzipkin/zipkin-php-example).
 
 ## Tracing
 
