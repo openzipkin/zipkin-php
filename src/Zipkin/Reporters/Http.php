@@ -29,6 +29,10 @@ final class Http implements Reporter
     private $options;
 
     /**
+     * logger is only meant to be used for development purposes. Enabling
+     * an actual logger in production could cause a massive amount of data
+     * that will flood the logs.
+     *
      * @var LoggerInterface
      */
     private $logger;
@@ -63,7 +67,7 @@ final class Http implements Reporter
         try {
             $client($payload);
         } catch (RuntimeException $e) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error(sprintf('failed to report spans: %s', $e->getMessage()));
         }
     }
 }
