@@ -39,8 +39,9 @@ final class CurlFactory implements ClientFactory
         return static function ($payload) use ($options) {
             $handle = curl_init($options['endpoint_url']);
             if ($handle === false) {
-                return static function () {
-                };
+                throw new RuntimeException(
+                    sprintf('failed to create the handle for url "%s"', $options['endpoint_url'])
+                );
             }
 
             curl_setopt($handle, CURLOPT_POST, 1);
