@@ -40,7 +40,7 @@ final class DefaultTracing implements Tracing
         Sampler $sampler,
         $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
-        $isNoop = false
+        ?bool $isNoop = false
     ) {
         $this->tracer = new Tracer(
             $localEndpoint,
