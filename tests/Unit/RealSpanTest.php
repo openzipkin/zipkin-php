@@ -11,11 +11,11 @@ use function Zipkin\Timestamp\now;
 use const Zipkin\Annotations\WIRE_SEND;
 use Zipkin\Propagation\TraceContext;
 
-class RealSpanTest extends TestCase
+final class RealSpanTest extends TestCase
 {
-    const TEST_NAME = 'test_span';
-    const TEST_KIND = 'ab';
-    const TEST_START_TIMESTAMP = 1472470996199000;
+    private const TEST_NAME = 'test_span';
+    private const TEST_KIND = 'ab';
+    private const TEST_START_TIMESTAMP = 1472470996199000;
 
     public function testCreateRealSpanSuccess()
     {

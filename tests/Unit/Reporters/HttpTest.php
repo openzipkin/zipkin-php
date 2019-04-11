@@ -49,7 +49,7 @@ final class HttpTest extends TestCase
         $span = Span::createFromContext($context, $localEndpoint);
         $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
         $logger = $this->prophesize(LoggerInterface::class);
-        $logger->error(HttpMockFactory::ERROR_MESSAGE)->shouldBeCalled();
+        $logger->error(Argument::containingString(HttpMockFactory::ERROR_MESSAGE))->shouldBeCalled();
 
         $mockFactory = HttpMockFactory::createAsFailing();
         $httpReporter = new Http($mockFactory, [], $logger->reveal());

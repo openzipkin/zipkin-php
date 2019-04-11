@@ -12,7 +12,7 @@ use Zipkin\TracingBuilder;
 
 final class TracingBuilderTest extends TestCase
 {
-    const SERVICE_NAME = 'service_name';
+    private const SERVICE_NAME = 'service_name';
 
     public function testCreatingTracingWithDefaultValuesSuccess()
     {
