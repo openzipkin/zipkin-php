@@ -154,7 +154,7 @@ class TracingBuilder
         if ($this->localEndpoint === null) {
             $localEndpoint = Endpoint::createFromGlobals();
             if ($this->localServiceName !== null) {
-                $localEndpoint->withServiceName($this->localServiceName);
+                $localEndpoint = $localEndpoint->withServiceName($this->localServiceName);
             }
         }
 
