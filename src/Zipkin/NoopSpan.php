@@ -51,20 +51,22 @@ final class NoopSpan implements Span
      * set its name without lock contention.
      *
      * @param int|null $timestamp
-     * @return void
+     * @return self
      */
-    public function start(?int $timestamp = null): void
+    public function start(?int $timestamp = null): Span
     {
+        return $this;
     }
 
     /**
      * Sets the string name for the logical operation this span represents.
      *
      * @param string $name
-     * @return void
+     * @return self
      */
-    public function setName(string $name): void
+    public function setName(string $name): Span
     {
+        return $this;
     }
 
     /**
@@ -73,10 +75,11 @@ final class NoopSpan implements Span
      * and that plus its duration as "ss".
      *
      * @param string $kind
-     * @return void
+     * @return self
      */
-    public function setKind(string $kind): void
+    public function setKind(string $kind): Span
     {
+        return $this;
     }
 
     /**
@@ -87,10 +90,11 @@ final class NoopSpan implements Span
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
      * @param string $value value, cannot be <code>null</code>.
-     * @return void
+     * @return self
      */
-    public function setTag(string $key, string $value): void
+    public function tag(string $key, string $value): Span
     {
+        return $this;
     }
 
     /**
@@ -98,11 +102,12 @@ final class NoopSpan implements Span
      *
      * @param string $value A short tag indicating the event, like "finagle.retry"
      * @param int $timestamp
-     * @return void
+     * @return self
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp): void
+    public function annotate(string $value, int $timestamp): Span
     {
+        return $this;
     }
 
     /**
@@ -111,10 +116,11 @@ final class NoopSpan implements Span
      * It is often expensive to derive a remote address: always check {@link #isNoop()} first!
      *
      * @param Endpoint $remoteEndpoint
-     * @return void
+     * @return self
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): Span
     {
+        return $this;
     }
 
     /**
@@ -152,20 +158,6 @@ final class NoopSpan implements Span
      * @return void
      */
     public function flush(): void
-    {
-    }
-
-    /**
-     * Tags give your span context for search, viewing and analysis. For example, a key
-     * "your_app.version" would let you lookup spans by version. A tag {@link Zipkin\Tags\SQL_QUERY}
-     * isn't searchable, but it can help in debugging when viewing a trace.
-     *
-     * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
-     * standard ones.
-     * @param string $value value, cannot be <code>null</code>.
-     * @return void
-     */
-    public function tag(string $key, string $value): void
     {
     }
 }

@@ -38,8 +38,6 @@ final class CurrentTraceContext
 
     /**
      * Returns the current span context in scope or null if there isn't one.
-     *
-     * @return TraceContext|null
      */
     public function getContext(): ?TraceContext
     {

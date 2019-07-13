@@ -29,17 +29,17 @@ interface Span
      * set its name without lock contention.
      *
      * @param int|null $timestamp
-     * @return void
+     * @return self
      */
-    public function start(?int $timestamp = null): void;
+    public function start(?int $timestamp = null): self;
 
     /**
      * Sets the string name for the logical operation this span represents.
      *
      * @param string $name
-     * @return void
+     * @return self
      */
-    public function setName(string $name): void;
+    public function setName(string $name): self;
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
@@ -49,9 +49,9 @@ interface Span
      * The value must be strictly one of the ones listed in {@link Kind}.
      *
      * @param string $kind
-     * @return void
+     * @return self
      */
-    public function setKind(string $kind): void;
+    public function setKind(string $kind): self;
 
     /**
      * Tags give your span context for search, viewing and analysis. For example, a key
@@ -61,19 +61,19 @@ interface Span
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
      * @param string $value value, cannot be <code>null</code>.
-     * @return void
+     * @return self
      */
-    public function tag(string $key, string $value): void;
+    public function tag(string $key, string $value): self;
 
     /**
      * Associates an event that explains latency with the current system time.
      *
      * @param string $value A short tag indicating the event, like "finagle.retry"
      * @param int $timestamp
-     * @return void
+     * @return self
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp): void;
+    public function annotate(string $value, int $timestamp): self;
 
     /**
      * For a client span, this would be the server's address.
@@ -81,9 +81,9 @@ interface Span
      * It is often expensive to derive a remote address: always check {@link #isNoop()} first!
      *
      * @param Endpoint $remoteEndpoint
-     * @return void
+     * @return self
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void;
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): self;
 
     /**
      * Throws away the current span without reporting it.

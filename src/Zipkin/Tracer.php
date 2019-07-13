@@ -10,6 +10,7 @@ use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Sampler;
+use InvalidArgumentException;
 
 final class Tracer
 {
@@ -62,9 +63,8 @@ final class Tracer
     }
 
     /**
-     * Creates a new trace. If there is an existing trace, use {@link #newChild(TraceContext)}
-     * instead.
-     *
+     * Creates a new span. If there is an existing parent span, pass it as
+     * "parent" in the options.
      *
      * For example, to sample all requests for a specific url:
      * <pre>{@code
@@ -76,33 +76,77 @@ final class Tracer
      *   } else if (strpos('/static', $uri) !== false) {
      *     $flags = SamplingFlags::createAsNotSampled();
      *   }
-     *   return $this->tracer->newTrace($flags);
+     *   return $this->tracer->startSpan('request', ['parent' => $flags]);
      * }
      * }</pre>
-     *
-     * @param SamplingFlags $samplingFlags
-     * @return Span
      */
-    public function newTrace(SamplingFlags $samplingFlags = null): Span
+    public function startSpan(string $name, array $options = []): Span
     {
-        if ($samplingFlags === null) {
-            $samplingFlags = DefaultSamplingFlags::createAsEmpty();
+        $parent = $options['parent'] ?? null;
+        if (!($parent instanceof TraceContext)) {
+            if ($parent === null || $parent instanceof SamplingFlags) {
+                $parent = $this->newRootContext($parent);
+            } else {
+                throw new InvalidArgumentException(sprintf(
+                    'Invalid type for parent: null, %s or %s expected',
+                    SamplingFlags::class,
+                    TraceContext::class
+                ));
+            }
         }
 
-        return $this->ensureSampled($this->newRootContext($samplingFlags));
+        $span = $this->toSpan($parent);
+
+        $defaultTags = $options['tags'] ?? [];
+        foreach ($defaultTags as $key => $value) {
+            $span->tag($key, (string) $value);
+        }
+
+        if (array_key_exists('remote_endpoint', $options)) {
+            $span->setRemoteEndpoint($options['remote_endpoint']);
+        }
+
+        if (array_key_exists('kind', $options)) {
+            $span->setKind($options['kind']);
+        }
+        
+        return $span->setName($name)->start($options['start_time'] ?? null);
     }
 
     /**
-     * Creates a new span within an existing trace. If there is no existing trace, use {@link
-     * #newTrace()} instead.
+     * This creates a new span based on parameters extracted from an incoming request. This will
+     * always result in a new span. If no trace identifiers were extracted, a span will be created
+     * based on the implicit context in the same manner as {@link #nextSpan()}.
      *
-     * @param TraceContext $parent
-     * @return Span
-     * @throws \RuntimeException
+     * <p>Ex.
+     * <pre>{@code
+     * $extracted = $extractor->extract($headers);
+     * $span = $tracer->startNextSpan($extracted);
+     * }</pre>
+     *
+     * <p><em>Note:</em> Unlike {@link #joinSpan(TraceContext)}, this does not attempt to re-use
+     * extracted span IDs. This means the extracted context (if any) is the parent of the span
+     * returned.
+     *
+     * <p><em>Note:</em> If a context could be extracted from the input, that trace is resumed, not
+     * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
+     * so that data is written to the correct trace.
+     *
+     * @throws RuntimeException
      */
-    public function newChild(TraceContext $parent): Span
+    public function startNextSpan(string $name, array $options = []): Span
     {
-        return $this->nextSpan($parent);
+        $parent = $this->currentTraceContext->getContext();
+
+        if ($parent === null) {
+            return $this->startSpan($name, $options);
+        }
+
+        if ($parent instanceof TraceContext) {
+            return $this->startSpan($name, ['parent' => TraceContext::createFromParent($parent)] + $options);
+        }
+
+        throw new RuntimeException('Context or flags for next span is invalid.');
     }
 
     /**
@@ -177,82 +221,29 @@ final class Tracer
     }
 
     /**
-     * This creates a new span based on parameters extracted from an incoming request. This will
-     * always result in a new span. If no trace identifiers were extracted, a span will be created
-     * based on the implicit context in the same manner as {@link #nextSpan()}.
-     *
-     * <p>Ex.
-     * <pre>{@code
-     * $extracted = $extractor->extract($headers);
-     * $span = $tracer->nextSpan($extracted);
-     * }</pre>
-     *
-     * <p><em>Note:</em> Unlike {@link #joinSpan(TraceContext)}, this does not attempt to re-use
-     * extracted span IDs. This means the extracted context (if any) is the parent of the span
-     * returned.
-     *
-     * <p><em>Note:</em> If a context could be extracted from the input, that trace is resumed, not
-     * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
-     * so that data is written to the correct trace.
-     *
-     * @param SamplingFlags|TraceContext $contextOrFlags
-     * @return Span
-     * @throws \RuntimeException
-     */
-    public function nextSpan(?SamplingFlags $contextOrFlags = null): Span
-    {
-        if ($contextOrFlags === null) {
-            $parent = $this->currentTraceContext->getContext();
-            return $parent === null ? $this->newTrace() : $this->newChild($parent);
-        }
-
-        if ($contextOrFlags instanceof TraceContext) {
-            return $this->toSpan(TraceContext::createFromParent($contextOrFlags));
-        }
-
-        if ($contextOrFlags instanceof SamplingFlags) {
-            $implicitParent = $this->currentTraceContext->getContext();
-            if ($implicitParent === null) {
-                return $this->toSpan($this->newRootContext($contextOrFlags));
-            }
-        }
-
-        throw new RuntimeException('Context or flags for next span is invalid.');
-    }
-
-    /**
      * @param SamplingFlags|TraceContext $contextOrFlags
      * @return TraceContext
      */
-    private function newRootContext(SamplingFlags $contextOrFlags): TraceContext
+    private function newRootContext(?SamplingFlags $contextOrFlags = null): TraceContext
     {
         $context = TraceContext::createAsRoot($contextOrFlags, $this->usesTraceId128bits);
+        return $this->ensureSampled($context);
+    }
 
+    /**
+     * @param TraceContext $context
+     */
+    private function ensureSampled(TraceContext $context): TraceContext
+    {
         if ($context->isSampled() === null) {
-            $context = $context->withSampled($this->sampler->isSampled($context->getTraceId()));
+            return $context->withSampled($this->sampler->isSampled($context->getTraceId()));
         }
 
         return $context;
     }
 
     /**
-     * @param TraceContext $context
-     * @return Span
-     */
-    private function ensureSampled(TraceContext $context): Span
-    {
-        if ($context->isSampled() === null) {
-            $context = $context->withSampled($this->sampler->isSampled($context->getTraceId()));
-        }
-
-        return $this->toSpan($context);
-    }
-
-    /**
      * Converts the context as-is to a Span object
-     *
-     * @param TraceContext $context
-     * @return Span
      */
     private function toSpan(TraceContext $context): Span
     {

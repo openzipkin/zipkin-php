@@ -17,9 +17,7 @@ final class InMemoryTest extends TestCase
             ->havingReporter($reporter)
             ->build();
 
-        $span = $tracing->getTracer()->nextSpan();
-        $span->start();
-        $span->finish();
+        $tracing->getTracer()->startNextSpan('name')->finish();
 
         $tracing->getTracer()->flush();
         $flushedSpans = $reporter->flush();

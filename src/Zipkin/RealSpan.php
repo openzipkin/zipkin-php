@@ -32,7 +32,7 @@ final class RealSpan implements Span
      * @param Recorder $recorder
      * @return RealSpan
      */
-    public static function create(TraceContext $context, Recorder $recorder): self
+    public static function create(TraceContext $context, Recorder $recorder): Span
     {
         return new self($context, $recorder);
     }
@@ -64,10 +64,10 @@ final class RealSpan implements Span
      * set its name without lock contention.
      *
      * @param int $timestamp
-     * @return void
+     * @return self
      * @throws \InvalidArgumentException
      */
-    public function start(?int $timestamp = null): void
+    public function start(?int $timestamp = null): Span
     {
         if ($timestamp === null) {
             $timestamp = now();
@@ -80,17 +80,19 @@ final class RealSpan implements Span
         }
 
         $this->recorder->start($this->traceContext, $timestamp);
+        return $this;
     }
 
     /**
      * Sets the string name for the logical operation this span represents.
      *
      * @param string $name
-     * @return void
+     * @return self
      */
-    public function setName(string $name): void
+    public function setName(string $name): Span
     {
         $this->recorder->setName($this->traceContext, $name);
+        return $this;
     }
 
     /**
@@ -99,11 +101,12 @@ final class RealSpan implements Span
      * and that plus its duration as "ss".
      *
      * @param string $kind
-     * @return void
+     * @return self
      */
-    public function setKind(string $kind): void
+    public function setKind(string $kind): Span
     {
         $this->recorder->setKind($this->traceContext, $kind);
+        return $this;
     }
 
     /**
@@ -114,11 +117,12 @@ final class RealSpan implements Span
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
      * @param string $value, cannot be <code>null</code>.
-     * @return void
+     * @return self
      */
-    public function tag(string $key, string $value): void
+    public function tag(string $key, string $value): Span
     {
         $this->recorder->tag($this->traceContext, $key, $value);
+        return $this;
     }
 
     /**
@@ -126,19 +130,20 @@ final class RealSpan implements Span
      *
      * @param string $value A short tag indicating the event, like "finagle.retry"
      * @param int|null $timestamp
-     * @return void
+     * @return self
      * @throws \InvalidArgumentException
      * @see Zipkin\Annotations
      */
-    public function annotate(string $value, ?int $timestamp = null): void
+    public function annotate(string $value, ?int $timestamp = null): Span
     {
-        if (!isValid($timestamp)) {
+        if ($timestamp !== null && !isValid($timestamp)) {
             throw new InvalidArgumentException(
                 sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
             );
         }
 
-        $this->recorder->annotate($this->traceContext, $timestamp, $value);
+        $this->recorder->annotate($this->traceContext, $timestamp ?? now(), $value);
+        return $this;
     }
 
     /**
@@ -147,11 +152,12 @@ final class RealSpan implements Span
      * It is often expensive to derive a remote address: always check {@link #isNoop()} first!
      *
      * @param Endpoint $remoteEndpoint
-     * @return void
+     * @return self
      */
-    public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
+    public function setRemoteEndpoint(Endpoint $remoteEndpoint): Span
     {
         $this->recorder->setRemoteEndpoint($this->traceContext, $remoteEndpoint);
+        return $this;
     }
 
     /**

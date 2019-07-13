@@ -112,11 +112,7 @@ final class TraceContext implements SamplingFlags
         );
     }
 
-    /**
-     * @param TraceContext $parent
-     * @return TraceContext
-     */
-    public static function createFromParent(TraceContext $parent): self
+    public static function createFromParent(TraceContext $parent): TraceContext
     {
         $nextId = Id\generateNextId();
 
@@ -186,11 +182,7 @@ final class TraceContext implements SamplingFlags
         return $this->parentId;
     }
 
-    /**
-     * @param string $isSampled
-     * @return TraceContext
-     */
-    public function withSampled($isSampled): TraceContext
+    public function withSampled(bool $isSampled): TraceContext
     {
         return new TraceContext(
             $this->traceId,

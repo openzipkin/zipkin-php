@@ -53,7 +53,7 @@ final class TracerTest extends TestCase
 
         $samplingFlags = DefaultSamplingFlags::create(true, false);
 
-        $span = $tracer->newTrace($samplingFlags);
+        $span = $tracer->startSpan('exec', ['parent' => $samplingFlags]);
 
         $this->assertEquals(true, $span->getContext()->isSampled());
         $this->assertEquals(false, $span->getContext()->isDebug());
@@ -75,7 +75,7 @@ final class TracerTest extends TestCase
 
         $samplingFlags = DefaultSamplingFlags::create(true, false);
 
-        $span = $tracer->newTrace($samplingFlags);
+        $span = $tracer->startSpan('exec', ['parent' => $samplingFlags]);
 
         $this->assertEquals(true, $span->getContext()->isSampled());
         $this->assertEquals(false, $span->getContext()->isDebug());
@@ -98,7 +98,7 @@ final class TracerTest extends TestCase
 
         $traceContext = TraceContext::createAsRoot($samplingFlags);
 
-        $span = $tracer->newChild($traceContext);
+        $span = $tracer->startSpan('exec', ['parent' => $traceContext]);
 
         $this->assertInstanceOf(NoopSpan::class, $span);
     }
@@ -118,7 +118,7 @@ final class TracerTest extends TestCase
 
         $traceContext = TraceContext::createAsRoot($samplingFlags);
 
-        $span = $tracer->newChild($traceContext);
+        $span = $tracer->startSpan('exec', ['parent' => $traceContext]);
 
         $this->assertInstanceOf(RealSpan::class, $span);
     }
@@ -134,7 +134,7 @@ final class TracerTest extends TestCase
             false
         );
 
-        $span = $tracer->newTrace(DefaultSamplingFlags::createAsEmpty());
+        $span = $tracer->startSpan('exec', ['parent' => DefaultSamplingFlags::createAsEmpty()]);
         $this->assertTrue($span->getContext()->isSampled());
     }
 
@@ -149,7 +149,7 @@ final class TracerTest extends TestCase
             false
         );
 
-        $span = $tracer->newTrace(DefaultSamplingFlags::createAsEmpty());
+        $span = $tracer->startSpan('exec', ['parent' => DefaultSamplingFlags::createAsEmpty()]);
         $this->assertFalse($span->getContext()->isSampled());
     }
 
@@ -168,15 +168,15 @@ final class TracerTest extends TestCase
             false
         );
 
-        $span = $tracer->nextSpan();
+        $span = $tracer->startNextSpan('exec');
 
         $this->assertContextParentOf($context, $span->getContext());
     }
 
-    public function testNextSpanIsCreatedFromContext()
+    public function testNextSpanIsCreatedFromExistingContext()
     {
         $context = TraceContext::createAsRoot();
-
+        $scopeCloser = $this->currentTracerContext->createScopeAndRetrieveItsCloser($context);
         $tracer = new Tracer(
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
@@ -186,8 +186,9 @@ final class TracerTest extends TestCase
             false
         );
 
-        $span = $tracer->nextSpan($context);
+        $span = $tracer->startNextSpan('exec');
         $this->assertContextParentOf($context, $span->getContext());
+        $scopeCloser();
     }
 
     /**
@@ -206,7 +207,7 @@ final class TracerTest extends TestCase
             false
         );
 
-        $span = $tracer->nextSpan($samplingFlags);
+        $span = $tracer->startNextSpan('exec', ['parent' => $samplingFlags]);
 
         $this->assertSameSamplingFlags($samplingFlags, $span->getContext());
     }
@@ -227,7 +228,7 @@ final class TracerTest extends TestCase
             false
         );
 
-        $span = $tracer->nextSpan($samplingFlags);
+        $span = $tracer->startNextSpan('exec', ['parent' => $samplingFlags]);
         $this->assertEquals($isNoop, $span->isNoop());
     }
 
