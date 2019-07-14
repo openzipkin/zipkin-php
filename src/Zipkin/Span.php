@@ -60,7 +60,7 @@ interface Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param string $value value, cannot be <code>null</code>.
+     * @param string $value value.
      * @return self
      */
     public function tag(string $key, string $value): self;
@@ -93,10 +93,9 @@ interface Span
     public function abandon(): void;
 
     /**
-     * Like {@link #finish()}, except with a given timestamp in microseconds.
-     *
-     * {@link zipkin.Span#duration Zipkin's span duration} is derived by subtracting the start
-     * timestamp from this, and set when appropriate.
+     * {@link Span#duration Zipkin's span duration} is derived by subtracting the start
+     * timestamp from the provided finish timestamp (using NOW if none provided), and 
+     * set when appropriate.
      *
      * @param int|null $timestamp
      * @return void

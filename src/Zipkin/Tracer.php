@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
+use Throwable;
+use Zipkin\Sampler;
 use RuntimeException;
+use Zipkin\Tags;
+use InvalidArgumentException;
+use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
-use Zipkin\Propagation\SamplingFlags;
-use Zipkin\Propagation\TraceContext;
-use Zipkin\Sampler;
-use InvalidArgumentException;
 
 final class Tracer
 {
@@ -39,14 +41,6 @@ final class Tracer
      */
     private $currentTraceContext;
 
-    /**
-     * @param Endpoint $localEndpoint
-     * @param Reporter $reporter
-     * @param Sampler $sampler
-     * @param bool $usesTraceId128bits
-     * @param CurrentTraceContext $currentTraceContext
-     * @param bool $isNoop
-     */
     public function __construct(
         Endpoint $localEndpoint,
         Reporter $reporter,
@@ -64,7 +58,7 @@ final class Tracer
 
     /**
      * Creates a new span. If there is an existing parent span, pass it as
-     * "parent" in the options.
+     * 'parent' in the options.
      *
      * For example, to sample all requests for a specific url:
      * <pre>{@code
@@ -114,28 +108,33 @@ final class Tracer
     }
 
     /**
-     * This creates a new span based on parameters extracted from an incoming request. This will
-     * always result in a new span. If no trace identifiers were extracted, a span will be created
-     * based on the implicit context in the same manner as {@link #nextSpan()}.
+     * This creates a new span based on parameters extracted from an incoming request.
+     * This will always result in a new span. If no trace identifiers were extracted, 
+     * a span will be created based on the implicit context in the same manner as 
+     * {@link #startNextSpan()}.
      *
      * <p>Ex.
      * <pre>{@code
      * $extracted = $extractor->extract($headers);
-     * $span = $tracer->startNextSpan($extracted);
+     * $span = $tracer->startNextSpan($name, ['parent' => $extracted]);
      * }</pre>
      *
-     * <p><em>Note:</em> Unlike {@link #joinSpan(TraceContext)}, this does not attempt to re-use
-     * extracted span IDs. This means the extracted context (if any) is the parent of the span
-     * returned.
+     * <p><em>Note:</em> Unlike {@link #joinSpan(TraceContext)}, this does not attempt 
+     * to re-use extracted span IDs. This means the extracted context (if any) is the 
+     * parent of the span returned.
      *
-     * <p><em>Note:</em> If a context could be extracted from the input, that trace is resumed, not
-     * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
-     * so that data is written to the correct trace.
+     * <p><em>Note:</em> If a context could be extracted from the input, that trace is
+     * resumed, not whatever the {@link #currentSpan()} was. Make sure you re-apply 
+     * {@link #openScope(Span)} so that data is written to the correct trace.
      *
      * @throws RuntimeException
      */
     public function startNextSpan(string $name, array $options = []): Span
     {
+        if (array_key_exists('parent', $options)) {
+            return $this->startSpan($name, $options);
+        }
+
         $parent = $this->currentTraceContext->getContext();
 
         if ($parent === null) {
@@ -150,25 +149,43 @@ final class Tracer
     }
 
     /**
-     * Joining is re-using the same trace and span ids extracted from an incoming request. Here, we
-     * ensure a sampling decision has been made. If the span passed sampling, we assume this is a
-     * shared span, one where the caller and the current tracer report to the same span IDs. If no
-     * sampling decision occurred yet, we have exclusive access to this span ID.
+     * Instrument a callable by creating a Span that manages the startTime and endTime.
+     * If an exception is thrown while executing the callable, the exception will be caught,
+     * the span will be closed, and the exception will be re-thrown.
+     */
+    public function inSpan(string $name, array $options, callable $callable, ...$args)
+    {
+        $span = $this->startNextSpan($name, $options);
+        try {
+            return \call_user_func_array($callable, $args);
+        } catch(Throwable $e) {
+            $span->tag(Tags\ERROR, $e->getMessage());
+            throw $e;
+        } finally {
+            $span->finish();
+        }
+    }
+
+    /**
+     * Joining is re-using the same trace and span ids extracted from an incoming 
+     * request. Here, we ensure a sampling decision has been made. If the span passed
+     * sampling, we assume this is a shared span, one where the caller and the current
+     * tracer report to the same span IDs. If no sampling decision occurred yet, we 
+     * have exclusive access to this span ID.
      *
-     * <p>Here's an example of conditionally joining a span, depending on if a trace context was
-     * extracted from an incoming request.
+     * <p>Here's an example of conditionally joining a span, depending on if a trace 
+     * context was extracted from an incoming request.
      *
      * <pre>{@code
      * $contextOrFlags = $extractor->extract($request->headers);
      * span = ($contextOrFlags instanceof TraceContext)
      *          ? $tracer->joinSpan($contextOrFlags)
-     *          : $tracer->newTrace($contextOrFlags);
+     *          : $tracer->startSpan('request', ['parent' => $contextOrFlags]);
      * }</pre>
      *
      * @see Propagation
      * @see Extractor#extract(Object)
      *
-     * @param TraceContext $context
      * @return Span
      */
     public function joinSpan(TraceContext $context): Span
@@ -177,15 +194,15 @@ final class Tracer
     }
 
     /**
-     * Makes the given span the "current span" and returns the closer that exits that scope.
-     * The span provided will be returned by {@link #currentSpan()} until the return value is closed.
+     * Makes the given span the "current span" and returns the closer that exits 
+     * that scope. The span provided will be returned by {@link #currentSpan()} 
+     * until the return value is closed.
      *
-     * <p>Note: While downstream code might affect the span, calling this method, and calling the closer on
-     * the result have no effect on the input. For example, calling closer on the result does not
-     * finish the span. Not only is it safe to call the closer, you must call the closer to end the scope, or
-     * risk leaking resources associated with the scope.
-     *
-     * @param Span $span to place into scope or null to clear the scope
+     * <p>Note: While downstream code might affect the span, calling this method, 
+     * and calling the closer on the result have no effect on the input. For example,
+     * calling closer on the result does not finish the span. Not only is it safe to
+     * call the closer, you must call the closer to end the scope, or risk leaking 
+     * resources associated with the scope.
      *
      * @return callable The scope closer
      */
@@ -231,7 +248,7 @@ final class Tracer
     }
 
     /**
-     * @param TraceContext $context
+     * Makes sure a context includes a sampling decision.
      */
     private function ensureSampled(TraceContext $context): TraceContext
     {
