@@ -5,12 +5,9 @@ clone_folder: c:\projects\zipkin-php
 
 environment:
   matrix:
-  - dependencies: lowest
-    php_ver_target: 7.0
-  - dependencies: current
-    php_ver_target: 7.0
-  - dependencies: highest
-    php_ver_target: 7.2
+  - php_ver_target: 7.0
+  - php_ver_target: 7.1
+  - php_ver_target: 7.2
 
 ## Cache composer, chocolatey and php bits
 cache:
@@ -42,9 +39,7 @@ install:
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
     - cd c:\projects\zipkin-php
-    - IF %dependencies%==lowest appveyor-retry composer update --prefer-lowest --no-progress --profile -n
-    - IF %dependencies%==current appveyor-retry composer install --no-progress --profile
-    - IF %dependencies%==highest appveyor-retry composer update --no-progress --profile -n
+    - appveyor-retry composer update --prefer-lowest --no-progress --profile -n
     - composer show
 
 ## Run the actual test
