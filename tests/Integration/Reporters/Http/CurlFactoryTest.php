@@ -10,6 +10,9 @@ use RuntimeException;
 use Zipkin\Reporters\Http\CurlFactory;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group ignore-windows
+ */
 final class CurlFactoryTest extends TestCase
 {
     public function testHttpReportingSuccess()

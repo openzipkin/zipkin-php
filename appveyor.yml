@@ -47,4 +47,4 @@ install:
 ## Run the actual test
 test_script:
     - cd c:\projects\zipkin-php
-    - composer test
+    - composer test -- --exclude-group ignore-windows
