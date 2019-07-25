@@ -38,10 +38,11 @@ install:
     - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
     - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
+    - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
     - cd c:\projects\zipkin-php
-    - appveyor-retry composer update --prefer-lowest --no-progress --profile -n
+    - appveyor-retry composer update --no-progress --profile -n
     - composer show
 
 ## Run the actual test
