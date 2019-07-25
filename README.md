@@ -1,6 +1,7 @@
 # Zipkin instrumentation for PHP
 
 [![Build Status](https://travis-ci.org/openzipkin/zipkin-php.svg?branch=master)](https://travis-ci.org/openzipkin/zipkin-php)
+[![Build status](https://ci.appveyor.com/api/projects/status/f02q896uv1m3crg1?svg=true)](https://ci.appveyor.com/project/jcchavezs/zipkin-php)
 [![Latest Stable Version](https://poser.pugx.org/openzipkin/zipkin/v/stable)](https://packagist.org/packages/openzipkin/zipkin)
 [![Coverage Status](https://coveralls.io/repos/github/openzipkin/zipkin-php/badge.svg)](https://coveralls.io/github/openzipkin/zipkin-php)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.1-8892BF.svg)](https://php.net/)
