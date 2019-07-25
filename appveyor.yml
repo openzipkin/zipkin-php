@@ -43,9 +43,8 @@ install:
     - appveyor-retry appveyor DownloadFile https://getcomposer.org/composer.phar
     - cd c:\projects\zipkin-php
     - appveyor-retry composer install --no-progress --profile
-    - composer show
 
 ## Run the actual test
 test_script:
     - cd c:\projects\zipkin-php
-    - vendor/bin/phpunit -c phpunit.xml
+    - composer test
