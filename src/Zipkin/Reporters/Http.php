@@ -53,6 +53,9 @@ final class Http implements Reporter
      */
     public function report(array $spans): void
     {
+        if(empty($spans)){
+            return;
+        }
         $payload = json_encode(array_map(function (Span $span) {
             return $span->toArray();
         }, $spans));
