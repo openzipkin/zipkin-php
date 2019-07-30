@@ -15,21 +15,26 @@ final class HttpMockFactory implements ClientFactory
     private $content;
 
     /**
+     * @var int
+     */
+    private $calledTimes = 0;
+
+    /**
      * @var bool
      */
     private $shouldFail;
 
-    private function __construct($shouldFail)
+    private function __construct(bool $shouldFail)
     {
         $this->shouldFail = $shouldFail;
     }
 
-    public static function createAsSuccess()
+    public static function createAsSuccess(): self
     {
         return new self(false);
     }
 
-    public static function createAsFailing()
+    public static function createAsFailing(): self
     {
         return new self(true);
     }
@@ -42,17 +47,23 @@ final class HttpMockFactory implements ClientFactory
     {
         $self = $this;
 
-        return function ($payload) use (&$self) {
+        return function (string $payload) use (&$self) {
             if ($self->shouldFail) {
                 throw new RuntimeException(self::ERROR_MESSAGE);
             }
 
+            $self->calledTimes += 1;
             $self->content = $payload;
         };
     }
 
-    public function retrieveContent()
+    public function retrieveContent(): string
     {
         return $this->content;
+    }
+
+    public function calledTimes(): int
+    {
+        return $this->calledTimes;
     }
 }

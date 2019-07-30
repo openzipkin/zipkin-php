@@ -3,12 +3,10 @@
 namespace ZipkinTests\Unit\Reporters;
 
 use Zipkin\Endpoint;
-use RuntimeException;
 use Prophecy\Argument;
 use Zipkin\Recording\Span;
 use Zipkin\Reporters\Http;
 use Psr\Log\LoggerInterface;
-use Zipkin\Reporters\Metrics;
 use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\TraceContext;
 
@@ -36,10 +34,7 @@ final class HttpTest extends TestCase
         $httpReporter = new Http($mockFactory, [], $logger->reveal());
         $httpReporter->report([$span]);
 
-        $this->assertEquals(
-            $payload,
-            $mockFactory->retrieveContent()
-        );
+        $this->assertEquals($payload, $mockFactory->retrieveContent());
     }
 
     public function testHttpReporterFails()
@@ -47,12 +42,23 @@ final class HttpTest extends TestCase
         $context = TraceContext::createAsRoot();
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
-        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
         $logger = $this->prophesize(LoggerInterface::class);
         $logger->error(Argument::containingString(HttpMockFactory::ERROR_MESSAGE))->shouldBeCalled();
 
         $mockFactory = HttpMockFactory::createAsFailing();
         $httpReporter = new Http($mockFactory, [], $logger->reveal());
         $httpReporter->report([$span]);
+    }
+
+    public function testHttpReportsEmptySpansSuccess()
+    {
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->error()->shouldNotBeCalled();
+
+        $mockFactory = HttpMockFactory::createAsFailing();
+        $httpReporter = new Http($mockFactory, [], $logger->reveal());
+        $httpReporter->report([]);
+
+        $this->assertEquals(0, $mockFactory->calledTimes());
     }
 }
