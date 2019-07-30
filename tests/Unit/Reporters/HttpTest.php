@@ -42,6 +42,8 @@ final class HttpTest extends PHPUnit_Framework_TestCase
             $payload,
             $mockFactory->retrieveContent()
         );
+
+        $this->assertEquals(1, $mockFactory->calledTimes());
     }
 
     public function testHttpReporterFails()
@@ -61,5 +63,17 @@ final class HttpTest extends PHPUnit_Framework_TestCase
         $mockFactory = HttpMockFactory::createAsFailing();
         $httpReporter = new Http($mockFactory, [], $metrics->reveal());
         $httpReporter->report([$span]);
+    }
+
+    public function testHttpReportsEmptySpansSuccess()
+    {
+        $metrics = $this->prophesize(Metrics::class);
+        $metrics->incrementSpans()->shouldNotBeCalled();
+
+        $mockFactory = HttpMockFactory::createAsFailing();
+        $httpReporter = new Http($mockFactory, [], $metrics->reveal());
+        $httpReporter->report([]);
+
+        $this->assertEquals(0, $mockFactory->calledTimes());
     }
 }
