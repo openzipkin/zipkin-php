@@ -13,6 +13,11 @@ final class HttpMockFactory implements ClientFactory
     private $content;
 
     /**
+     * @var int
+     */
+    private $calledTimes = 0;
+
+    /**
      * @var bool
      */
     private $shouldFail;
@@ -45,6 +50,7 @@ final class HttpMockFactory implements ClientFactory
                 throw new RuntimeException('Failed to report over http.');
             }
 
+            $self->calledTimes += 1;
             $self->content = $payload;
         };
     }
@@ -52,5 +58,10 @@ final class HttpMockFactory implements ClientFactory
     public function retrieveContent()
     {
         return $this->content;
+    }
+
+    public function calledTimes()
+    {
+        return $this->calledTimes;
     }
 }
