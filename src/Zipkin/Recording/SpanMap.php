@@ -30,7 +30,7 @@ final class SpanMap
     {
         $contextHash = $this->getHash($context);
 
-        if (!array_key_exists($contextHash, $this->map)) {
+        if (!\array_key_exists($contextHash, $this->map)) {
             return null;
         }
 
@@ -46,7 +46,7 @@ final class SpanMap
     {
         $contextHash = $this->getHash($context);
 
-        if (!array_key_exists($contextHash, $this->map)) {
+        if (!\array_key_exists($contextHash, $this->map)) {
             $this->map[$contextHash] = Span::createFromContext($context, $endpoint);
         }
 
@@ -61,7 +61,7 @@ final class SpanMap
     {
         $contextHash = $this->getHash($context);
 
-        if (!array_key_exists($contextHash, $this->map)) {
+        if (!\array_key_exists($contextHash, $this->map)) {
             return null;
         }
 
@@ -81,7 +81,7 @@ final class SpanMap
 
         $this->map = [];
 
-        return array_values($spans);
+        return \array_values($spans);
     }
 
     /**
@@ -90,6 +90,6 @@ final class SpanMap
      */
     private function getHash(TraceContext $context): int
     {
-        return crc32($context->getSpanId() . $context->getTraceId());
+        return \crc32($context->getSpanId() . $context->getTraceId());
     }
 }

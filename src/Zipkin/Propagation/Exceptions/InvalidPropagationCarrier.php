@@ -10,9 +10,9 @@ final class InvalidPropagationCarrier extends InvalidArgumentException
 {
     public static function forCarrier($carrier): self
     {
-        return new self(sprintf(
+        return new self(\sprintf(
             'Invalid carrier of type %s',
-            is_object($carrier) ? get_class($carrier) : gettype($carrier)
+            \is_object($carrier) ? \get_class($carrier) : \gettype($carrier)
         ));
     }
 }

@@ -16,7 +16,7 @@ final class InMemory implements Reporter
 
     public function report(array $spans): void
     {
-        $this->spans = array_merge($this->spans, $spans);
+        $this->spans = \array_merge($this->spans, $spans);
     }
 
     /**

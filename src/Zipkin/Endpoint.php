@@ -55,22 +55,22 @@ class Endpoint
         ?string $ipv6 = null,
         ?int $port = null
     ): self {
-        if ($ipv4 !== null && filter_var($ipv4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+        if ($ipv4 !== null && \filter_var($ipv4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
             throw new InvalidArgumentException(
-                sprintf('Invalid IPv4. Expected something in the range 0.0.0.0 and 255.255.255.255, got %s', $ipv4)
+                \sprintf('Invalid IPv4. Expected something in the range 0.0.0.0 and 255.255.255.255, got %s', $ipv4)
             );
         }
 
-        if ($ipv6 !== null && filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
+        if ($ipv6 !== null && \filter_var($ipv6, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
             throw new InvalidArgumentException(
-                sprintf('Invalid IPv6 %s', $ipv6)
+                \sprintf('Invalid IPv6 %s', $ipv6)
             );
         }
 
         if ($port !== null) {
             if ($port > 65535) {
                 throw new InvalidArgumentException(
-                    sprintf('Invalid port. Expected a number between 0 and 65535, got %d', $port)
+                    \sprintf('Invalid port. Expected a number between 0 and 65535, got %d', $port)
                 );
             }
         }
@@ -85,9 +85,9 @@ class Endpoint
     {
         return new self(
             PHP_SAPI,
-            array_key_exists('REMOTE_ADDR', $_SERVER) ? $_SERVER['REMOTE_ADDR'] : null,
+            \array_key_exists('REMOTE_ADDR', $_SERVER) ? $_SERVER['REMOTE_ADDR'] : null,
             null,
-            array_key_exists('REMOTE_PORT', $_SERVER) ? (int) $_SERVER['REMOTE_PORT'] : null
+            \array_key_exists('REMOTE_PORT', $_SERVER) ? (int) $_SERVER['REMOTE_PORT'] : null
         );
     }
 

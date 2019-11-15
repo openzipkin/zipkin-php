@@ -19,7 +19,7 @@ final class CurlFactory implements ClientFactory
      */
     public static function create(): self
     {
-        if (!function_exists('curl_init')) {
+        if (!\function_exists('curl_init')) {
             throw new BadFunctionCallException('cURL is not enabled');
         }
 
@@ -37,45 +37,45 @@ final class CurlFactory implements ClientFactory
          * @return void
          */
         return static function ($payload) use ($options) {
-            $handle = curl_init($options['endpoint_url']);
+            $handle = \curl_init($options['endpoint_url']);
             if ($handle === false) {
                 throw new RuntimeException(
-                    sprintf('failed to create the handle for url "%s"', $options['endpoint_url'])
+                    \sprintf('failed to create the handle for url "%s"', $options['endpoint_url'])
                 );
             }
 
-            curl_setopt($handle, CURLOPT_POST, 1);
-            curl_setopt($handle, CURLOPT_POSTFIELDS, $payload);
-            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            \curl_setopt($handle, CURLOPT_POST, 1);
+            \curl_setopt($handle, CURLOPT_POSTFIELDS, $payload);
+            \curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
             $requiredHeaders = [
                 'Content-Type' => 'application/json',
-                'Content-Length' => strlen($payload),
+                'Content-Length' => \strlen($payload),
             ];
             $additionalHeaders = (isset($options['headers']) ? $options['headers'] : []);
-            $headers = array_merge($additionalHeaders, $requiredHeaders);
-            $formattedHeaders = array_map(function ($key, $value) {
+            $headers = \array_merge($additionalHeaders, $requiredHeaders);
+            $formattedHeaders = \array_map(function ($key, $value) {
                 return $key . ': ' . $value;
-            }, array_keys($headers), $headers);
-            curl_setopt($handle, CURLOPT_HTTPHEADER, $formattedHeaders);
+            }, \array_keys($headers), $headers);
+            \curl_setopt($handle, CURLOPT_HTTPHEADER, $formattedHeaders);
 
             if (isset($options['timeout'])) {
-                curl_setopt($handle, CURLOPT_TIMEOUT, $options['timeout']);
+                \curl_setopt($handle, CURLOPT_TIMEOUT, $options['timeout']);
             }
 
-            if (curl_exec($handle) !== false) {
-                $statusCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-                curl_close($handle);
+            if (\curl_exec($handle) !== false) {
+                $statusCode = \curl_getinfo($handle, CURLINFO_HTTP_CODE);
+                \curl_close($handle);
 
                 if ($statusCode !== 202) {
                     throw new RuntimeException(
-                        sprintf('Reporting of spans failed, status code %d', $statusCode)
+                        \sprintf('Reporting of spans failed, status code %d', $statusCode)
                     );
                 }
             } else {
-                throw new RuntimeException(sprintf(
+                throw new RuntimeException(\sprintf(
                     'Reporting of spans failed: %s, error code %s',
-                    curl_error($handle),
-                    curl_errno($handle)
+                    \curl_error($handle),
+                    \curl_errno($handle)
                 ));
             }
         };
