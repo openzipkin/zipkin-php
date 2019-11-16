@@ -15,7 +15,7 @@ final class RequestHeaders implements Getter, Setter
      */
     public function get($carrier, string $key): ?string
     {
-        $lKey = strtolower($key);
+        $lKey = \strtolower($key);
         return $carrier->hasHeader($lKey) ? $carrier->getHeader($lKey)[0] : null;
     }
 
@@ -27,7 +27,7 @@ final class RequestHeaders implements Getter, Setter
      */
     public function put(&$carrier, string $key, string $value): void
     {
-        $lKey = strtolower($key);
+        $lKey = \strtolower($key);
         $carrier = $carrier->withAddedHeader($lKey, $value);
     }
 }

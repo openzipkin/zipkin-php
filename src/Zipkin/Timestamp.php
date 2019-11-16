@@ -11,7 +11,7 @@ namespace Zipkin\Timestamp;
  */
 function now(): int
 {
-    return (int) (microtime(true) * 1000 * 1000);
+    return (int) (\microtime(true) * 1000 * 1000);
 }
 
 /**
@@ -22,5 +22,5 @@ function now(): int
  */
 function isValid($timestamp): bool
 {
-    return strlen((string) $timestamp) === 16;
+    return \strlen((string) $timestamp) === 16;
 }

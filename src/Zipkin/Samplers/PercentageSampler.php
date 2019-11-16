@@ -28,7 +28,7 @@ final class PercentageSampler implements Sampler
     {
         if ($rate > 1 || $rate < 0) {
             throw new InvalidArgumentException(
-                sprintf('Invalid rate. Expected a value between 0 and 1, got %f', $rate)
+                \sprintf('Invalid rate. Expected a value between 0 and 1, got %f', $rate)
             );
         }
         return new self($rate);
@@ -39,6 +39,6 @@ final class PercentageSampler implements Sampler
      */
     public function isSampled(string $traceId): bool
     {
-        return (mt_rand(0, 99) / 100) <= $this->rate;
+        return (\mt_rand(0, 99) / 100) <= $this->rate;
     }
 }

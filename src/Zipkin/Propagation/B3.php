@@ -105,9 +105,9 @@ final class B3 implements Propagation
 
             $isSampled = SamplingFlags::EMPTY_SAMPLED;
             if ($isSampledRaw !== null) {
-                if ($isSampledRaw === '1' || strtolower($isSampledRaw) === 'true') {
+                if ($isSampledRaw === '1' || \strtolower($isSampledRaw) === 'true') {
                     $isSampled = true;
-                } elseif ($isSampledRaw === '0' || strtolower($isSampledRaw) === 'false') {
+                } elseif ($isSampledRaw === '0' || \strtolower($isSampledRaw) === 'false') {
                     $isSampled = false;
                 }
             }
@@ -139,7 +139,7 @@ final class B3 implements Propagation
             try {
                 return TraceContext::create($traceId, $spanId, $parentSpanId, $isSampled, $isDebug);
             } catch (InvalidTraceContextArgument $e) {
-                $this->logger->debug(sprintf(
+                $this->logger->debug(\sprintf(
                     'Failed to extract propagated context: %s',
                     $e->getMessage()
                 ));

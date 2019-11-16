@@ -74,7 +74,7 @@ final class RealSpan implements Span
         } else {
             if (!isValid($timestamp)) {
                 throw new InvalidArgumentException(
-                    sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
+                    \sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
                 );
             }
         }
@@ -134,7 +134,7 @@ final class RealSpan implements Span
     {
         if (!isValid($timestamp)) {
             throw new InvalidArgumentException(
-                sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
+                \sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
             );
         }
 

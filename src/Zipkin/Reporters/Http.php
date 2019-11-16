@@ -43,7 +43,7 @@ final class Http implements Reporter
         ?LoggerInterface $logger = null
     ) {
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
-        $this->options = array_merge(self::DEFAULT_OPTIONS, $options);
+        $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -53,16 +53,16 @@ final class Http implements Reporter
      */
     public function report(array $spans): void
     {
-        if (count($spans) === 0) {
+        if (\count($spans) === 0) {
             return;
         }
         
-        $payload = json_encode(array_map(function (Span $span) {
+        $payload = \json_encode(\array_map(function (Span $span) {
             return $span->toArray();
         }, $spans));
         if ($payload === false) {
             $this->logger->error(
-                sprintf('failed to encode spans with code %d', \json_last_error())
+                \sprintf('failed to encode spans with code %d', \json_last_error())
             );
             return;
         }
@@ -71,7 +71,7 @@ final class Http implements Reporter
         try {
             $client($payload);
         } catch (RuntimeException $e) {
-            $this->logger->error(sprintf('failed to report spans: %s', $e->getMessage()));
+            $this->logger->error(\sprintf('failed to report spans: %s', $e->getMessage()));
         }
     }
 }
