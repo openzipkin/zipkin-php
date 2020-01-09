@@ -53,5 +53,10 @@
         "lint": "phpcs --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
         "test": "phpunit tests",
         "static-check": "phpstan analyse src --level 4"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
     }
 }
