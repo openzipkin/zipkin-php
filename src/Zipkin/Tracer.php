@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
+use BadMethodCallException;
 use RuntimeException;
+use Throwable;
+use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
-use Zipkin\Propagation\SamplingFlags;
-use Zipkin\Propagation\TraceContext;
 use Zipkin\Sampler;
+use Zipkin\SpanCustomizer;
+use Zipkin\SpanCustomizerShield;
 
 final class Tracer
 {
@@ -218,6 +222,49 @@ final class Tracer
         }
 
         throw new RuntimeException('Context or flags for next span is invalid.');
+    }
+
+    /**
+     * @param callable $fn
+     * @param array $args
+     * @param callable $argsParser
+     * @param callable $resultParser
+     */
+    public function inSpan($fn, array $args, ?callable $argsParser = null, ?callable $resultParser = null)
+    {
+        if (!is_callable($fn)) {
+            throw new BadMethodCallException(sprintf('Invalid callable: %s', $fn));
+        }
+
+        $span = $this->nextSpan();
+        if ($fn === (string) $fn) {
+            $span->setName((string) $fn);
+        }
+
+        $spanCustomizer = new SpanCustomizerShield($span);
+        if ($argsParser !== null) {
+            $argsParser($spanCustomizer, $args);
+        }
+
+        if ($resultParser === null) {
+            $resultParser = function (SpanCustomizer $spanCustomizer, ?Throwable $e, $result) {
+                if ($e != null) {
+                    $spanCustomizer->tag('error', $e->getMessage());
+                }
+            };
+        }
+
+        $span->start();
+        try {
+            $result = \call_user_func_array($fn, $args);
+            $resultParser($spanCustomizer, null, $result);
+            return $result;
+        } catch (Throwable $e) {
+            $resultParser($spanCustomizer, $e, null);
+            throw $e;
+        } finally {
+            $span->finish();
+        }
     }
 
     /**
