@@ -1,6 +1,6 @@
 <?php
 
-namespace ZipkinTests\Unit\InSpanCallables;
+namespace ZipkinTests\Unit\InSpan\Callables;
 
 function sum(int $a, int $b): int
 {

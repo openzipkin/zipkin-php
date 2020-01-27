@@ -2,25 +2,24 @@
 
 namespace ZipkinTests\Unit;
 
+use OutOfBoundsException;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Throwable;
-use Zipkin\Span;
 use Zipkin\Tracer;
 use Zipkin\Sampler;
 use Zipkin\Endpoint;
 use Zipkin\NoopSpan;
 use Zipkin\RealSpan;
 use Zipkin\Reporter;
-use OutOfBoundsException;
 use Zipkin\SpanCustomizer;
 use Zipkin\Reporters\InMemory;
-use PHPUnit\Framework\TestCase;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Propagation\TraceContext;
-use Prophecy\Prophecy\ObjectProphecy;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
-use function ZipkinTests\Unit\InSpanCallables\sum;
+use ZipkinTests\Unit\InSpan\Sumer;
 
 final class TracerTest extends TestCase
 {
@@ -336,11 +335,11 @@ final class TracerTest extends TestCase
             $sumCallable,
             [1, 2],
             'sum',
-            function (SpanCustomizer $span, $args) {
+            function (SpanCustomizer $span, ?array $args = []) {
                 $span->tag('arg0', (string) $args[0]);
                 $span->tag('arg1', (string) $args[1]);
             },
-            function (SpanCustomizer $span, ?Throwable $e, $output) {
+            function (SpanCustomizer $span, $output = null, ?Throwable $e = null) {
                 $span->tag('result', (string) $output);
             }
         );
@@ -357,9 +356,36 @@ final class TracerTest extends TestCase
         $this->assertEquals('3', $span['tags']['result']);
     }
 
+    /**
+     * @dataProvider sumCallables
+     */
+    public function testInSpanNamesAreSuccessfullyGenerated($sumCallable, $expectedName)
+    {
+        $reporter = new InMemory();
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $reporter,
+            BinarySampler::createAsAlwaysSample(),
+            false,
+            CurrentTraceContext::create(),
+            false
+        );
+
+        $tracer->inSpan(
+            $sumCallable,
+            [1, 2]
+        );
+
+        $tracer->flush();
+        $spans = $reporter->flush();
+
+        $span = $spans[0]->toArray();
+        $this->assertEquals($expectedName, $span['name']);
+    }
+
     public function sumCallables(): array
     {
-        $summer = new class() {
+        $anonymousSumer = new class() {
             public function sum(int $a, int $b)
             {
                 return $a + $b;
@@ -367,19 +393,24 @@ final class TracerTest extends TestCase
 
             public function __invoke(int $a, int $b)
             {
-                return sum($a, $b);
+                return $this->sum($a, $b);
             }
         };
 
+        $sumer = new Sumer();
+
         return [
-            ['\ZipkinTests\Unit\InSpanCallables\sum'], // string
+            ['\ZipkinTests\Unit\InSpan\Callables\sum', 'sum'], // string
             [
                 function (int $a, int $b) {
                     return $a + $b;
-                }
+                }, ''
             ], // first class function
-            [[$summer, 'sum']], // object method
-            [$summer] // invokable object
+            ['\ZipkinTests\Unit\InSpan\Sumer::ssum', 'Sumer::ssum'],
+            [[Sumer::class, 'ssum'], 'Sumer::ssum'],
+            [[$sumer, 'sum'], 'Sumer::sum'],
+            [[$anonymousSumer, 'sum'], 'sum'], // object method
+            [$anonymousSumer, ''] // invokable object
         ];
     }
 

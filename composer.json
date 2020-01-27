@@ -47,7 +47,7 @@
             "ZipkinTests\\": "./tests/"
         },
         "files": [
-            "./tests/Unit/InSpanCallables.php"
+            "./tests/Unit/InSpan/Callables.php"
         ]
     },
     "minimum-stability": "stable",

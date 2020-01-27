@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use BadMethodCallException;
-use RuntimeException;
+use Closure;
 use Throwable;
+use Zipkin\Sampler;
+use RuntimeException;
+use Zipkin\SpanCustomizer;
+use BadMethodCallException;
+use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
-use Zipkin\Sampler;
-use Zipkin\SpanCustomizer;
-use Zipkin\SpanCustomizerShield;
 
 final class Tracer
 {
@@ -228,20 +229,23 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
-     * @param callable|null $argsParser with signature function (SpanCustomizer $spanCustomizer, array $args): void
+     * @param callable|null $argsParser with signature function (SpanCustomizer $span, ?array $args = []): void
      * @param callable|null $resultParser with signature
-     * function (SpanCustomizer $spanCustomizer, ?Throwable $e, mixed $result): void
+     * function (SpanCustomizer $span, $output = null, ?Throwable $e = null): void
      */
-    public function inSpan($fn, array $args = [], ?string $name = null, ?callable $argsParser = null, ?callable $resultParser = null)
-    {
+    public function inSpan(
+        callable $fn,
+        array $args = [],
+        ?string $name = null,
+        ?callable $argsParser = null,
+        ?callable $resultParser = null
+    ) {
         if (!is_callable($fn)) {
             throw new BadMethodCallException(sprintf('Invalid callable: %s', $fn));
         }
 
         $span = $this->nextSpan();
-        if ($name !== null) {
-            $span->setName($name);
-        }
+        $span->setName($name ?: self::generateSpanName($fn));
 
         $spanCustomizer = new SpanCustomizerShield($span);
         if ($argsParser !== null) {
@@ -249,7 +253,7 @@ final class Tracer
         }
 
         if ($resultParser === null) {
-            $resultParser = function (SpanCustomizer $spanCustomizer, ?Throwable $e, $result) {
+            $resultParser = function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e = null) {
                 if ($e != null) {
                     $spanCustomizer->tag('error', $e->getMessage());
                 }
@@ -259,14 +263,41 @@ final class Tracer
         $span->start();
         try {
             $result = \call_user_func_array($fn, $args);
-            $resultParser($spanCustomizer, null, $result);
+            $resultParser($spanCustomizer, $result);
             return $result;
         } catch (Throwable $e) {
-            $resultParser($spanCustomizer, $e, null);
+            $resultParser($spanCustomizer, null, $e);
             throw $e;
         } finally {
             $span->finish();
         }
+    }
+
+    /**
+     * @var mixed $fn
+     */
+    private static function generateSpanName($fn): string
+    {
+        $fnType = \gettype($fn);
+        $name = '';
+        if ($fnType === 'string') {
+            $name = $fn;
+        } elseif ($fnType === 'array') {
+            if (\gettype($fn[0]) === 'string') {
+                $name = $fn[0] . '::' . $fn[1];
+            } elseif (\strpos(\get_class($fn[0]), 'class@anonymous') !== 0) {
+                $name = get_class($fn[0]) . '::' . $fn[1];
+            } else {
+                $name = $fn[1];
+            }
+        } elseif ($fnType === 'object' && !($fn instanceof Closure)) {
+            $fnClass = \get_class($fn);
+            if (\strpos($fnClass, 'class@anonymous') !== 0) {
+                $name = $fnClass;
+            }
+        }
+        $namePieces = \explode("\\", $name);
+        return $namePieces[\count($namePieces) - 1];
     }
 
     /**
