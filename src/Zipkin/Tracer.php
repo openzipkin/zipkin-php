@@ -228,7 +228,8 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param callable $argsParser with signature function (SpanCustomizer $spanCustomizer, array $args): void
-     * @param callable $resultParser  with signature function (SpanCustomizer $spanCustomizer, ?Throwable $e, mixed $result): void
+     * @param callable $resultParser with signature
+     * function (SpanCustomizer $spanCustomizer, ?Throwable $e, mixed $result): void
      */
     public function inSpan($fn, array $args, ?callable $argsParser = null, ?callable $resultParser = null)
     {
