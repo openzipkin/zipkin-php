@@ -227,19 +227,20 @@ final class Tracer
     /**
      * @param callable $fn
      * @param array $args
-     * @param callable $argsParser with signature function (SpanCustomizer $spanCustomizer, array $args): void
-     * @param callable $resultParser with signature
+     * @param string|null $name the name of the span
+     * @param callable|null $argsParser with signature function (SpanCustomizer $spanCustomizer, array $args): void
+     * @param callable|null $resultParser with signature
      * function (SpanCustomizer $spanCustomizer, ?Throwable $e, mixed $result): void
      */
-    public function inSpan($fn, array $args, ?callable $argsParser = null, ?callable $resultParser = null)
+    public function inSpan($fn, array $args = [], ?string $name = null, ?callable $argsParser = null, ?callable $resultParser = null)
     {
         if (!is_callable($fn)) {
             throw new BadMethodCallException(sprintf('Invalid callable: %s', $fn));
         }
 
         $span = $this->nextSpan();
-        if ($fn === (string) $fn) {
-            $span->setName((string) $fn);
+        if ($name !== null) {
+            $span->setName($name);
         }
 
         $spanCustomizer = new SpanCustomizerShield($span);

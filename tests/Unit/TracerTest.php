@@ -335,6 +335,7 @@ final class TracerTest extends TestCase
         $result = $tracer->inSpan(
             $sumCallable,
             [1, 2],
+            'sum',
             function (SpanCustomizer $span, $args) {
                 $span->tag('arg0', (string) $args[0]);
                 $span->tag('arg1', (string) $args[1]);
@@ -350,6 +351,7 @@ final class TracerTest extends TestCase
         $this->assertCount(1, $spans);
 
         $span = $spans[0]->toArray();
+        $this->assertEquals('sum', $span['name']);
         $this->assertEquals('1', $span['tags']['arg0']);
         $this->assertEquals('2', $span['tags']['arg1']);
         $this->assertEquals('3', $span['tags']['result']);
@@ -357,17 +359,27 @@ final class TracerTest extends TestCase
 
     public function sumCallables(): array
     {
-        return [
-            ['\ZipkinTests\Unit\InSpanCallables\sum'],
-            [function (int $a, int $b) {
+        $summer = new class() {
+            public function sum(int $a, int $b)
+            {
                 return $a + $b;
-            }],
-            [new class() {
-                public function __invoke(int $a, int $b)
-                {
+            }
+
+            public function __invoke(int $a, int $b)
+            {
+                return sum($a, $b);
+            }
+        };
+
+        return [
+            ['\ZipkinTests\Unit\InSpanCallables\sum'], // string
+            [
+                function (int $a, int $b) {
                     return $a + $b;
                 }
-            }]
+            ], // first class function
+            [[$summer, 'sum']], // object method
+            [$summer] // invokable object
         ];
     }
 
@@ -391,7 +403,7 @@ final class TracerTest extends TestCase
         };
 
         try {
-            $result = $tracer->inSpan($sum, [1, 2]);
+            $tracer->inSpan($sum, [1, 2]);
             $this->fail('Should not reach here');
         } catch (OutOfBoundsException $e) {
         }
