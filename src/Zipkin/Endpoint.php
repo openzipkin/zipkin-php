@@ -33,7 +33,7 @@ class Endpoint
      */
     private $port;
 
-    private function __construct($serviceName, $ipv4 = null, $ipv6 = null, $port = null)
+    private function __construct(string $serviceName, ?string $ipv4 = null, ?string $ipv6 = null, ?int $port = null)
     {
         $this->serviceName = $serviceName;
         $this->ipv4 = $ipv4;

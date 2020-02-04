@@ -18,6 +18,9 @@ namespace Zipkin\Propagation;
 
 final class CurrentTraceContext
 {
+    /**
+     * @var TraceContext
+     */
     private $context;
 
     private function __construct(TraceContext $currentContext = null)

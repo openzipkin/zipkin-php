@@ -32,7 +32,7 @@ final class TraceContext implements SamplingFlags
     private $spanId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $parentId;
 
@@ -41,8 +41,14 @@ final class TraceContext implements SamplingFlags
      */
     private $usesTraceId128bits;
 
-    private function __construct($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits)
-    {
+    private function __construct(
+        string $traceId,
+        string $spanId,
+        ?string $parentId,
+        ?bool $isSampled,
+        bool $isDebug,
+        bool $usesTraceId128bits
+    ) {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
@@ -187,10 +193,10 @@ final class TraceContext implements SamplingFlags
     }
 
     /**
-     * @param string $isSampled
+     * @param bool $isSampled
      * @return TraceContext
      */
-    public function withSampled($isSampled): TraceContext
+    public function withSampled(bool $isSampled): TraceContext
     {
         return new TraceContext(
             $this->traceId,

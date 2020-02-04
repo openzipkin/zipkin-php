@@ -52,14 +52,14 @@ final class Span
     /**
      * Unique 8-byte identifier for a trace, set on all spans within it.
      *
-     * @var int
+     * @var string
      */
     private $traceId;
 
     /**
      * The parent's Span.id; absent if this the root span in a trace.
      *
-     * @var int
+     * @var string
      */
     private $parentId;
 
@@ -67,7 +67,7 @@ final class Span
      * Unique 8-byte identifier of this span within a trace. A span is uniquely
      * identified in storage by (trace_id, id).
      *
-     * @var int
+     * @var string
      */
     private $spanId;
 
@@ -120,8 +120,13 @@ final class Span
      */
     private $localEndpoint;
 
-    private function __construct($traceId, $parentId, $spanId, $debug, Endpoint $localEndpoint)
-    {
+    private function __construct(
+        string $traceId,
+        ?string $parentId,
+        string $spanId,
+        bool $debug,
+        Endpoint $localEndpoint
+    ) {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
         $this->spanId = $spanId;
@@ -234,10 +239,10 @@ final class Span
     public function toArray(): array
     {
         $spanAsArray = [
-            'id' => (string) $this->spanId,
+            'id' => $this->spanId,
             'name' => $this->name,
-            'traceId' => (string) $this->traceId,
-            'parentId' => $this->parentId ? (string) $this->parentId : null,
+            'traceId' => $this->traceId,
+            'parentId' => $this->parentId ? $this->parentId : null,
             'timestamp' => $this->timestamp,
             'duration' => $this->duration,
             'debug' => $this->debug,

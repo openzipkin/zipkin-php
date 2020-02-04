@@ -6,6 +6,7 @@ namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Recording\SpanMap;
+use Zipkin\Reporters\Noop;
 
 class Recorder
 {
@@ -30,7 +31,6 @@ class Recorder
     private $noop;
 
     /**
-     * Recorder constructor.
      * @param Endpoint $endpoint
      * @param Reporter $reporter
      * @param bool $isNoop
@@ -38,7 +38,7 @@ class Recorder
     public function __construct(
         Endpoint $endpoint,
         Reporter $reporter,
-        $isNoop
+        bool $isNoop = false
     ) {
         $this->endpoint = $endpoint;
         $this->reporter = $reporter;
@@ -48,12 +48,12 @@ class Recorder
 
     public static function createAsNoop(): self
     {
-        return new self(Endpoint::createAsEmpty(), null, true);
+        return new self(Endpoint::createAsEmpty(), new Noop(), true);
     }
 
     /**
      * @param TraceContext $context
-     * @return int
+     * @return int|null
      */
     public function getTimestamp(TraceContext $context): ?int
     {
@@ -69,6 +69,7 @@ class Recorder
     /**
      * @param TraceContext $context
      * @param int $timestamp
+     * @return void
      */
     public function start(TraceContext $context, int $timestamp): void
     {
@@ -94,6 +95,7 @@ class Recorder
     /**
      * @param TraceContext $context
      * @param string $kind
+     * @return void
      */
     public function setKind(TraceContext $context, string $kind): void
     {
@@ -110,6 +112,7 @@ class Recorder
      * @param int $timestamp
      * @param string $value
      * @throws \InvalidArgumentException
+     * @return void
      */
     public function annotate(TraceContext $context, int $timestamp, string $value): void
     {
@@ -125,6 +128,7 @@ class Recorder
      * @param TraceContext $context
      * @param string $key
      * @param string $value
+     * @return void
      */
     public function tag(TraceContext $context, string $key, string $value): void
     {

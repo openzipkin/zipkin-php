@@ -171,7 +171,7 @@ final class Tracer
      * @see register_shutdown_function()
      * @see fastcgi_finish_request()
      */
-    public function flush()
+    public function flush(): void
     {
         $this->recorder->flushAll();
     }

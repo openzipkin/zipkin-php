@@ -10,6 +10,9 @@ use Zipkin\Reporter;
 
 final class Log implements Reporter
 {
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
     /**

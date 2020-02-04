@@ -73,7 +73,7 @@ interface Span
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp): void;
+    public function annotate(string $value, ?int $timestamp = null): void;
 
     /**
      * For a client span, this would be the server's address.
