@@ -226,12 +226,54 @@ final class Tracer
     }
 
     /**
+     * This creates a new span based on a function call and the passed arguments. There are many
+     * situations where instrumentation can be a very manual process and this convenience method
+     * abstracts all that complexity. This method is mainly for local tracing (e.g. complex marshaling
+     * worth to be measured as it takes a good chunk of the request time) or a legacy client call
+     * using curl that can't easily be refactored to use a modern http client.
+     *
+     * For example:
+     *
+     * <p>Ex.
+     * <pre>{@code
+     * $ch = curl_init();
+     * curl_setopt($ch, CURLOPT_URL, $url);
+     * curl_setopt($ch, CURLOPT_HEADER, TRUE);
+     * curl_setopt($ch, CURLOPT_NOBODY, TRUE); // remove body
+     * curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+     * $response = $tracer->inSpan('curl_exec', [$ch], 'api_call' function($span, $args) {
+     *     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+     *     $span->setTag('http.status_code', $httpCode);
+     *     if ($httpCode/100 > 5) {
+     *         $span->setTag('error', $httpCode);
+     *     }
+     * );
+     * curl_close($ch);
+     * }</pre>
+     *
+     * <p><em>Note:</em> The fourth parameter is a arguments parser which allows the user to
+     * set tags based on the args passed to the function. Arguments copy can be expensive so
+     * user should be careful about passing this function. The fifth parameter is an result parser
+     * which allows the user to set tags based on the output of the function and a exception thrown
+     * by the callable. By default, this function will tag with an error if the callable throws an
+     * exception.
+     *
+     * <p><em>Note:</em> If a context could be extracted from the input, that trace is resumed, not
+     * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
+     * so that data is written to the correct trace.
+     *
+     * <p><em>Note:</em> argsParser and resultParser are not executed in the natural order mainly
+     * because some functions (like curl) require that the first argument to be passed to obtain
+     * certain information about the output. In any case this should not be a problem unless you want
+     * to set annotations on the span which we discourage you because annotations are suppose to be
+     * meaningful events in the span lifecycle which you can't control in this black box approach.
+     *
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
      * @param callable|null $argsParser with signature function (SpanCustomizer $span, ?array $args = []): void
      * @param callable|null $resultParser with signature
-     * function (SpanCustomizer $span, $output = null, ?Throwable $e = null): void
+     * function (SpanCustomizer $span, $output = null, ?Throwable $e): void
      */
     public function inSpan(
         callable $fn,
@@ -248,12 +290,8 @@ final class Tracer
         $span->setName($name ?: self::generateSpanName($fn));
 
         $spanCustomizer = new SpanCustomizerShield($span);
-        if ($argsParser !== null) {
-            $argsParser($spanCustomizer, $args);
-        }
-
         if ($resultParser === null) {
-            $resultParser = function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e = null) {
+            $resultParser = function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e) {
                 if ($e != null) {
                     $spanCustomizer->tag('error', $e->getMessage());
                 }
@@ -263,12 +301,15 @@ final class Tracer
         $span->start();
         try {
             $result = \call_user_func_array($fn, $args);
-            $resultParser($spanCustomizer, $result);
+            $resultParser($spanCustomizer, $result, null);
             return $result;
         } catch (Throwable $e) {
             $resultParser($spanCustomizer, null, $e);
             throw $e;
         } finally {
+            if ($argsParser !== null) {
+                $argsParser($spanCustomizer, $args);
+            }
             $span->finish();
         }
     }
