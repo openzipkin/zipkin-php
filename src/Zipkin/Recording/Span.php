@@ -59,7 +59,7 @@ final class Span
     /**
      * The parent's Span.id; absent if this the root span in a trace.
      *
-     * @var string
+     * @var string|null
      */
     private $parentId;
 
@@ -220,7 +220,7 @@ final class Span
      *
      * @param int|null $finishTimestamp
      */
-    public function finish(?int $finishTimestamp = null): void
+    public function finish(int $finishTimestamp = null): void
     {
         if ($this->finished) {
             return;
@@ -273,6 +273,6 @@ final class Span
      */
     public function __toString(): string
     {
-        return \json_encode($this->toArray());
+        return \json_encode($this->toArray()) ?: '';
     }
 }

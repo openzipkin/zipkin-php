@@ -19,7 +19,7 @@ namespace Zipkin\Propagation;
 final class CurrentTraceContext
 {
     /**
-     * @var TraceContext
+     * @var TraceContext|null
      */
     private $context;
 
@@ -34,7 +34,7 @@ final class CurrentTraceContext
      * @param TraceContext|null $currentContext
      * @return CurrentTraceContext
      */
-    public static function create(?TraceContext $currentContext = null): self
+    public static function create(TraceContext $currentContext = null): self
     {
         return new self($currentContext);
     }
@@ -56,7 +56,7 @@ final class CurrentTraceContext
      * @param TraceContext|null $currentContext
      * @return callable The scope closed
      */
-    public function createScopeAndRetrieveItsCloser(?TraceContext $currentContext = null): callable
+    public function createScopeAndRetrieveItsCloser(TraceContext $currentContext = null): callable
     {
         $previous = $this->context;
         $self = $this;

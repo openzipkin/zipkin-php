@@ -12,22 +12,22 @@ use Zipkin\Samplers\BinarySampler;
 class TracingBuilder
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $localServiceName;
 
     /**
-     * @var Endpoint
+     * @var Endpoint|null
      */
     private $localEndpoint;
 
     /**
-     * @var Reporter
+     * @var Reporter|null
      */
     private $reporter;
 
     /**
-     * @var Sampler
+     * @var Sampler|null
      */
     private $sampler;
 
@@ -37,7 +37,7 @@ class TracingBuilder
     private $usesTraceId128bits = false;
 
     /**
-     * @var CurrentTraceContext
+     * @var CurrentTraceContext|null
      */
     private $currentTraceContext;
 
@@ -158,11 +158,9 @@ class TracingBuilder
             }
         }
 
-        $reporter = $this->reporter ?? new Log(new NullLogger());
-
-        $sampler = $this->sampler ?? BinarySampler::createAsNeverSample();
-
-        $currentTraceContext = $this->currentTraceContext ?? CurrentTraceContext::create();
+        $reporter = $this->reporter ?: new Log(new NullLogger());
+        $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
+        $currentTraceContext = $this->currentTraceContext ?: CurrentTraceContext::create();
 
         return new DefaultTracing(
             $localEndpoint,

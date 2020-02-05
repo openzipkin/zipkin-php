@@ -40,11 +40,11 @@ final class Http implements Reporter
     public function __construct(
         ?ClientFactory $requesterFactory = null,
         array $options = [],
-        ?LoggerInterface $logger = null
+        LoggerInterface $logger = null
     ) {
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
-        $this->logger = $logger ?? new NullLogger();
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**

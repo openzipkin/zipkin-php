@@ -56,7 +56,7 @@ final class NoopSpan implements Span
      * @param int|null $timestamp
      * @return void
      */
-    public function start(?int $timestamp = null): void
+    public function start(int $timestamp = null): void
     {
     }
 
@@ -104,7 +104,7 @@ final class NoopSpan implements Span
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, ?int $timestamp = null): void
+    public function annotate(string $value, int $timestamp = null): void
     {
     }
 
@@ -138,7 +138,7 @@ final class NoopSpan implements Span
      * @param int|null $timestamp
      * @return void
      */
-    public function finish(?int $timestamp = null): void
+    public function finish(int $timestamp = null): void
     {
     }
 

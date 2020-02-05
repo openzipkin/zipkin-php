@@ -67,19 +67,15 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function start(?int $timestamp = null): void
+    public function start(int $timestamp = null): void
     {
-        if ($timestamp === null) {
-            $timestamp = now();
-        } else {
-            if (!isValid($timestamp)) {
-                throw new InvalidArgumentException(
-                    \sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
-                );
-            }
+        if ($timestamp !== null && !isValid($timestamp)) {
+            throw new InvalidArgumentException(
+                \sprintf('Invalid timestamp. Expected int, got %s', $timestamp)
+            );
         }
 
-        $this->recorder->start($this->traceContext, $timestamp);
+        $this->recorder->start($this->traceContext, $timestamp ?: now());
     }
 
     /**
@@ -130,15 +126,15 @@ final class RealSpan implements Span
      * @throws \InvalidArgumentException
      * @see Zipkin\Annotations
      */
-    public function annotate(string $value, ?int $timestamp = null): void
+    public function annotate(string $value, int $timestamp = null): void
     {
-        if (!isValid($timestamp)) {
+        if ($timestamp !== null && !isValid($timestamp)) {
             throw new InvalidArgumentException(
                 \sprintf('Valid timestamp represented microtime expected, got \'%s\'', $timestamp)
             );
         }
 
-        $this->recorder->annotate($this->traceContext, $timestamp, $value);
+        $this->recorder->annotate($this->traceContext, $timestamp ?: now(), $value);
     }
 
     /**
@@ -174,17 +170,13 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function finish(?int $timestamp = null): void
+    public function finish(int $timestamp = null): void
     {
-        if ($timestamp !== null && !Timestamp\isValid($timestamp)) {
+        if ($timestamp !== null && !isValid($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');
         }
 
-        if ($timestamp === null) {
-            $timestamp = now();
-        }
-
-        $this->recorder->finish($this->traceContext, $timestamp);
+        $this->recorder->finish($this->traceContext, $timestamp ?: now());
     }
 
     /**

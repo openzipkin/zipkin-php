@@ -31,7 +31,7 @@ interface Span
      * @param int|null $timestamp
      * @return void
      */
-    public function start(?int $timestamp = null): void;
+    public function start(int $timestamp = null): void;
 
     /**
      * Sets the string name for the logical operation this span represents.
@@ -73,7 +73,7 @@ interface Span
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, ?int $timestamp = null): void;
+    public function annotate(string $value, int $timestamp = null): void;
 
     /**
      * For a client span, this would be the server's address.
@@ -101,7 +101,7 @@ interface Span
      * @param int|null $timestamp
      * @return void
      */
-    public function finish(?int $timestamp = null): void;
+    public function finish(int $timestamp = null): void;
 
     /**
      * Reports the span, even if unfinished. Most users will not call this method.

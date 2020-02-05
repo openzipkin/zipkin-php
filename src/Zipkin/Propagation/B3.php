@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
@@ -115,7 +114,7 @@ final class B3 implements Propagation
             $isDebugRaw = $getter->get($carrier, self::FLAGS_NAME);
             
             /**
-             * @var bool|null
+             * @var bool $isDebug
              */
             $isDebug = SamplingFlags::EMPTY_DEBUG;
             if ($isDebugRaw !== null) {
@@ -124,8 +123,12 @@ final class B3 implements Propagation
 
             $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
 
-            if ($isSampled === null && $isDebug === null && $traceId === null) {
-                return DefaultSamplingFlags::createAsEmpty();
+            if ($traceId === null) {
+                if ($isSampled === null) {
+                    return DefaultSamplingFlags::createAsEmpty();
+                }
+                
+                return DefaultSamplingFlags::create($isSampled, $isDebug);
             }
 
             $spanId = $getter->get($carrier, self::SPAN_ID_NAME);

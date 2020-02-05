@@ -145,7 +145,7 @@ final class Tracer
      *
      * @return callable The scope closer
      */
-    public function openScope(?Span $span = null): callable
+    public function openScope(Span $span = null): callable
     {
         return $this->currentTraceContext->createScopeAndRetrieveItsCloser(
             $span === null ? null : $span->getContext()
@@ -199,7 +199,7 @@ final class Tracer
      * @return Span
      * @throws \RuntimeException
      */
-    public function nextSpan(?SamplingFlags $contextOrFlags = null): Span
+    public function nextSpan(SamplingFlags $contextOrFlags = null): Span
     {
         if ($contextOrFlags === null) {
             $parent = $this->currentTraceContext->getContext();
