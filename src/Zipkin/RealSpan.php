@@ -67,7 +67,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function start(?int $timestamp = null): void
+    public function start(int $timestamp = null): void
     {
         if ($timestamp === null) {
             $timestamp = now();
@@ -130,7 +130,7 @@ final class RealSpan implements Span
      * @throws \InvalidArgumentException
      * @see Zipkin\Annotations
      */
-    public function annotate(string $value, ?int $timestamp = null): void
+    public function annotate(string $value, int $timestamp = null): void
     {
         if (!isValid($timestamp)) {
             throw new InvalidArgumentException(
@@ -174,7 +174,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function finish(?int $timestamp = null): void
+    public function finish(int $timestamp = null): void
     {
         if ($timestamp !== null && !Timestamp\isValid($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');

@@ -29,7 +29,7 @@ final class CurlFactory implements ClientFactory
     /**
      * {@inheritdoc}
      */
-    public function build(?array $options = []): callable
+    public function build(array $options = []): callable
     {
         /**
          * @param string $payload

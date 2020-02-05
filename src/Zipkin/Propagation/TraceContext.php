@@ -95,7 +95,7 @@ final class TraceContext implements SamplingFlags
      * @param bool $usesTraceId128bits
      * @return TraceContext
      */
-    public static function createAsRoot(?SamplingFlags $samplingFlags = null, ?bool $usesTraceId128bits = false): self
+    public static function createAsRoot(?SamplingFlags $samplingFlags = null, bool $usesTraceId128bits = false): self
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();

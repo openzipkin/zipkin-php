@@ -220,7 +220,7 @@ final class Span
      *
      * @param int|null $finishTimestamp
      */
-    public function finish(?int $finishTimestamp = null): void
+    public function finish(int $finishTimestamp = null): void
     {
         if ($this->finished) {
             return;
