@@ -51,7 +51,7 @@ final class CurlFactory implements ClientFactory
                 'Content-Type' => 'application/json',
                 'Content-Length' => \strlen($payload),
             ];
-            $additionalHeaders = (isset($options['headers']) ? $options['headers'] : []);
+            $additionalHeaders = $options['headers'] ?? [];
             $headers = \array_merge($additionalHeaders, $requiredHeaders);
             $formattedHeaders = \array_map(function ($key, $value) {
                 return $key . ': ' . $value;

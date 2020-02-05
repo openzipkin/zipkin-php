@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
-use InvalidArgumentException;
-
 final class DefaultSamplingFlags implements SamplingFlags
 {
     /**
