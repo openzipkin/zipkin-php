@@ -10,7 +10,7 @@ parameters:
 			message: '#Parameter \#1 \$data of function bin2hex expects string, string\|false given#'
 			path: src/Zipkin/Propagation/Id.php
 		-
-			# This is probably a mistake in the logic as $localEndpoint is always being overrided
+			# This is probably a mistake in the logic of PHPStan as $localEndpoint is always being overrided
 			message: '#Parameter \#1 \$localEndpoint of class Zipkin\\DefaultTracing constructor expects Zipkin\\Endpoint, Zipkin\\Endpoint\|null given#'
 			path: src/Zipkin/TracingBuilder.php
 		-
@@ -21,3 +21,7 @@ parameters:
 			# This avoids false positive in quirky HTTP reporter constructor
 			message: '#Strict comparison using \=\=\=#'
 			path: src/Zipkin/Reporters/Http.php
+		-
+			# If we specify a type for $fn the it is impossible to justify the casting to string or array
+			message: '#Method Zipkin\\Tracer::generateSpanName\(\) has parameter \$fn with no typehint specified.#'
+			path: src/Zipkin/Tracer.php
