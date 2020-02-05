@@ -39,7 +39,8 @@
             "./src/Zipkin/Timestamp.php",
             "./src/Zipkin/Kind.php",
             "./src/Zipkin/Tags.php",
-            "./src/Zipkin/Annotations.php"
+            "./src/Zipkin/Annotations.php",
+            "./src/Zipkin/SpanName.php"
         ]
     },
     "autoload-dev": {

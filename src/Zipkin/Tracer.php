@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use Closure;
 use Throwable;
 use Zipkin\Sampler;
 use RuntimeException;
@@ -15,6 +14,7 @@ use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
+use function Zipkin\SpanName\generateSpanName;
 
 final class Tracer
 {
@@ -288,11 +288,11 @@ final class Tracer
         }
 
         $span = $this->nextSpan();
-        $span->setName($name ?: self::generateSpanName($fn));
+        $span->setName($name ?: generateSpanName($fn));
 
         $spanCustomizer = new SpanCustomizerShield($span);
         if ($resultParser === null) {
-            $resultParser = function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e) {
+            $resultParser = static function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e) {
                 if ($e != null) {
                     $spanCustomizer->tag('error', $e->getMessage());
                 }
@@ -313,35 +313,6 @@ final class Tracer
             }
             $span->finish();
         }
-    }
-
-    /**
-     * Infers the span name based on the callable
-     *
-     * @var callable $fn
-     */
-    private static function generateSpanName($fn): string
-    {
-        $fnType = \gettype($fn);
-        $name = '';
-        if ($fnType === 'string') {
-            $name = $fn;
-        } elseif ($fnType === 'array') { // object->method call style
-            if (\gettype($fn[0]) === 'string') { // static class
-                $name = $fn[0] . '::' . $fn[1];
-            } elseif (\strpos(\get_class($fn[0]), 'class@anonymous') !== 0) {
-                $name = \get_class($fn[0]) . '::' . $fn[1]; // non anonymous class
-            } else {
-                $name = $fn[1]; // anonymous class, hence we use the method
-            }
-        } elseif ($fnType === 'object' && !($fn instanceof Closure)) { // invokable
-            $fnClass = \get_class($fn);
-            if (\strpos($fnClass, 'class@anonymous') !== 0) {
-                $name = $fnClass;
-            }
-        }
-        $namePieces = \explode("\\", $name);
-        return $namePieces[\count($namePieces) - 1];
     }
 
     /**
