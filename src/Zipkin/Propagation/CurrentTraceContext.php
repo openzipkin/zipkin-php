@@ -19,7 +19,7 @@ namespace Zipkin\Propagation;
 final class CurrentTraceContext
 {
     /**
-     * @var TraceContext
+     * @var TraceContext|null
      */
     private $context;
 

@@ -17,10 +17,10 @@ function now(): int
 /**
  * Checks whether a timestamp is valid or not.
  *
- * @param mixed $timestamp
+ * @param int $timestamp
  * @return bool
  */
-function isValid($timestamp): bool
+function isValid(int $timestamp): bool
 {
     return \strlen((string) $timestamp) === 16;
 }
