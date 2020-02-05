@@ -35,6 +35,7 @@ final class CurlFactoryTest extends TestCase
             ]);
 
             $curlClient(json_encode([]));
+            $this->assertTrue(true);
         } finally {
             $server->stop();
         }
@@ -62,6 +63,7 @@ final class CurlFactoryTest extends TestCase
             ]);
 
             $curlClient(json_encode([]));
+            $this->assertTrue(true);
         } finally {
             $server->stop();
         }

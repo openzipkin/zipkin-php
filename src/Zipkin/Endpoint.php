@@ -33,7 +33,7 @@ class Endpoint
      */
     private $port;
 
-    private function __construct($serviceName, $ipv4 = null, $ipv6 = null, $port = null)
+    private function __construct(string $serviceName, ?string $ipv4, ?string $ipv6, ?int $port)
     {
         $this->serviceName = $serviceName;
         $this->ipv4 = $ipv4;
@@ -96,7 +96,7 @@ class Endpoint
      */
     public static function createAsEmpty(): self
     {
-        return new self('');
+        return new self('', null, null, null);
     }
 
     /**

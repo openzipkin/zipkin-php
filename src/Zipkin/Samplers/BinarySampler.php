@@ -13,7 +13,7 @@ final class BinarySampler implements Sampler
      */
     private $isSampled;
 
-    private function __construct($isSampled)
+    private function __construct(bool $isSampled)
     {
         $this->isSampled = $isSampled;
     }

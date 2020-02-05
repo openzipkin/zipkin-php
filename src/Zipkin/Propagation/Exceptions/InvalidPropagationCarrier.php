@@ -8,6 +8,9 @@ use InvalidArgumentException;
 
 final class InvalidPropagationCarrier extends InvalidArgumentException
 {
+    /**
+     * @param mixed $carrier
+     */
     public static function forCarrier($carrier): self
     {
         return new self(\sprintf(

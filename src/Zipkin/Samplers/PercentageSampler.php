@@ -14,7 +14,7 @@ final class PercentageSampler implements Sampler
      */
     private $rate;
 
-    private function __construct($rate)
+    private function __construct(float $rate)
     {
         $this->rate = $rate;
     }

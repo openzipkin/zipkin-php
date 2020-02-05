@@ -8,6 +8,9 @@ use Zipkin\Propagation\TraceContext;
 
 final class NoopSpan implements Span
 {
+    /**
+     * @var TraceContext
+     */
     private $context;
 
     private function __construct(TraceContext $context)
@@ -101,7 +104,7 @@ final class NoopSpan implements Span
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp): void
+    public function annotate(string $value, ?int $timestamp = null): void
     {
     }
 
