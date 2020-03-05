@@ -21,7 +21,7 @@ final class RealSpanTest extends TestCase
     {
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $this->assertEquals($context, $span->getContext());
     }
 
@@ -30,7 +30,7 @@ final class RealSpanTest extends TestCase
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->start($context, self::TEST_START_TIMESTAMP)->shouldBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $span->start(self::TEST_START_TIMESTAMP);
     }
 
@@ -39,7 +39,7 @@ final class RealSpanTest extends TestCase
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->setName($context, self::TEST_NAME)->shouldBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $span->setName(self::TEST_NAME);
     }
 
@@ -48,7 +48,7 @@ final class RealSpanTest extends TestCase
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->setKind($context, self::TEST_KIND)->shouldBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $span->setKind(self::TEST_KIND);
     }
 
@@ -58,7 +58,7 @@ final class RealSpanTest extends TestCase
         $remoteEndpoint = Endpoint::createAsEmpty();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->setRemoteEndpoint($context, $remoteEndpoint)->shouldBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $span->setRemoteEndpoint($remoteEndpoint);
     }
 
@@ -69,7 +69,7 @@ final class RealSpanTest extends TestCase
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->annotate($context, $timestamp, $value)->shouldBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $span->annotate($value, $timestamp);
     }
 
@@ -81,7 +81,7 @@ final class RealSpanTest extends TestCase
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
         $recorder->annotate($context, $timestamp, $value)->shouldNotBeCalled();
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $this->expectException(InvalidArgumentException::class);
         $span->annotate($value, $timestamp);
     }
@@ -91,7 +91,7 @@ final class RealSpanTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $context = TraceContext::createAsRoot();
         $recorder = $this->prophesize(Recorder::class);
-        $span = RealSpan::create($context, $recorder->reveal());
+        $span = new RealSpan($context, $recorder->reveal());
         $span->start(-1);
     }
 }

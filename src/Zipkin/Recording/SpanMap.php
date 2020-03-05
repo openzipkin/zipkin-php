@@ -15,14 +15,6 @@ final class SpanMap
     private $map = [];
 
     /**
-     * @return SpanMap
-     */
-    public static function create()
-    {
-        return new self();
-    }
-
-    /**
      * @param TraceContext $context
      * @return Span|null
      */

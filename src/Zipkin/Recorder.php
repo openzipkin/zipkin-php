@@ -43,7 +43,7 @@ class Recorder
         $this->endpoint = $endpoint;
         $this->reporter = $reporter;
         $this->noop = $isNoop;
-        $this->spanMap = SpanMap::create();
+        $this->spanMap = new SpanMap;
     }
 
     public static function createAsNoop(): self

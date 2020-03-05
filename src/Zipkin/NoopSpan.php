@@ -13,18 +13,9 @@ final class NoopSpan implements Span
      */
     private $context;
 
-    private function __construct(TraceContext $context)
+    public function __construct(TraceContext $context)
     {
         $this->context = $context;
-    }
-
-    /**
-     * @param TraceContext $context
-     * @return NoopSpan
-     */
-    public static function create(TraceContext $context): self
-    {
-        return new self($context);
     }
 
     /**
@@ -89,7 +80,7 @@ final class NoopSpan implements Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param string $value value, cannot be <code>null</code>.
+     * @param string $value
      * @return void
      */
     public function setTag(string $key, string $value): void
@@ -165,7 +156,7 @@ final class NoopSpan implements Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param string $value value, cannot be <code>null</code>.
+     * @param string $value
      * @return void
      */
     public function tag(string $key, string $value): void

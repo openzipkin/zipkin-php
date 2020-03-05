@@ -21,20 +21,10 @@ final class RealSpan implements Span
      */
     private $traceContext;
 
-    private function __construct(TraceContext $context, Recorder $recorder)
+    public function __construct(TraceContext $context, Recorder $recorder)
     {
         $this->traceContext = $context;
         $this->recorder = $recorder;
-    }
-
-    /**
-     * @param TraceContext $context
-     * @param Recorder $recorder
-     * @return RealSpan
-     */
-    public static function create(TraceContext $context, Recorder $recorder): self
-    {
-        return new self($context, $recorder);
     }
 
     /**

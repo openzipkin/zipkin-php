@@ -160,7 +160,7 @@ class TracingBuilder
 
         $reporter = $this->reporter ?: new Log(new NullLogger());
         $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
-        $currentTraceContext = $this->currentTraceContext ?: CurrentTraceContext::create();
+        $currentTraceContext = $this->currentTraceContext ?: new CurrentTraceContext;
 
         return new DefaultTracing(
             $localEndpoint,

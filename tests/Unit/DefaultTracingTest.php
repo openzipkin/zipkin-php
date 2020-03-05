@@ -26,7 +26,7 @@ final class DefaultTracingTest extends TestCase
             $reporter,
             $sampler,
             false,
-            CurrentTraceContext::create(),
+            new CurrentTraceContext,
             $isNoop
         );
 

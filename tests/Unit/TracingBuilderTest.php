@@ -30,7 +30,7 @@ final class TracingBuilderTest extends TestCase
         $reporter = new Noop();
         $sampler = BinarySampler::createAsAlwaysSample();
         $usesTraceId128bits = $this->randomBool();
-        $currentTraceContext = CurrentTraceContext::create();
+        $currentTraceContext = new CurrentTraceContext;
 
         $tracing = TracingBuilder::create()
             ->havingLocalServiceName(self::SERVICE_NAME)
