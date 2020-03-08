@@ -11,7 +11,7 @@ final class NoopSpanTest extends TestCase
     public function testCreateNoopSpanSuccess()
     {
         $context = TraceContext::createAsRoot();
-        $span = NoopSpan::create($context);
+        $span = new NoopSpan($context);
         $this->assertTrue($span instanceof NoopSpan);
     }
 }

@@ -37,7 +37,7 @@ final class TracerTest extends TestCase
     {
         $this->reporter = $this->prophesize(Reporter::class);
         $this->sampler = $this->prophesize(Sampler::class);
-        $this->currentTracerContext = CurrentTraceContext::create();
+        $this->currentTracerContext = new CurrentTraceContext;
     }
 
     public function testNewTraceSuccess()
@@ -69,7 +69,7 @@ final class TracerTest extends TestCase
             $this->reporter->reveal(),
             $this->sampler->reveal(),
             true,
-            CurrentTraceContext::create(),
+            new CurrentTraceContext,
             false
         );
 
@@ -294,7 +294,7 @@ final class TracerTest extends TestCase
             $this->reporter->reveal(),
             BinarySampler::createAsNeverSample(),
             false,
-            CurrentTraceContext::create(),
+            new CurrentTraceContext,
             false
         );
 
@@ -307,7 +307,7 @@ final class TracerTest extends TestCase
     {
         return [
             [null],
-            [NoopSpan::create(TraceContext::createAsRoot())]
+            [new NoopSpan(TraceContext::createAsRoot())]
         ];
     }
 }

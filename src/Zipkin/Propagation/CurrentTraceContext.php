@@ -23,20 +23,9 @@ final class CurrentTraceContext
      */
     private $context;
 
-    private function __construct(TraceContext $currentContext = null)
+    public function __construct(TraceContext $currentContext = null)
     {
         $this->context = $currentContext;
-    }
-
-    /**
-     * Creates a current trace context controller. If there is no context, and consequently no span, it holds null.
-     *
-     * @param TraceContext|null $currentContext
-     * @return CurrentTraceContext
-     */
-    public static function create(TraceContext $currentContext = null): self
-    {
-        return new self($currentContext);
     }
 
     /**

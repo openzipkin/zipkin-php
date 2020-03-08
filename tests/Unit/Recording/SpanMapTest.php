@@ -13,13 +13,13 @@ final class SpanMapTest extends TestCase
 {
     public function testCreateASpanMapSuccess()
     {
-        $spanMap = SpanMap::create();
+        $spanMap = new SpanMap;
         $this->assertInstanceOf(SpanMap::class, $spanMap);
     }
 
     public function testGetReturnsOrCreateOnNonExistingSpan()
     {
-        $spanMap = SpanMap::create();
+        $spanMap = new SpanMap;
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $endpoint = Endpoint::createAsEmpty();
         $span = $spanMap->getOrCreate($context, $endpoint);
@@ -28,14 +28,14 @@ final class SpanMapTest extends TestCase
 
     public function testGetReturnsNullOnNonExistingSpan()
     {
-        $spanMap = SpanMap::create();
+        $spanMap = new SpanMap;
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $this->assertNull($spanMap->get($context));
     }
 
     public function testGetReturnsDifferentObjects()
     {
-        $spanMap = SpanMap::create();
+        $spanMap = new SpanMap;
         $endpoint = Endpoint::createAsEmpty();
         $rootSpan = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $recordedSpans = [];
@@ -52,7 +52,7 @@ final class SpanMapTest extends TestCase
 
     public function testRemoveReturnsEmptyAfterRemoval()
     {
-        $spanMap = SpanMap::create();
+        $spanMap = new SpanMap;
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());
         $endpoint = Endpoint::createAsEmpty();
         $spanMap->getOrCreate($context, $endpoint);
@@ -62,7 +62,7 @@ final class SpanMapTest extends TestCase
 
     public function testRemoveAllReturnsEmptyAfterRemoval()
     {
-        $spanMap = SpanMap::create();
+        $spanMap = new SpanMap;
         $contexts = [];
         $numberOfContexts = 3;
 

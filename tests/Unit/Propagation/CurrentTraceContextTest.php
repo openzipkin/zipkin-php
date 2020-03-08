@@ -11,7 +11,7 @@ final class CurrentTraceContextTest extends TestCase
     public function testCurrentTraceContextIsCreated()
     {
         $context = TraceContext::createAsRoot();
-        $currentTraceContext = CurrentTraceContext::create($context);
+        $currentTraceContext = new CurrentTraceContext($context);
         $this->assertEquals($context, $currentTraceContext->getContext());
     }
 
@@ -20,7 +20,7 @@ final class CurrentTraceContextTest extends TestCase
      */
     public function testNewScopeSuccess($context1)
     {
-        $currentTraceContext = CurrentTraceContext::create($context1);
+        $currentTraceContext = new CurrentTraceContext($context1);
         $context2 = TraceContext::createAsRoot();
 
         $scopeCloser = $currentTraceContext->createScopeAndRetrieveItsCloser($context2);

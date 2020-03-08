@@ -257,9 +257,9 @@ final class Tracer
     private function toSpan(TraceContext $context): Span
     {
         if (!$this->isNoop && $context->isSampled()) {
-            return RealSpan::create($context, $this->recorder);
+            return new RealSpan($context, $this->recorder);
         }
 
-        return NoopSpan::create($context);
+        return new NoopSpan($context);
     }
 }
