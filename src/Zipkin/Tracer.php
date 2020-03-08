@@ -271,7 +271,7 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
-     * @param callable|null $argsParser with signature function (SpanCustomizer $span, ?array $args = []): void
+     * @param callable|null $argsParser with signature function (SpanCustomizer $span, array $args = []): void
      * @param callable|null $resultParser with signature
      * function (SpanCustomizer $span, $output = null, ?Throwable $e): void
      */
@@ -282,7 +282,7 @@ final class Tracer
         ?callable $argsParser = null,
         ?callable $resultParser = null
     ) {
-        if (!is_callable($fn)) {
+        if (!\is_callable($fn)) {
             throw new BadMethodCallException(sprintf('Invalid callable: %s', $fn));
         }
 
@@ -327,7 +327,7 @@ final class Tracer
             if (\gettype($fn[0]) === 'string') {
                 $name = $fn[0] . '::' . $fn[1];
             } elseif (\strpos(\get_class($fn[0]), 'class@anonymous') !== 0) {
-                $name = get_class($fn[0]) . '::' . $fn[1];
+                $name = \get_class($fn[0]) . '::' . $fn[1];
             } else {
                 $name = $fn[1];
             }
