@@ -327,14 +327,16 @@ final class TracerTest extends TestCase
             $reporter,
             BinarySampler::createAsAlwaysSample(),
             false,
-            CurrentTraceContext::create(),
+            new CurrentTraceContext,
             false
         );
+        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsSampled());
 
         $result = $tracer->inSpan(
             $sumCallable,
             [1, 2],
             'sum',
+            new CurrentTraceContext($context),
             function (SpanCustomizer $span, ?array $args = []) {
                 $span->tag('arg0', (string) $args[0]);
                 $span->tag('arg1', (string) $args[1]);
@@ -350,6 +352,7 @@ final class TracerTest extends TestCase
         $this->assertCount(1, $spans);
 
         $span = $spans[0]->toArray();
+        $this->assertEquals($context->getTraceId(), $span['traceId']);
         $this->assertEquals('sum', $span['name']);
         $this->assertEquals('1', $span['tags']['arg0']);
         $this->assertEquals('2', $span['tags']['arg1']);
@@ -367,7 +370,7 @@ final class TracerTest extends TestCase
             $reporter,
             BinarySampler::createAsAlwaysSample(),
             false,
-            CurrentTraceContext::create(),
+            new CurrentTraceContext,
             false
         );
 
@@ -422,7 +425,7 @@ final class TracerTest extends TestCase
             $reporter,
             BinarySampler::createAsAlwaysSample(),
             false,
-            CurrentTraceContext::create(),
+            new CurrentTraceContext,
             false
         );
 

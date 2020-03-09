@@ -5,7 +5,7 @@ namespace Zipkin\SpanName;
 use Closure;
 
 /**
- * Infers the span name based on the callable
+ * Infers the span name based on the callable.
  *
  * @var callable $fn
  */

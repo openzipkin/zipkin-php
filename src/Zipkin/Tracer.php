@@ -262,15 +262,18 @@ final class Tracer
      * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
      * so that data is written to the correct trace.
      *
-     * <p><em>Note:</em> argsParser and resultParser are not executed in the natural order mainly
+     * <p><em>Note:</em> argsParser and resultParser are not executed in a natural order mainly
      * because some functions (like curl) require that the first argument to be passed to obtain
-     * certain information about the output. In any case this should not be a problem unless you want
-     * to set annotations on the span which we discourage you because annotations are suppose to be
-     * meaningful events in the span lifecycle which you can't control in this black box approach.
+     * certain information about the output. In any case this should not be a problem unless it is
+     * desired to set annotations on the span which we discourage you because annotations are
+     * suppose to be meaningful events in the span lifecycle which one can't control in this black
+     * box approach.
      *
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
+     * @param CurrentTraceContext|null $currentContext the parent context wrapper for this span.
+     * Passing null will make into the usage of the `Tracer::currentTraceContext` retriever from global state.
      * @param callable|null $argsParser with signature function (SpanCustomizer $span, array $args = []): void
      * @param callable|null $resultParser with signature
      * function (SpanCustomizer $span, $output = null, ?Throwable $e): void
@@ -280,21 +283,22 @@ final class Tracer
         callable $fn,
         array $args = [],
         ?string $name = null,
+        ?CurrentTraceContext $currentContext = null,
         ?callable $argsParser = null,
         ?callable $resultParser = null
     ) {
         if (!\is_callable($fn)) {
-            throw new BadMethodCallException(sprintf('Invalid callable: %s', $fn));
+            throw new BadMethodCallException(sprintf('Invalid callable provided as first argument: %s', $fn));
         }
 
-        $span = $this->nextSpan();
+        $span = ($currentContext === null) ? $this->nextSpan() : $this->nextSpan($currentContext->getContext());
         $span->setName($name ?: generateSpanName($fn));
 
         $spanCustomizer = new SpanCustomizerShield($span);
         if ($resultParser === null) {
             $resultParser = static function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e) {
                 if ($e != null) {
-                    $spanCustomizer->tag('error', $e->getMessage());
+                    $spanCustomizer->tag(Tags\ERROR, $e->getMessage());
                 }
             };
         }
