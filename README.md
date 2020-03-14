@@ -25,13 +25,14 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\TracingBuilder;
 use Zipkin\Reporters\Http;
 
-$endpoint = Endpoint::createFromGlobals();
+// First we create the endpoint that describes our service
+$endpoint = Endpoint::create('my_service');
 
 // Logger to stdout
 $logger = new \Monolog\Logger('log');
 $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
 
-$reporter = new Http();
+$reporter = new Http(['endpoint_url' => 'http://myzipkin:9411/api/v2/spans']);
 $sampler = BinarySampler::createAsAlwaysSample();
 $tracing = TracingBuilder::create()
     ->havingLocalEndpoint($endpoint)
@@ -93,6 +94,7 @@ try {
 ```
 
 ### Customizing spans
+
 Once you have a span, you can add tags to it, which can be used as lookup
 keys or details. For example, you might add a tag with your runtime
 version.
@@ -211,6 +213,7 @@ private function newTrace(Request $request) {
 ```
 
 ## Propagation
+
 Propagation is needed to ensure activity originating from the same root
 are collected together in the same trace. The most common propagation
 approach is to copy a trace context from a client sending an RPC request
@@ -266,6 +269,7 @@ $span->setKind(Kind\SERVER);
 ```
 
 ### Extracting a propagated context
+
 The `Extractor` reads trace identifiers and sampling status
 from an incoming request or message. The carrier is usually a request object
 or headers.
@@ -334,6 +338,12 @@ Tests can be run by
 
 ```bash
 composer test
+```
+
+Whereas static checks can be run by:
+
+```bash
+composer static-check
 ```
 
 ## Reference
