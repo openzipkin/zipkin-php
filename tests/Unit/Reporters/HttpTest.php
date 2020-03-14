@@ -31,7 +31,7 @@ final class HttpTest extends TestCase
         $logger->error()->shouldNotBeCalled();
 
         $mockFactory = HttpMockFactory::createAsSuccess();
-        $httpReporter = new Http($mockFactory, [], $logger->reveal());
+        $httpReporter = new Http([], $mockFactory, $logger->reveal());
         $httpReporter->report([$span]);
 
         $this->assertEquals($payload, $mockFactory->retrieveContent());
@@ -46,7 +46,7 @@ final class HttpTest extends TestCase
         $logger->error(Argument::containingString(HttpMockFactory::ERROR_MESSAGE))->shouldBeCalled();
 
         $mockFactory = HttpMockFactory::createAsFailing();
-        $httpReporter = new Http($mockFactory, [], $logger->reveal());
+        $httpReporter = new Http([], $mockFactory, $logger->reveal());
         $httpReporter->report([$span]);
     }
 
@@ -56,7 +56,7 @@ final class HttpTest extends TestCase
         $logger->error()->shouldNotBeCalled();
 
         $mockFactory = HttpMockFactory::createAsFailing();
-        $httpReporter = new Http($mockFactory, [], $logger->reveal());
+        $httpReporter = new Http([], $mockFactory, $logger->reveal());
         $httpReporter->report([]);
 
         $this->assertEquals(0, $mockFactory->calledTimes());
