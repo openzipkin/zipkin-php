@@ -37,13 +37,23 @@ final class Http implements Reporter
      */
     private $logger;
 
+    /**
+     * @param array $options the options for HTTP call:
+     * <code>
+     * $options = [
+     *   'endpoint_url' => 'http://myzipkin:9411/api/v2/spans', // the reporting url for zipkin server
+     *   'headers'      => ['X-API-Key' => 'abc123'] // the additional headers to be included in the request
+     *   'timeout'      => 10, // the timeout for the request in seconds
+     * ];
+     * </code>
+     */
     public function __construct(
-        ?ClientFactory $requesterFactory = null,
         array $options = [],
+        ClientFactory $requesterFactory = null,
         LoggerInterface $logger = null
     ) {
-        $this->clientFactory = $requesterFactory ?: CurlFactory::create();
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
+        $this->clientFactory = $requesterFactory ?: CurlFactory::create();
         $this->logger = $logger ?: new NullLogger();
     }
 
