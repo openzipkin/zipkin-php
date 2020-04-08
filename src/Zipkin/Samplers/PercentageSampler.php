@@ -39,6 +39,6 @@ final class PercentageSampler implements Sampler
      */
     public function isSampled(string $traceId): bool
     {
-        return (\mt_rand(0, 99) / 100) <= $this->rate;
+        return (\mt_rand(0, 99) / 100) < $this->rate;
     }
 }
