@@ -83,7 +83,7 @@ final class NoopSpan implements Span
      * @param string $value
      * @return void
      */
-    public function setTag(string $key, string $value): void
+    public function tag(string $key, string $value): void
     {
     }
 
@@ -146,20 +146,6 @@ final class NoopSpan implements Span
      * @return void
      */
     public function flush(): void
-    {
-    }
-
-    /**
-     * Tags give your span context for search, viewing and analysis. For example, a key
-     * "your_app.version" would let you lookup spans by version. A tag {@link Zipkin\Tags\SQL_QUERY}
-     * isn't searchable, but it can help in debugging when viewing a trace.
-     *
-     * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
-     * standard ones.
-     * @param string $value
-     * @return void
-     */
-    public function tag(string $key, string $value): void
     {
     }
 }
