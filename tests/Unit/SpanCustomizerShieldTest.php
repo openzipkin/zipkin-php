@@ -16,7 +16,7 @@ final class SpanCustomizerShieldTest extends TestCase
     public function testAttributesAreSetAndMethodAreCalled()
     {
         $span = new class($this) implements Span {
-            use NoopSpan;
+            use SpanCustomizerShieldNoopSpan;
 
             public function isNoop(): bool
             {
@@ -49,21 +49,21 @@ final class SpanCustomizerShieldTest extends TestCase
     public function testMethodsAreNotCalledOnNoop()
     {
         $span = new class($this) implements Span {
-            use NoopSpan;
+            use SpanCustomizerShieldNoopSpan;
 
             public function setName(string $name): void
             {
-                $this->test->fail("should not be called");
+                $this->test->fail("setName should not be called");
             }
 
             public function tag(string $key, string $value): void
             {
-                $this->test->fail("should not be called");
+                $this->test->fail("tag should not be called");
             }
 
             public function annotate(string $value, int $timestamp = null): void
             {
-                $this->test->fail("should not be called");
+                $this->test->fail("annotate should not be called");
             }
         };
 

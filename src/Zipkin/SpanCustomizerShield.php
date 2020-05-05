@@ -18,6 +18,7 @@ final class SpanCustomizerShield implements SpanCustomizer
 
     public function __construct(Span $span)
     {
+        // If NOOP span we don't want to do the actual calls.
         if (!$span->isNoop()) {
             $this->delegate = $span;
             $this->isNotNoop = true;
