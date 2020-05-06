@@ -99,7 +99,7 @@ final class RealSpan implements Span
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
-     * @param string $value, cannot be <code>null</code>.
+     * @param string $value.
      * @return void
      */
     public function tag(string $key, string $value): void
