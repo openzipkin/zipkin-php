@@ -1,4 +1,6 @@
 parameters:
+	checkGenericClassInNonGenericObjectType: false
+	treatPhpDocTypesAsCertain: false
 	autoload_files:
 		- vendor/autoload.php
 	checkMissingIterableValueType: false
@@ -11,3 +13,11 @@ parameters:
 			# This is probably a mistake in the logic as $localEndpoint is always being overrided
 			message: '#Parameter \#1 \$localEndpoint of class Zipkin\\DefaultTracing constructor expects Zipkin\\Endpoint, Zipkin\\Endpoint\|null given#'
 			path: src/Zipkin/TracingBuilder.php
+		-
+			# This avoids false positive in quirky HTTP reporter constructor
+			message: '#Zipkin\\Reporters\\Http\:\:\_\_construct\(\)#'
+			path: src/Zipkin/Reporters/Http.php
+		-
+			# This avoids false positive in quirky HTTP reporter constructor
+			message: '#Strict comparison using \=\=\=#'
+			path: src/Zipkin/Reporters/Http.php
