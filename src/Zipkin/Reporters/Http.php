@@ -69,19 +69,19 @@ final class Http implements Reporter
         if ($options === self::EMPTY_ARG) {
             // means no arguments because first argument wasn't nullable in v1
             $parsedOptions = [];
-        } elseif (is_array($options) && (($requesterFactory instanceof ClientFactory) || $requesterFactory == null)) {
+        } elseif (\is_array($options) && (($requesterFactory instanceof ClientFactory) || $requesterFactory == null)) {
             // means the intention of the first argument is the `options`
             $parsedOptions = $options;
-        } elseif ($options instanceof ClientFactory && (is_array($requesterFactory) || $requesterFactory === null)) {
+        } elseif ($options instanceof ClientFactory && (\is_array($requesterFactory) || $requesterFactory === null)) {
             // means the intention of the first argument is the `ClientFactory`
             $parsedOptions = $requesterFactory ?? [];
             $requesterFactory = $options;
         } else {
             throw new TypeError(
-                sprintf(
+                \sprintf(
                     'Argument 1 passed to %s::__construct must be of type array, %s given',
                     self::class,
-                    $options === null ? 'null' : gettype($options)
+                    $options === null ? 'null' : \gettype($options)
                 )
             );
         }
