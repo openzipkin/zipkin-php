@@ -32,7 +32,7 @@ $endpoint = Endpoint::create('my_service');
 $logger = new \Monolog\Logger('log');
 $logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
 
-$reporter = new Http(null, ['endpoint_url' => 'http://myzipkin:9411/api/v2/spans']);
+$reporter = new Http(['endpoint_url' => 'http://myzipkin:9411/api/v2/spans']);
 $sampler = BinarySampler::createAsAlwaysSample();
 $tracing = TracingBuilder::create()
     ->havingLocalEndpoint($endpoint)
