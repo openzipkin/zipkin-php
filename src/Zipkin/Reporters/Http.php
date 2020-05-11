@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Zipkin\Reporters;
 
-use RuntimeException;
-use Zipkin\Recording\Span;
+use TypeError;
 use Zipkin\Reporter;
-use Zipkin\Reporters\Http\ClientFactory;
-use Zipkin\Reporters\Http\CurlFactory;
-use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Psr\Log\NullLogger;
+use Zipkin\Recording\Span;
+use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
+use Zipkin\Reporters\Http\CurlFactory;
+use Zipkin\Reporters\Http\ClientFactory;
 
 final class Http implements Reporter
 {
-    const DEFAULT_OPTIONS = [
+    private const EMPTY_ARG = 'empty_arg';
+
+    public const DEFAULT_OPTIONS = [
         'endpoint_url' => 'http://localhost:9411/api/v2/spans',
     ];
 
@@ -39,6 +43,7 @@ final class Http implements Reporter
 
     /**
      * @param array $options the options for HTTP call:
+     *
      * <code>
      * $options = [
      *   'endpoint_url' => 'http://myzipkin:9411/api/v2/spans', // the reporting url for zipkin server
@@ -46,13 +51,42 @@ final class Http implements Reporter
      *   'timeout'      => 10, // the timeout for the request in seconds
      * ];
      * </code>
+     *
+     * @param ClientFactory $requesterFactory the factory for the client
+     * that will do the HTTP call
+     * @param LoggerInterface $logger the logger for output
      */
     public function __construct(
-        array $options = [],
-        ClientFactory $requesterFactory = null,
+        $options = self::EMPTY_ARG,
+        $requesterFactory = null,
         LoggerInterface $logger = null
     ) {
-        $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
+        // V1 signature did not make much sense as in 99% of the cases, you don't
+        // want to pass a ClientFactory to it but $options instead. There was a plan
+        // to change that in v2 but it would be a breaking change, hence we added this
+        // logic to accept new signature but keep compabitility with the old one.
+
+        if ($options === self::EMPTY_ARG) {
+            // means no arguments because first argument wasn't nullable in v1
+            $parsedOptions = [];
+        } elseif (is_array($options) && (($requesterFactory instanceof ClientFactory) || $requesterFactory == null)) {
+            // means the intention of the first argument is the `options`
+            $parsedOptions = $options;
+        } elseif ($options instanceof ClientFactory && (is_array($requesterFactory) || $requesterFactory === null)) {
+            // means the intention of the first argument is the `ClientFactory`
+            $parsedOptions = $requesterFactory ?? [];
+            $requesterFactory = $options;
+        } else {
+            throw new TypeError(
+                sprintf(
+                    'Argument 1 passed to %s::__construct must be of type array, %s given',
+                    self::class,
+                    $options === null ? 'null' : gettype($options)
+                )
+            );
+        }
+
+        $this->options = \array_merge(self::DEFAULT_OPTIONS, $parsedOptions);
         $this->clientFactory = $requesterFactory ?: CurlFactory::create();
         $this->logger = $logger ?: new NullLogger();
     }
@@ -66,7 +100,7 @@ final class Http implements Reporter
         if (\count($spans) === 0) {
             return;
         }
-        
+
         $payload = \json_encode(\array_map(function (Span $span) {
             return $span->toArray();
         }, $spans));
