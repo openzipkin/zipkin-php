@@ -76,12 +76,15 @@ final class Http implements Reporter
             // means the intention of the first argument is the `ClientFactory`
             $parsedOptions = $requesterFactory ?? [];
             $requesterFactory = $options;
+        } elseif ($options === null) {
+            $parsedOptions = $requesterFactory ?? [];
+            $requesterFactory = null;
         } else {
             throw new TypeError(
                 \sprintf(
                     'Argument 1 passed to %s::__construct must be of type array, %s given',
                     self::class,
-                    $options === null ? 'null' : \gettype($options)
+                    \gettype($options)
                 )
             );
         }
