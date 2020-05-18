@@ -35,4 +35,13 @@ final class RequestHeadersTest extends PHPUnit_Framework_TestCase
         $value = $requestHeaders->get($request, self::TEST_KEY);
         $this->assertEquals(self::TEST_VALUE, $value);
     }
+
+    public function testPutOverridesWithTheExpectedValue()
+    {
+        $request = new Request('GET', '/');
+        $requestHeaders = new RequestHeaders([self::TEST_KEY => 'foobar']);
+        $requestHeaders->put($request, self::TEST_KEY, self::TEST_VALUE);
+        $value = $requestHeaders->get($request, self::TEST_KEY);
+        $this->assertEquals(self::TEST_VALUE, $value);
+    }
 }
