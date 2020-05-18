@@ -14,6 +14,8 @@ final class RequestHeaders implements Getter, Setter
     public function get($carrier, $key)
     {
         $lKey = strtolower($key);
+        // We return the first value becase we relay on the fact that we
+        // always override the header value when put method is called.
         return $carrier->hasHeader($lKey) ? $carrier->getHeader($lKey)[0] : null;
     }
 
