@@ -2,19 +2,24 @@
 
 namespace ZipkinTests\Unit;
 
+use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Throwable;
+use Zipkin\Tracer;
+use Zipkin\Sampler;
 use Zipkin\Endpoint;
 use Zipkin\NoopSpan;
-use Zipkin\Propagation\CurrentTraceContext;
-use Zipkin\Propagation\DefaultSamplingFlags;
-use Zipkin\Propagation\SamplingFlags;
 use Zipkin\RealSpan;
 use Zipkin\Reporter;
-use Zipkin\Sampler;
+use Zipkin\SpanCustomizer;
+use Zipkin\Reporters\InMemory;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Propagation\TraceContext;
-use Zipkin\Tracer;
+use Zipkin\Propagation\SamplingFlags;
+use Zipkin\Propagation\CurrentTraceContext;
+use Zipkin\Propagation\DefaultSamplingFlags;
+use ZipkinTests\Unit\InSpan\Sumer;
 
 final class TracerTest extends TestCase
 {
@@ -309,5 +314,136 @@ final class TracerTest extends TestCase
             [null],
             [new NoopSpan(TraceContext::createAsRoot())]
         ];
+    }
+
+    /**
+     * @dataProvider sumCallables
+     */
+    public function testInSpanForSuccessfullCall($sumCallable)
+    {
+        $reporter = new InMemory();
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $reporter,
+            BinarySampler::createAsAlwaysSample(),
+            false,
+            new CurrentTraceContext,
+            false
+        );
+
+        $result = $tracer->inSpan(
+            $sumCallable,
+            [1, 2],
+            'sum',
+            function (SpanCustomizer $span, ?array $args = []) {
+                $span->tag('arg0', (string) $args[0]);
+                $span->tag('arg1', (string) $args[1]);
+            },
+            function (SpanCustomizer $span, $output = null, ?Throwable $e = null) {
+                $span->tag('result', (string) $output);
+            }
+        );
+
+        $this->assertEquals(3, $result);
+        $tracer->flush();
+        $spans = $reporter->flush();
+        $this->assertCount(1, $spans);
+
+        $span = $spans[0]->toArray();
+        $this->assertEquals('sum', $span['name']);
+        $this->assertEquals('1', $span['tags']['arg0']);
+        $this->assertEquals('2', $span['tags']['arg1']);
+        $this->assertEquals('3', $span['tags']['result']);
+    }
+
+    /**
+     * @dataProvider sumCallables
+     */
+    public function testInSpanNamesAreSuccessfullyGenerated($sumCallable, $expectedName)
+    {
+        $reporter = new InMemory();
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $reporter,
+            BinarySampler::createAsAlwaysSample(),
+            false,
+            new CurrentTraceContext,
+            false
+        );
+
+        $tracer->inSpan(
+            $sumCallable,
+            [1, 2]
+        );
+
+        $tracer->flush();
+        $spans = $reporter->flush();
+
+        $span = $spans[0]->toArray();
+        $this->assertEquals($expectedName, $span['name']);
+    }
+
+    public function sumCallables(): array
+    {
+        $anonymousSumer = new class() {
+            public function sum(int $a, int $b)
+            {
+                return $a + $b;
+            }
+
+            public function __invoke(int $a, int $b)
+            {
+                return $this->sum($a, $b);
+            }
+        };
+
+        $sumer = new Sumer();
+
+        return [
+            ['\ZipkinTests\Unit\InSpan\Callables\sum', 'sum'], // string
+            [
+                function (int $a, int $b) {
+                    return $a + $b;
+                }, ''
+            ], // first class function
+            ['\ZipkinTests\Unit\InSpan\Sumer::ssum', 'Sumer::ssum'],
+            [[Sumer::class, 'ssum'], 'Sumer::ssum'],
+            [[$sumer, 'sum'], 'Sumer::sum'],
+            [[$anonymousSumer, 'sum'], 'sum'], // object method
+            [$anonymousSumer, ''] // invokable object
+        ];
+    }
+
+    public function testInSpanForFailingCall()
+    {
+        $reporter = new InMemory();
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $reporter,
+            BinarySampler::createAsAlwaysSample(),
+            false,
+            new CurrentTraceContext,
+            false
+        );
+
+        $sum = new class() {
+            public function __invoke(int $a, int $b)
+            {
+                throw new OutOfBoundsException('too small values');
+            }
+        };
+
+        try {
+            $tracer->inSpan($sum, [1, 2]);
+            $this->fail('Should not reach here');
+        } catch (OutOfBoundsException $e) {
+        }
+
+        $tracer->flush();
+        $spans = $reporter->flush();
+        $this->assertCount(1, $spans);
+
+        $span = $spans[0]->toArray();
+        $this->assertEquals('too small values', $span['tags']['error']);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace ZipkinTests\Integration\Reporters\Http;
 
-use Exception;
 use HttpTest\HttpTestServer;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;

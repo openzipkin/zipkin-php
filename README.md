@@ -130,54 +130,6 @@ $span->annotate(Annotation\WIRE_RECV);
 $span->finish();
 ```
 
-#### One-Way tracing
-
-Sometimes you need to model an asynchronous operation, where there is a
-request, but no response. In normal RPC tracing, you use `$span->finish()`
-which indicates the response was received. In one-way tracing, you use
-`$span->flush()` instead, as you don't expect a response.
-
-Here's how a client might model a one-way operation
-
-```php
-// start a new span representing a client request
-$oneWaySend = $tracer->newChild($parent);
-$oneWaySend->setKind(Kind\CLIENT);
-
-// Add the trace context to the request, so it can be propagated in-band
-$injector = $tracing->getPropagation()->getInjector(new RequestHeaders);
-$injector($oneWaySend->getContext(), $request);
-
-// fire off the request asynchronously, totally dropping any response
-$client->execute($request);
-
-// start the client side and flush instead of finish
-$oneWaySend->start()
-$oneWaySend->flush();
-```
-
-And here's how a server might handle this...
-
-```php
-// pull the context out of the incoming request
-$extractor = $tracing->getPropagation()->getExtractor(new RequestHeaders);
-
-// convert that context to a span which you can name and add tags to
-$oneWayReceive = $tracer->newChild($extractor($request));
-$oneWayReceive->setName('process-request');
-$oneWayReceive->setKind(Kind\SERVER);
-    ... add tags etc.
-
-// start the server side and flush instead of finish
-$oneWayReceive->start()->flush();
-
-// you should not modify this span anymore as it is complete. However,
-// you can create children to represent follow-up work.
-$next = $tracer->newChild($oneWayReceive->getContext());
-$next->setName('step2');
-$next->start();
-```
-
 ## Sampling
 
 Sampling may be employed to reduce the data collected and reported out
