@@ -241,10 +241,10 @@ final class Tracer
      * curl_setopt($ch, CURLOPT_HEADER, TRUE);
      * curl_setopt($ch, CURLOPT_NOBODY, TRUE); // remove body
      * curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-     * $response = $tracer->inSpan('curl_exec', [$ch], 'api_call' function($span, $args) {
+     * $response = $tracer->inSpan('curl_exec', [$ch], 'api_call', function($span, $args) {
      *     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
      *     $span->setTag('http.status_code', $httpCode);
-     *     if ($httpCode/100 > 5) {
+     *     if ($httpCode/100 >= 5) {
      *         $span->setTag('error', $httpCode);
      *     }
      * );
@@ -252,15 +252,11 @@ final class Tracer
      * }</pre>
      *
      * <p><em>Note:</em> The fourth parameter is a arguments parser which allows the user to
-     * set tags based on the args passed to the function. Arguments copy can be expensive so
+     * set tags based on the args passed to the function. Arguments' copy can be expensive so
      * user should be careful about passing this function. The fifth parameter is an result parser
      * which allows the user to set tags based on the output of the function and a exception thrown
      * by the callable. By default, this function will tag with an error if the callable throws an
      * exception.
-     *
-     * <p><em>Note:</em> If a context could be extracted from the input, that trace is resumed, not
-     * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
-     * so that data is written to the correct trace.
      *
      * <p><em>Note:</em> argsParser and resultParser are not executed in a natural order mainly
      * because some functions (like curl) require that the first argument to be passed to obtain
@@ -272,8 +268,6 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
-     * @param CurrentTraceContext|null $currentContext the parent context wrapper for this span.
-     * Passing null will make into the usage of the `Tracer::currentTraceContext` retriever from global state.
      * @param callable|null $argsParser with signature function (SpanCustomizer $span, array $args = []): void
      * @param callable|null $resultParser with signature
      * function (SpanCustomizer $span, $output = null, ?Throwable $e): void
@@ -283,39 +277,35 @@ final class Tracer
         callable $fn,
         array $args = [],
         ?string $name = null,
-        ?CurrentTraceContext $currentContext = null,
         ?callable $argsParser = null,
         ?callable $resultParser = null
     ) {
-        if (!\is_callable($fn)) {
-            throw new BadMethodCallException(sprintf('Invalid callable provided as first argument: %s', $fn));
-        }
-
-        $span = ($currentContext === null) ? $this->nextSpan() : $this->nextSpan($currentContext->getContext());
+        $span = $this->nextSpan();
         $span->setName($name ?: generateSpanName($fn));
 
         $spanCustomizer = new SpanCustomizerShield($span);
-        if ($resultParser === null) {
-            $resultParser = static function (SpanCustomizer $spanCustomizer, $result, ?Throwable $e) {
-                if ($e != null) {
-                    $spanCustomizer->tag(Tags\ERROR, $e->getMessage());
-                }
-            };
-        }
+        $resultParser = $resultParser ?? [self::class, 'defaultResultParser'];
 
         $span->start();
         try {
             $result = \call_user_func_array($fn, $args);
-            $resultParser($spanCustomizer, $result, null);
+            ($resultParser)($spanCustomizer, $result, null);
             return $result;
         } catch (Throwable $e) {
-            $resultParser($spanCustomizer, null, $e);
+            ($resultParser)($spanCustomizer, null, $e);
             throw $e;
         } finally {
             if ($argsParser !== null) {
                 $argsParser($spanCustomizer, $args);
             }
             $span->finish();
+        }
+    }
+    
+    private static function defaultResultParser(SpanCustomizer $spanCustomizer, $result, ?Throwable $e)
+    {
+        if ($e != null) {
+            $spanCustomizer->tag(Tags\ERROR, $e->getMessage());
         }
     }
 
