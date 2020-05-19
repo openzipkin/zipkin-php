@@ -2,11 +2,12 @@
 
 namespace ZipkinTests\Unit;
 
+use LogicException;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\TraceContext;
 use PHPUnit\Framework\TestCase;
 
-trait SpanCustomizerShieldNoopSpan
+trait SpanCustomizerShieldSpan
 {
     /**
      * @var TestCase
@@ -26,7 +27,7 @@ trait SpanCustomizerShieldNoopSpan
 
     public function isNoop(): bool
     {
-        return true;
+        return false;
     }
 
     public function getContext(): TraceContext
@@ -36,25 +37,31 @@ trait SpanCustomizerShieldNoopSpan
 
     public function start(int $timestamp = null): void
     {
+        throw new LogicException('should not be called');
     }
 
     public function setKind(string $kind): void
     {
+        throw new LogicException('should not be called');
     }
 
     public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
+        throw new LogicException('should not be called');
     }
 
     public function abandon(): void
     {
+        throw new LogicException('should not be called');
     }
 
     public function finish(int $timestamp = null): void
     {
+        throw new LogicException('should not be called');
     }
 
     public function flush(): void
     {
+        throw new LogicException('should not be called');
     }
 }
