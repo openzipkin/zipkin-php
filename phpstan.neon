@@ -25,3 +25,7 @@ parameters:
 			# If we specify a type for $fn the it is impossible to justify the casting to string or array
 			message: '#Function Zipkin\\SpanName\\generateSpanName\(\) has parameter \$fn with no typehint specified.#'
 			path: src/Zipkin/SpanName.php
+		-
+			# $result can't have a type as it can be literally anything.
+			message: '#Method Zipkin\\Tracer\:\:defaultResultParser\(\) has parameter \$result with no typehint specified.#'
+			path: src/Zipkin/Tracer.php

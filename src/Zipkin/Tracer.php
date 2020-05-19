@@ -302,7 +302,7 @@ final class Tracer
         }
     }
     
-    private static function defaultResultParser(SpanCustomizer $spanCustomizer, $result, ?Throwable $e)
+    private static function defaultResultParser(SpanCustomizer $spanCustomizer, $result, ?Throwable $e): void
     {
         if ($e != null) {
             $spanCustomizer->tag(Tags\ERROR, $e->getMessage());
