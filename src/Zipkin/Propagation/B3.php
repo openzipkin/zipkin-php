@@ -183,13 +183,14 @@ final class B3 implements Propagation
 
     public static function parseSingleValue(string $value): ?SamplingFlags
     {
-        $pieces = explode('-', $value);
-        $numberOfPieces = count($pieces);
         if ($value === '') {
             return null;
         }
 
-        if ($numberOfPieces === 1) {
+        $pieces = explode('-', $value);
+        $numberOfPieces = count($pieces);
+
+        if ($numberOfPieces === 1) { // {sampling}
             if ($value === '0') {
                 return DefaultSamplingFlags::createAsNotSampled();
             } elseif ($value === '1') {
@@ -201,12 +202,12 @@ final class B3 implements Propagation
             }
         }
 
-        if ($numberOfPieces >= 2) {
+        if ($numberOfPieces >= 2) { // {trace_id}-{span_id}[-{sampling}-{parent_id}]
             $traceId = $numberOfPieces[0];
             $spanId = $numberOfPieces[1];
             $isSampled = DefaultSamplingFlags::EMPTY_SAMPLED;
             $isDebug = DefaultSamplingFlags::EMPTY_DEBUG;
-            if ($numberOfPieces > 2) {
+            if ($numberOfPieces > 2) { // {trace_id}-{span_id}-{sampling}[-{parent_id}]
                 $samplingBit = $numberOfPieces[2];
                 if ($samplingBit === '0') {
                     $isSampled = false;
@@ -218,7 +219,7 @@ final class B3 implements Propagation
                     throw InvalidTraceContextArgument::forSampling($value);
                 }
             }
-            $parentId = $numberOfPieces > 3 ? $numberOfPieces[3] : null;
+            $parentId = $numberOfPieces > 3 ? $numberOfPieces[3] : null; // {trace_id}-{span_id}-{sampling}-{parent_id}
 
             return TraceContext::create($traceId, $spanId, $parentId, $isSampled, $isDebug, \strlen($numberOfPieces[0]) == 32);
         }
