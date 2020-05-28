@@ -4,6 +4,8 @@ namespace ZipkinTests\Unit\Propagation;
 
 use ArrayObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Zipkin\Propagation\B3;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\Map;
@@ -116,6 +118,52 @@ final class B3Test extends TestCase
         $this->assertEquals(self::TEST_TRACE_ID, $context->getTraceId());
         $this->assertEquals(self::TEST_SPAN_ID, $context->getSpanId());
         $this->assertEquals(self::TEST_PARENT_ID, $context->getParentId());
+    }
+
+    public function testExtractorFailsForInvalidValues()
+    {
+        $carrier = [];
+        $carrier[strtolower(self::TRACE_ID_NAME)] = self::TEST_TRACE_ID;
+        $carrier[strtolower(self::SPAN_ID_NAME)] = self::TEST_SPAN_ID;
+        $carrier[strtolower(self::PARENT_SPAN_ID_NAME)] = self::TEST_PARENT_ID;
+
+        $getter = new Map();
+        $b3Propagator = new B3();
+        $extractor = $b3Propagator->getExtractor($getter);
+        $context = $extractor($carrier);
+
+        $this->assertInstanceOf(TraceContext::class, $context);
+        $this->assertEquals(self::TEST_TRACE_ID, $context->getTraceId());
+        $this->assertEquals(self::TEST_SPAN_ID, $context->getSpanId());
+        $this->assertEquals(self::TEST_PARENT_ID, $context->getParentId());
+    }
+
+    public function testInvalidPropagationValuesFail()
+    {
+        $carrier = [];
+        $carrier[strtolower(self::TRACE_ID_NAME)] = 'xyz';
+        $carrier[strtolower(self::SPAN_ID_NAME)] = 'mno';
+        $test = $this;
+
+        $logger = new class($test) implements LoggerInterface {
+            use LoggerTrait;
+
+            private $test;
+
+            public function __construct(TestCase $test)
+            {
+                $this->test = $test;
+            }
+            
+            public function log($level, $message, array $context = array())
+            {
+                $this->test->assertEquals('debug', $level);
+            }
+        };
+        $getter = new Map();
+        $b3Propagator = new B3($logger);
+        $extractor = $b3Propagator->getExtractor($getter);
+        $this->assertNull($extractor($carrier)->isSampled());
     }
 
     public function carrierProvider()

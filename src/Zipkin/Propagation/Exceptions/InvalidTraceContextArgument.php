@@ -22,4 +22,9 @@ final class InvalidTraceContextArgument extends InvalidArgumentException
     {
         return new self(\sprintf('Invalid parent span id, got %s', $parentId));
     }
+
+    public static function forSampling(string $value): self
+    {
+        return new self(\sprintf('Invalid sampling bit, got %s, expected 1, 0 or d', $value));
+    }
 }

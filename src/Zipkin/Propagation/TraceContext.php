@@ -206,6 +206,11 @@ final class TraceContext implements SamplingFlags
         );
     }
 
+    public function isEmpty(): bool
+    {
+        return false;
+    }
+
     /**
      * @param SamplingFlags $samplingFlags
      * @return bool
