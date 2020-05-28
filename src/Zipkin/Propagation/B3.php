@@ -40,6 +40,9 @@ final class B3 implements Propagation
      */
     private const FLAGS_NAME = 'X-B3-Flags';
 
+    /**
+     * @see https://github.com/openzipkin/b3-propagation#single-header
+     */
     private const SINGLE_VALUE_NAME = 'b3';
 
     private const MULTI_VALUE_NAMES = [
@@ -50,8 +53,16 @@ final class B3 implements Propagation
         self::FLAGS_NAME,
     ];
 
-    public const INJECT_SINGLE_AND_MULTI = 0;
-    public const INJECT_SINGLE_ONLY = 1;
+    /**
+     * Injector will include both single and multi headers. This is
+     * suitable for an intermediate step during a migration.
+     */
+    public const INJECT_OPTION_SINGLE_AND_MULTI = 0;
+
+    /**
+     * Injector will include only single value header.
+     */
+    public const INJECT_OPTION_SINGLE_ONLY = 1;
 
     /**
      * @var LoggerInterface
@@ -65,10 +76,10 @@ final class B3 implements Propagation
 
     public function __construct(
         LoggerInterface $logger = null,
-        int $injectHeadersOption = self::INJECT_SINGLE_AND_MULTI
+        int $injectOption = self::INJECT_OPTION_SINGLE_AND_MULTI
     ) {
         $this->logger = $logger ?: new NullLogger();
-        $this->injectMultiValues = $injectHeadersOption !== self::INJECT_SINGLE_ONLY;
+        $this->injectMultiValues = $injectOption !== self::INJECT_OPTION_SINGLE_ONLY;
     }
 
     /**
@@ -116,6 +127,7 @@ final class B3 implements Propagation
             $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext));
         };
     }
+
 
     public static function buildSingleValue(SamplingFlags $traceContext): string
     {
@@ -228,7 +240,7 @@ final class B3 implements Propagation
         $isDebugRaw = $getter->get($carrier, self::FLAGS_NAME);
             
         /**
-         * @var bool $isDebug
+         * @var ?bool $isDebug
          */
         $isDebug = SamplingFlags::EMPTY_DEBUG;
         if ($isDebugRaw !== null) {
