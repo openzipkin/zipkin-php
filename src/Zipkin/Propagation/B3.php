@@ -53,20 +53,20 @@ final class B3 implements Propagation
         self::FLAGS_NAME,
     ];
 
-    public const INJECTOR_SINGLE = 'single';
-    public const INJECTOR_SINGLE_NO_PARENT = 'single_no_parent';
-    public const INJECTOR_MULTI = 'multi';
+    public const INJECT_SINGLE = 'single';
+    public const INJECT_SINGLE_NO_PARENT = 'single_no_parent';
+    public const INJECT_MULTI = 'multi';
 
     private const INJECTORS = [
-        self::INJECTOR_SINGLE => [self::class, 'injectSingleValue'],
-        self::INJECTOR_SINGLE_NO_PARENT => [self::class, 'injectSingleValueNoParent'],
-        self::INJECTOR_MULTI => [self::class, 'injectMultiValues'],
+        self::INJECT_SINGLE => [self::class, 'injectSingleValue'],
+        self::INJECT_SINGLE_NO_PARENT => [self::class, 'injectSingleValueNoParent'],
+        self::INJECT_MULTI => [self::class, 'injectMultiValues'],
     ];
 
     private const KEYS = [
-        self::INJECTOR_SINGLE => self::SINGLE_VALUE_NAME,
-        self::INJECTOR_SINGLE_NO_PARENT => self::SINGLE_VALUE_NAME,
-        self::INJECTOR_MULTI => self::MULTI_VALUE_NAMES,
+        self::INJECT_SINGLE => self::SINGLE_VALUE_NAME,
+        self::INJECT_SINGLE_NO_PARENT => self::SINGLE_VALUE_NAME,
+        self::INJECT_MULTI => self::MULTI_VALUE_NAMES,
     ];
 
     /**
@@ -86,41 +86,11 @@ final class B3 implements Propagation
 
     public function __construct(
         LoggerInterface $logger = null,
-        string $injector = self::INJECTOR_MULTI
+        string $injector = self::INJECT_MULTI
     ) {
         $this->logger = $logger ?: new NullLogger();
         $this->injectorFn = self::INJECTORS[$injector];
         $this->keys = self::KEYS[$injector];
-    }
-
-    private static function injectSingleValue(Setter $setter, TraceContext $traceContext, $carrier)
-    {
-        $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext));
-    }
-
-    private static function injectSingleValueNoParent(Setter $setter, TraceContext $traceContext, $carrier)
-    {
-        $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext, false));
-    }
-
-    private static function injectMultiValues(Setter $setter, TraceContext $traceContext, $carrier)
-    {
-        if ($traceContext instanceof TraceContext) {
-            $setter->put($carrier, self::TRACE_ID_NAME, $traceContext->getTraceId());
-            $setter->put($carrier, self::SPAN_ID_NAME, $traceContext->getSpanId());
-
-            if ($traceContext->getParentId() !== null) {
-                $setter->put($carrier, self::PARENT_SPAN_ID_NAME, $traceContext->getParentId());
-            }
-        }
-
-        if ($traceContext->isSampled() !== null) {
-            $setter->put($carrier, self::SAMPLED_NAME, $traceContext->isSampled() ? '1' : '0');
-        }
-
-        if ($traceContext->isDebug()) {
-            $setter->put($carrier, self::FLAGS_NAME, '1');
-        }
     }
 
     /**
@@ -150,8 +120,37 @@ final class B3 implements Propagation
         };
     }
 
+    private static function injectSingleValue(Setter $setter, TraceContext $traceContext, &$carrier)
+    {
+        $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext));
+    }
 
-    public static function buildSingleValue(SamplingFlags $traceContext, bool $includeParent = true): string
+    private static function injectSingleValueNoParent(Setter $setter, TraceContext $traceContext, &$carrier)
+    {
+        $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext, false));
+    }
+
+    private static function injectMultiValues(Setter $setter, TraceContext $traceContext, &$carrier)
+    {
+        if ($traceContext instanceof TraceContext) {
+            $setter->put($carrier, self::TRACE_ID_NAME, $traceContext->getTraceId());
+            $setter->put($carrier, self::SPAN_ID_NAME, $traceContext->getSpanId());
+
+            if ($traceContext->getParentId() !== null) {
+                $setter->put($carrier, self::PARENT_SPAN_ID_NAME, $traceContext->getParentId());
+            }
+        }
+
+        if ($traceContext->isSampled() !== null) {
+            $setter->put($carrier, self::SAMPLED_NAME, $traceContext->isSampled() ? '1' : '0');
+        }
+
+        if ($traceContext->isDebug()) {
+            $setter->put($carrier, self::FLAGS_NAME, '1');
+        }
+    }
+
+    private static function buildSingleValue(SamplingFlags $traceContext, bool $includeParent = true): string
     {
         $samplingBit = null;
         if ($traceContext->isDebug()) {
@@ -243,7 +242,14 @@ final class B3 implements Propagation
             }
             $parentId = $numberOfPieces > 3 ? $numberOfPieces[3] : null; // {trace_id}-{span_id}-{sampling}-{parent_id}
 
-            return TraceContext::create($traceId, $spanId, $parentId, $isSampled, $isDebug, \strlen($numberOfPieces[0]) == 32);
+            return TraceContext::create(
+                $traceId,
+                $spanId,
+                $parentId,
+                $isSampled,
+                $isDebug,
+                \strlen($numberOfPieces[0]) == 32
+            );
         }
     }
 
