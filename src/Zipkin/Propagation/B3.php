@@ -64,20 +64,20 @@ final class B3 implements Propagation
     ];
 
     private const KEYS = [
-        self::INJECT_SINGLE => self::SINGLE_VALUE_NAME,
-        self::INJECT_SINGLE_NO_PARENT => self::SINGLE_VALUE_NAME,
+        self::INJECT_SINGLE => [self::SINGLE_VALUE_NAME],
+        self::INJECT_SINGLE_NO_PARENT => [self::SINGLE_VALUE_NAME],
         self::INJECT_MULTI => self::MULTI_VALUE_NAMES,
     ];
 
     /**
-     * @var array
+     * @var string[]|array
      */
-    private $keys;
+    private $keys = [];
 
     /**
-     * @var callable
+     * @var callable[]|array
      */
-    private $injectorFn;
+    private $injectorsFn = [];
 
     /**
      * @var LoggerInterface
@@ -86,11 +86,16 @@ final class B3 implements Propagation
 
     public function __construct(
         LoggerInterface $logger = null,
-        string $injector = self::INJECT_MULTI
+        array $injectors = [self::INJECT_MULTI]
     ) {
         $this->logger = $logger ?: new NullLogger();
-        $this->injectorFn = self::INJECTORS[$injector];
-        $this->keys = self::KEYS[$injector];
+
+        foreach($injectors as $injectorName) {
+            $this->injectorsFn[] = self::INJECTORS[$injectorName];
+        }
+        foreach($injectors as $injectorName) {
+            $this->keys = array_merge($this->keys, self::KEYS[$injectorName]);
+        }
     }
 
     /**
@@ -116,7 +121,9 @@ final class B3 implements Propagation
                 return;
             }
 
-            ($this->injectorFn)($setter, $traceContext, $carrier);
+            foreach($this->injectorsFn as $injectorFn) {
+                ($injectorFn)($setter, $traceContext, $carrier);
+            }
         };
     }
 
@@ -170,6 +177,8 @@ final class B3 implements Propagation
                     $value .= '-' . $traceContext->getParentId();
                 }
             }
+
+            return $value;
         }
 
         return $samplingBit;
@@ -210,7 +219,6 @@ final class B3 implements Propagation
 
         $pieces = explode('-', $value);
         $numberOfPieces = count($pieces);
-
         if ($numberOfPieces === 1) { // {sampling}
             if ($value === '0') {
                 return DefaultSamplingFlags::createAsNotSampled();
@@ -220,16 +228,16 @@ final class B3 implements Propagation
                 return DefaultSamplingFlags::createAsDebug();
             } else {
                 throw InvalidTraceContextArgument::forSampling($value);
-            }
+            }            
         }
 
         if ($numberOfPieces >= 2) { // {trace_id}-{span_id}[-{sampling}-{parent_id}]
-            $traceId = $numberOfPieces[0];
-            $spanId = $numberOfPieces[1];
+            $traceId = $pieces[0];
+            $spanId = $pieces[1];
             $isSampled = DefaultSamplingFlags::EMPTY_SAMPLED;
             $isDebug = DefaultSamplingFlags::EMPTY_DEBUG;
             if ($numberOfPieces > 2) { // {trace_id}-{span_id}-{sampling}[-{parent_id}]
-                $samplingBit = $numberOfPieces[2];
+                $samplingBit = $pieces[2];
                 if ($samplingBit === '0') {
                     $isSampled = false;
                 } elseif ($samplingBit === '1') {
@@ -237,18 +245,18 @@ final class B3 implements Propagation
                 } elseif ($samplingBit === 'd') {
                     $isDebug = true;
                 } else {
-                    throw InvalidTraceContextArgument::forSampling($value);
+                    throw InvalidTraceContextArgument::forSampling($samplingBit);
                 }
             }
-            $parentId = $numberOfPieces > 3 ? $numberOfPieces[3] : null; // {trace_id}-{span_id}-{sampling}-{parent_id}
 
+            $parentId = $numberOfPieces > 3 ? $pieces[3] : null; // {trace_id}-{span_id}-{sampling}-{parent_id}
             return TraceContext::create(
                 $traceId,
                 $spanId,
                 $parentId,
                 $isSampled,
                 $isDebug,
-                \strlen($numberOfPieces[0]) == 32
+                \strlen($pieces[0]) == 32
             );
         }
     }
@@ -278,11 +286,7 @@ final class B3 implements Propagation
 
         $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
 
-        if ($traceId === null) {
-            if ($isSampled === null) {
-                return DefaultSamplingFlags::createAsEmpty();
-            }
-                
+        if ($traceId === null) {                
             return DefaultSamplingFlags::create($isSampled, $isDebug);
         }
 

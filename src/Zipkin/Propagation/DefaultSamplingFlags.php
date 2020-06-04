@@ -61,7 +61,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public static function createAsDebug(): self
     {
-        return new self(true, true);
+        return new self(null, true);
     }
 
     /**
