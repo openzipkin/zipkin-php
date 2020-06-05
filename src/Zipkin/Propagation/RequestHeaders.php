@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
+use Zipkin\Kind;
 use Psr\Http\Message\RequestInterface;
 
-final class RequestHeaders implements Getter, Setter
+final class RequestHeaders implements Getter, RemoteSetter
 {
+    public function getKind(): string
+    {
+        return Kind\CLIENT;
+    }
+
     /**
      * {@inheritdoc}
      *

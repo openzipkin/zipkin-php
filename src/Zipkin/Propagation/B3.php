@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
-use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
+use Zipkin\Kind;
 use Psr\Log\NullLogger;
-use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
+use Psr\Log\LoggerInterface;
+use Zipkin\Propagation\RemoteSetter;
 use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 
 /**
  * @see https://github.com/openzipkin/b3-propagation
@@ -53,10 +56,6 @@ final class B3 implements Propagation
         self::FLAGS_NAME,
     ];
 
-    public const INJECT_SINGLE = 'single';
-    public const INJECT_SINGLE_NO_PARENT = 'single_no_parent';
-    public const INJECT_MULTI = 'multi';
-
     private const INJECTORS = [
         self::INJECT_SINGLE => [self::class, 'injectSingleValue'],
         self::INJECT_SINGLE_NO_PARENT => [self::class, 'injectSingleValueNoParent'],
@@ -70,14 +69,35 @@ final class B3 implements Propagation
     ];
 
     /**
+     * Inject the single value context
+     */
+    public const INJECT_SINGLE = 'single';
+    
+    /**
+     * Inject the single value context excluding the parent (e.g. for messaging)
+     */
+    public const INJECT_SINGLE_NO_PARENT = 'single_no_parent';
+
+    /**
+     * Inject the multi value context
+     */
+    public const INJECT_MULTI = 'multi';
+
+    /**
      * @var string[]|array
      */
     private $keys = [];
 
+    private const NO_KIND = 'no_kind';
+
     /**
-     * @var callable[]|array
+     * @var array[]
      */
-    private $injectorsFn = [];
+    private $injectorsFn = [
+        Kind\CLIENT => [self::INJECT_MULTI, self::INJECT_SINGLE],
+        Kind\PRODUCER => [self::INJECT_SINGLE_NO_PARENT],
+        self::NO_KIND => [self::INJECT_MULTI],
+    ];
 
     /**
      * @var LoggerInterface
@@ -86,16 +106,36 @@ final class B3 implements Propagation
 
     public function __construct(
         LoggerInterface $logger = null,
-        array $injectors = [self::INJECT_MULTI]
+        array $kindInjectors = []
     ) {
         $this->logger = $logger ?: new NullLogger();
 
-        foreach($injectors as $injectorName) {
-            $this->injectorsFn[] = self::INJECTORS[$injectorName];
+        foreach ($kindInjectors as $kind => $injectors) {
+            if ($kind !== Kind\CLIENT || $kind !== Kind\PRODUCER || $kind !== self::NO_KIND) {
+                throw new InvalidArgumentException(sprintf(
+                    'Unkown kind "%s" for injector, "%s", "%s" or "%s" supported.',
+                    $kind,
+                    Kind\CLIENT,
+                    Kind\PRODUCER,
+                    self::NO_KIND
+                ));
+            }
+
+            $this->injectorsFn[$kind] = array_map(function ($injectorName) {
+                return self::INJECTORS[$injectorName];
+            }, $injectors);
+
+            $this->keys = array_merge($this->keys, self::keysForInjectors($injectors));
         }
-        foreach($injectors as $injectorName) {
-            $this->keys = array_merge($this->keys, self::KEYS[$injectorName]);
+    }
+
+    private static function keysForInjectors(array $injectors): array
+    {
+        $keys = [];
+        foreach ($injectors as $injectorName) {
+            $keys = array_merge($keys, self::KEYS[$injectorName]);
         }
+        return $keys;
     }
 
     /**
@@ -111,17 +151,19 @@ final class B3 implements Propagation
      */
     public function getInjector(Setter $setter): callable
     {
+        $injectorKind = ($setter instanceof RemoteSetter) ? $setter->getKind() : self::NO_KIND;
+
         /**
          * @param TraceContext $traceContext
          * @param &$carrier
          * @return void
          */
-        return function (SamplingFlags $traceContext, &$carrier) use ($setter) {
+        return function (SamplingFlags $traceContext, &$carrier) use ($setter, $injectorKind) {
             if ($traceContext->isEmpty()) {
                 return;
             }
 
-            foreach($this->injectorsFn as $injectorFn) {
+            foreach ($this->injectorsFn[$injectorKind] as $injectorFn) {
                 ($injectorFn)($setter, $traceContext, $carrier);
             }
         };
@@ -228,7 +270,7 @@ final class B3 implements Propagation
                 return DefaultSamplingFlags::createAsDebug();
             } else {
                 throw InvalidTraceContextArgument::forSampling($value);
-            }            
+            }
         }
 
         if ($numberOfPieces >= 2) { // {trace_id}-{span_id}[-{sampling}-{parent_id}]
@@ -286,7 +328,7 @@ final class B3 implements Propagation
 
         $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
 
-        if ($traceId === null) {                
+        if ($traceId === null) {
             return DefaultSamplingFlags::create($isSampled, $isDebug);
         }
 

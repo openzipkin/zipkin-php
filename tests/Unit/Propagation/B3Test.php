@@ -29,10 +29,24 @@ final class B3Test extends TestCase
     const TEST_SINGLE_HEADER = 'bd7a977555f6b982-be2d01e33cc78d97-1-bd7a977555f6b982';
     const TEST_SINGLE_HEADER_NO_PARENT = 'bd7a977555f6b982-be2d01e33cc78d97-1';
 
-    public function injectorProvider(): array {
+    public function testKeysIncludesAllByDefault()
+    {
+        $b3Propagator = new B3();
+        $this->assertEquals([
+            'b3',
+            'X-B3-TraceId',
+            'X-B3-SpanId',
+            'X-B3-ParentSpanId',
+            'X-B3-Sampled',
+            'X-B3-Flags',
+        ], $b3Propagator->getKeys());
+    }
+
+    public function injectorProvider(): array
+    {
         return [
             'multi' => [
-                [B3::INJECT_MULTI],
+                ['no_kind' => [B3::INJECT_MULTI]],
                 [
                     self::TEST_TRACE_ID => self::TRACE_ID_NAME,
                     self::TEST_SPAN_ID => self::SPAN_ID_NAME,
@@ -40,13 +54,13 @@ final class B3Test extends TestCase
                 ]
             ],
             'single' => [
-                [B3::INJECT_SINGLE],
+                ['no_kind' => [B3::INJECT_SINGLE]],
                 [
                     self::TEST_SINGLE_HEADER => self::SINGLE_VALUE_NAME,
                 ]
             ],
             'both single and multi' => [
-                [B3::INJECT_MULTI, B3::INJECT_SINGLE],
+                ['no_kind' => [B3::INJECT_MULTI, B3::INJECT_SINGLE]],
                 [
                     self::TEST_TRACE_ID => self::TRACE_ID_NAME,
                     self::TEST_SPAN_ID => self::SPAN_ID_NAME,
@@ -55,7 +69,7 @@ final class B3Test extends TestCase
                 ]
             ],
             'single no parent' => [
-                [B3::INJECT_SINGLE_NO_PARENT],
+                ['no_kind' => [B3::INJECT_SINGLE_NO_PARENT]],
                 [
                     self::TEST_SINGLE_HEADER_NO_PARENT => self::SINGLE_VALUE_NAME,
                 ]
@@ -98,7 +112,8 @@ final class B3Test extends TestCase
         $this->assertNull($samplingFlags->isSampled());
     }
 
-    public function samplingDebugCarrierProvider(): array {
+    public function samplingDebugCarrierProvider(): array
+    {
         return [
             'multi' => [
                 [strtolower(self::FLAGS_NAME) => '1'],
@@ -124,7 +139,8 @@ final class B3Test extends TestCase
         $this->assertTrue($samplingFlags->isDebug());
     }
 
-    public function samplingCarrierProvider(): array {
+    public function samplingCarrierProvider(): array
+    {
         return [
             'multi sampled' => [
                 [
@@ -164,7 +180,8 @@ final class B3Test extends TestCase
         $this->assertEquals($isSampled, $samplingFlags->isSampled());
     }
 
-    public function traceContextCarrierProvider(): array {
+    public function traceContextCarrierProvider(): array
+    {
         return [
             'multi' => [
                 [
