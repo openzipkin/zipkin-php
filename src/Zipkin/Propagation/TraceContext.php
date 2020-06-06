@@ -63,7 +63,6 @@ final class TraceContext implements SamplingFlags
      * @param string|null $parentId
      * @param bool|null $isSampled
      * @param bool $isDebug
-     * @param bool $usesTraceId128bits
      * @return TraceContext
      * @throws InvalidTraceContextArgument
      */
@@ -72,8 +71,7 @@ final class TraceContext implements SamplingFlags
         string $spanId,
         ?string $parentId = null,
         ?bool $isSampled = SamplingFlags::EMPTY_SAMPLED,
-        bool $isDebug = SamplingFlags::EMPTY_DEBUG,
-        bool $usesTraceId128bits = false
+        bool $isDebug = SamplingFlags::EMPTY_DEBUG
     ): TraceContext {
         if (!Id\isValidTraceId($traceId)) {
             throw InvalidTraceContextArgument::forTraceId($traceId);
@@ -87,7 +85,7 @@ final class TraceContext implements SamplingFlags
             throw InvalidTraceContextArgument::forParentSpanId($parentId);
         }
 
-        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $usesTraceId128bits);
+        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, strlen($traceId) === 32);
     }
 
     /**
