@@ -51,9 +51,9 @@ final class TracerTest extends TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             $this->sampler->reveal(),
-            false,
+            false, // usesTraceId128bits
             $this->currentTracerContext,
-            false
+            false // isNoop
         );
 
         $samplingFlags = DefaultSamplingFlags::create(true, false);
@@ -73,9 +73,9 @@ final class TracerTest extends TestCase
             Endpoint::createAsEmpty(),
             $this->reporter->reveal(),
             $this->sampler->reveal(),
-            true,
+            true, // usesTraceId128bits
             new CurrentTraceContext,
-            false
+            false // isNoop
         );
 
         $samplingFlags = DefaultSamplingFlags::create(true, false);
