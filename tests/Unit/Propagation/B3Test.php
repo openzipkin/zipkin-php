@@ -2,22 +2,22 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use ArrayObject;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 use Psr\Log\NullLogger;
+use Psr\Log\LoggerTrait;
 use Zipkin\Propagation\B3;
-use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\Map;
+use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\TestCase;
+use Zipkin\Propagation\RemoteSetter;
 use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\DefaultSamplingFlags;
 
 final class B3Test extends TestCase
 {
-    const TRACE_ID_NAME = 'x-b3-Traceid';
-    const SPAN_ID_NAME = 'x-b3-SpanId';
-    const PARENT_SPAN_ID_NAME = 'x-b3-parentSpanId';
-    const SAMPLED_NAME = 'X-B3-Sampled';
+    const TRACE_ID_NAME = 'x-b3-traceid';
+    const SPAN_ID_NAME = 'x-b3-spanid';
+    const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
+    const SAMPLED_NAME = 'x-b3-sampled';
     const FLAGS_NAME = 'x-b3-flags';
     const SINGLE_VALUE_NAME = 'b3';
 
@@ -42,11 +42,39 @@ final class B3Test extends TestCase
         ], $b3Propagator->getKeys());
     }
 
+    public function testKeysMultiOnly()
+    {
+        $b3Propagator = new B3(new NullLogger, [
+            'PRODUCER' => ['multi'],
+            'CLIENT' => ['multi'],
+            'default' => ['multi'],
+        ]);
+
+        $this->assertEquals([
+            'X-B3-TraceId',
+            'X-B3-SpanId',
+            'X-B3-ParentSpanId',
+            'X-B3-Sampled',
+            'X-B3-Flags',
+        ], $b3Propagator->getKeys());
+    }
+
+    public function testKeysSingleOnly()
+    {
+        $b3Propagator = new B3(new NullLogger, [
+            'PRODUCER' => ['single'],
+            'CLIENT' => ['single'],
+            'default' => ['single'],
+        ]);
+
+        $this->assertEquals(['b3'], $b3Propagator->getKeys());
+    }
+
     public function injectorProvider(): array
     {
         return [
             'multi' => [
-                ['no_kind' => [B3::INJECT_MULTI]],
+                ['default' => [B3::INJECT_MULTI]],
                 [
                     self::TEST_TRACE_ID => self::TRACE_ID_NAME,
                     self::TEST_SPAN_ID => self::SPAN_ID_NAME,
@@ -54,13 +82,13 @@ final class B3Test extends TestCase
                 ]
             ],
             'single' => [
-                ['no_kind' => [B3::INJECT_SINGLE]],
+                ['default' => [B3::INJECT_SINGLE]],
                 [
                     self::TEST_SINGLE_HEADER => self::SINGLE_VALUE_NAME,
                 ]
             ],
             'both single and multi' => [
-                ['no_kind' => [B3::INJECT_MULTI, B3::INJECT_SINGLE]],
+                ['default' => [B3::INJECT_MULTI, B3::INJECT_SINGLE]],
                 [
                     self::TEST_TRACE_ID => self::TRACE_ID_NAME,
                     self::TEST_SPAN_ID => self::SPAN_ID_NAME,
@@ -69,7 +97,7 @@ final class B3Test extends TestCase
                 ]
             ],
             'single no parent' => [
-                ['no_kind' => [B3::INJECT_SINGLE_NO_PARENT]],
+                ['default' => [B3::INJECT_SINGLE_NO_PARENT]],
                 [
                     self::TEST_SINGLE_HEADER_NO_PARENT => self::SINGLE_VALUE_NAME,
                 ]
@@ -97,6 +125,66 @@ final class B3Test extends TestCase
 
         foreach ($headerChecks as $key => $value) {
             $this->assertEquals($key, $setterNGetter->get($carrier, $value));
+        }
+    }
+
+    public function kindRemoteSetter(): array
+    {
+        return [
+            'client' => [
+                new class() extends Map implements RemoteSetter {
+                    public function getKind(): string
+                    {
+                        return 'CLIENT';
+                    }
+                },
+                [
+                    self::TEST_TRACE_ID => self::TRACE_ID_NAME,
+                    self::TEST_SPAN_ID => self::SPAN_ID_NAME,
+                    self::TEST_PARENT_ID =>  self::PARENT_SPAN_ID_NAME,
+                ]
+            ],
+            'producer' => [
+                new class() extends Map implements RemoteSetter {
+                    public function getKind(): string
+                    {
+                        return 'PRODUCER';
+                    }
+                },
+                [
+                    self::TEST_SINGLE_HEADER_NO_PARENT => self::SINGLE_VALUE_NAME,
+                ]
+            ],
+            'default' => [
+                new Map(),
+                [
+                    self::TEST_TRACE_ID => self::TRACE_ID_NAME,
+                    self::TEST_SPAN_ID => self::SPAN_ID_NAME,
+                    self::TEST_PARENT_ID =>  self::PARENT_SPAN_ID_NAME,
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider kindRemoteSetter
+     */
+    public function testGetInjectorReturnsTheExpectedFunctionPerKind($remoteSetter, array $headerChecks)
+    {
+        $carrier = [];
+        $context = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            self::TEST_SAMPLE,
+            self::TEST_DEBUG
+        );
+        $b3Propagator = new B3(new NullLogger);
+        $injector = $b3Propagator->getInjector($remoteSetter);
+        $injector($context, $carrier);
+
+        foreach ($headerChecks as $key => $value) {
+            $this->assertEquals($key, $carrier[$value]);
         }
     }
 

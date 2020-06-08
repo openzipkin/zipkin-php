@@ -56,12 +56,18 @@ final class B3 implements Propagation
         self::FLAGS_NAME,
     ];
 
+    /**
+     * @var array[string]
+     */
     private const INJECTORS = [
         self::INJECT_SINGLE => [self::class, 'injectSingleValue'],
         self::INJECT_SINGLE_NO_PARENT => [self::class, 'injectSingleValueNoParent'],
         self::INJECT_MULTI => [self::class, 'injectMultiValues'],
     ];
 
+    /**
+     * @var array[string]
+     */
     private const KEYS = [
         self::INJECT_SINGLE => [self::SINGLE_VALUE_NAME],
         self::INJECT_SINGLE_NO_PARENT => [self::SINGLE_VALUE_NAME],
@@ -83,20 +89,33 @@ final class B3 implements Propagation
      */
     public const INJECT_MULTI = 'multi';
 
+    private const DEFAULT_INJECTOR = 'default';
+
     /**
-     * @var string[]|array
+     * @var array
      */
+    private const DEFAULT_KIND_KEYS = [
+        Kind\CLIENT => [self::INJECT_SINGLE, self::INJECT_MULTI],
+        Kind\PRODUCER => [self::INJECT_SINGLE],
+        self::DEFAULT_INJECTOR => [self::INJECT_MULTI],
+    ];
+
     private $keys = [];
 
-    private const NO_KIND = 'no_kind';
-
     /**
-     * @var array[]
+     * @var array[string]
      */
     private $injectorsFn = [
-        Kind\CLIENT => [self::INJECT_MULTI, self::INJECT_SINGLE],
-        Kind\PRODUCER => [self::INJECT_SINGLE_NO_PARENT],
-        self::NO_KIND => [self::INJECT_MULTI],
+        Kind\CLIENT => [
+            [self::class, 'injectMultiValues'],
+            [self::class, 'injectSingleValue']
+        ],
+        Kind\PRODUCER => [
+            [self::class, 'injectSingleValueNoParent'],
+        ],
+        self::DEFAULT_INJECTOR => [
+            [self::class, 'injectMultiValues'],
+        ],
     ];
 
     /**
@@ -104,38 +123,52 @@ final class B3 implements Propagation
      */
     private $logger;
 
+    /**
+     * @param LoggerInterface $logger
+     * @param array[string] $kindInjectors is a map of kind and injectors, for example:
+     * $kindInjectors = [
+     *      Kind\CLIENT => [B3::INJECT_SINGLE, B3::INJECT_MULTI],
+     * ]
+     * @throws InvalidArgumentException if the kind in the keys of $kindInjectors
+     * or the injector name in the values are not recognized i.e. not any of
+     *  - B3::INJECT_MULTI
+     *  - B3::INJECT_SINGLE
+     *  - B3::INJECT_SINGLE_NO_PARENT
+     */
     public function __construct(
         LoggerInterface $logger = null,
         array $kindInjectors = []
     ) {
         $this->logger = $logger ?: new NullLogger();
-
-        foreach ($kindInjectors as $kind => $injectors) {
-            if ($kind !== Kind\CLIENT || $kind !== Kind\PRODUCER || $kind !== self::NO_KIND) {
+        
+        foreach ($kindInjectors as $kind => $injectorsNames) {
+            if ($kind !== Kind\CLIENT && $kind !== Kind\PRODUCER && $kind !== self::DEFAULT_INJECTOR) {
                 throw new InvalidArgumentException(sprintf(
-                    'Unkown kind "%s" for injector, "%s", "%s" or "%s" supported.',
+                    'Unknown kind "%s" for injector, "%s", "%s" or "%s" supported.',
                     $kind,
                     Kind\CLIENT,
                     Kind\PRODUCER,
-                    self::NO_KIND
+                    self::DEFAULT_INJECTOR
                 ));
             }
 
             $this->injectorsFn[$kind] = array_map(function ($injectorName) {
                 return self::INJECTORS[$injectorName];
-            }, $injectors);
-
-            $this->keys = array_merge($this->keys, self::keysForInjectors($injectors));
+            }, $injectorsNames);
         }
-    }
 
-    private static function keysForInjectors(array $injectors): array
-    {
-        $keys = [];
-        foreach ($injectors as $injectorName) {
-            $keys = array_merge($keys, self::KEYS[$injectorName]);
+        // $keysInjectors keeps reference for the already included injectors
+        // to avoid duplications in the headers and/or the need to apply
+        // array_unique
+        $keysInjectors = [];
+        foreach ($kindInjectors + self::DEFAULT_KIND_KEYS as $injectorsNames) {
+            if (!empty($missingInjectors = array_diff($injectorsNames, $keysInjectors))) {
+                $keysInjectors = array_merge($keysInjectors, $missingInjectors);
+                $this->keys = array_reduce($missingInjectors, function ($carry, $item) {
+                    return array_merge($carry, self::KEYS[$item]);
+                }, $this->keys);
+            }
         }
-        return $keys;
     }
 
     /**
@@ -151,7 +184,7 @@ final class B3 implements Propagation
      */
     public function getInjector(Setter $setter): callable
     {
-        $injectorKind = ($setter instanceof RemoteSetter) ? $setter->getKind() : self::NO_KIND;
+        $injectorKind = ($setter instanceof RemoteSetter) ? $setter->getKind() : self::DEFAULT_INJECTOR;
 
         /**
          * @param TraceContext $traceContext
@@ -297,8 +330,7 @@ final class B3 implements Propagation
                 $spanId,
                 $parentId,
                 $isSampled,
-                $isDebug,
-                \strlen($pieces[0]) == 32
+                $isDebug
             );
         }
     }
