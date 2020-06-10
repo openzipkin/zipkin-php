@@ -2,15 +2,15 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use Psr\Log\NullLogger;
-use Psr\Log\LoggerTrait;
-use Zipkin\Propagation\B3;
-use Zipkin\Propagation\Map;
-use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerTrait;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Zipkin\Propagation\B3;
+use Zipkin\Propagation\DefaultSamplingFlags;
+use Zipkin\Propagation\Map;
 use Zipkin\Propagation\RemoteSetter;
 use Zipkin\Propagation\TraceContext;
-use Zipkin\Propagation\DefaultSamplingFlags;
 
 final class B3Test extends TestCase
 {
