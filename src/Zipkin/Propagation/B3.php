@@ -89,6 +89,9 @@ final class B3 implements Propagation
      */
     public const INJECT_MULTI = 'multi';
 
+    /**
+     * Default injector for when Setter is not remote
+     */
     private const DEFAULT_INJECTOR = 'default';
 
     /**
@@ -100,6 +103,9 @@ final class B3 implements Propagation
         self::DEFAULT_INJECTOR => [self::INJECT_MULTI],
     ];
 
+    /**
+     * @var array|string[]
+     */
     private $keys = [];
 
     /**
@@ -125,7 +131,7 @@ final class B3 implements Propagation
 
     /**
      * @param LoggerInterface $logger
-     * @param array[string] $kindInjectors is a map of kind and injectors, for example:
+     * @param array $kindInjectors is a map of kind and injectors, for example:
      * $kindInjectors = [
      *      Kind\CLIENT => [B3::INJECT_SINGLE, B3::INJECT_MULTI],
      * ]
@@ -134,6 +140,8 @@ final class B3 implements Propagation
      *  - B3::INJECT_MULTI
      *  - B3::INJECT_SINGLE
      *  - B3::INJECT_SINGLE_NO_PARENT
+     * or if both B3::INJECT_SINGLE and B3::INJECT_SINGLE_NO_PARENT are passed in the
+     * same injector list.
      */
     public function __construct(
         LoggerInterface $logger = null,
@@ -149,6 +157,15 @@ final class B3 implements Propagation
                     Kind\CLIENT,
                     Kind\PRODUCER,
                     self::DEFAULT_INJECTOR
+                ));
+            }
+
+            if (array_key_exists(self::INJECT_SINGLE, $injectorsNames) &&
+                array_key_exists(self::INJECT_SINGLE_NO_PARENT, $injectorsNames)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Both \"B3::INJECT_SINGLE\" and \"B3::INJECT_SINGLE_NO_PARENT\" ' .
+                    'can\'t be included for the same kind \"%d\".',
+                    $kind
                 ));
             }
 
@@ -202,17 +219,17 @@ final class B3 implements Propagation
         };
     }
 
-    private static function injectSingleValue(Setter $setter, TraceContext $traceContext, &$carrier)
+    private static function injectSingleValue(Setter $setter, TraceContext $traceContext, &$carrier): void
     {
         $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext));
     }
 
-    private static function injectSingleValueNoParent(Setter $setter, TraceContext $traceContext, &$carrier)
+    private static function injectSingleValueNoParent(Setter $setter, TraceContext $traceContext, &$carrier): void
     {
         $setter->put($carrier, self::SINGLE_VALUE_NAME, self::buildSingleValue($traceContext, false));
     }
 
-    private static function injectMultiValues(Setter $setter, TraceContext $traceContext, &$carrier)
+    private static function injectMultiValues(Setter $setter, TraceContext $traceContext, &$carrier): void
     {
         if ($traceContext instanceof TraceContext) {
             $setter->put($carrier, self::TRACE_ID_NAME, $traceContext->getTraceId());
@@ -234,7 +251,7 @@ final class B3 implements Propagation
 
     private static function buildSingleValue(SamplingFlags $traceContext, bool $includeParent = true): string
     {
-        $samplingBit = null;
+        $samplingBit = '';
         if ($traceContext->isDebug()) {
             $samplingBit = 'd';
         } elseif ($traceContext->isSampled() !== null) {
@@ -301,38 +318,37 @@ final class B3 implements Propagation
                 return DefaultSamplingFlags::createAsSampled();
             } elseif ($value === 'd') {
                 return DefaultSamplingFlags::createAsDebug();
+            }
+
+            throw InvalidTraceContextArgument::forSampling($value);
+        }
+
+        // $numberOfPieces > 1 {trace_id}-{span_id}[-{sampling}-{parent_id}]
+        $traceId = $pieces[0];
+        $spanId = $pieces[1];
+        $isSampled = DefaultSamplingFlags::EMPTY_SAMPLED;
+        $isDebug = DefaultSamplingFlags::EMPTY_DEBUG;
+        if ($numberOfPieces > 2) { // {trace_id}-{span_id}-{sampling}[-{parent_id}]
+            $samplingBit = $pieces[2];
+            if ($samplingBit === '0') {
+                $isSampled = false;
+            } elseif ($samplingBit === '1') {
+                $isSampled = true;
+            } elseif ($samplingBit === 'd') {
+                $isDebug = true;
             } else {
-                throw InvalidTraceContextArgument::forSampling($value);
+                throw InvalidTraceContextArgument::forSampling($samplingBit);
             }
         }
 
-        if ($numberOfPieces >= 2) { // {trace_id}-{span_id}[-{sampling}-{parent_id}]
-            $traceId = $pieces[0];
-            $spanId = $pieces[1];
-            $isSampled = DefaultSamplingFlags::EMPTY_SAMPLED;
-            $isDebug = DefaultSamplingFlags::EMPTY_DEBUG;
-            if ($numberOfPieces > 2) { // {trace_id}-{span_id}-{sampling}[-{parent_id}]
-                $samplingBit = $pieces[2];
-                if ($samplingBit === '0') {
-                    $isSampled = false;
-                } elseif ($samplingBit === '1') {
-                    $isSampled = true;
-                } elseif ($samplingBit === 'd') {
-                    $isDebug = true;
-                } else {
-                    throw InvalidTraceContextArgument::forSampling($samplingBit);
-                }
-            }
-
-            $parentId = $numberOfPieces > 3 ? $pieces[3] : null; // {trace_id}-{span_id}-{sampling}-{parent_id}
-            return TraceContext::create(
-                $traceId,
-                $spanId,
-                $parentId,
-                $isSampled,
-                $isDebug
-            );
-        }
+        $parentId = $numberOfPieces > 3 ? $pieces[3] : null; // {trace_id}-{span_id}-{sampling}-{parent_id}
+        return TraceContext::create(
+            $traceId,
+            $spanId,
+            $parentId,
+            $isSampled,
+            $isDebug
+        );
     }
 
     public static function parseMultiValue(Getter $getter, $carrier): SamplingFlags
@@ -349,17 +365,9 @@ final class B3 implements Propagation
         }
 
         $isDebugRaw = $getter->get($carrier, self::FLAGS_NAME);
-            
-        /**
-         * @var ?bool $isDebug
-         */
-        $isDebug = SamplingFlags::EMPTY_DEBUG;
-        if ($isDebugRaw !== null) {
-            $isDebug = ($isDebugRaw === '1');
-        }
+        $isDebug = $isDebugRaw === '1';
 
         $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
-
         if ($traceId === null) {
             return DefaultSamplingFlags::create($isSampled, $isDebug);
         }
