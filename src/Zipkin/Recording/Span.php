@@ -259,8 +259,8 @@ final class Span
             'localEndpoint' => $this->localEndpoint->toArray(),
         ];
 
-        if ($this->shared) {
-            $spanAsArray['shared'] = $this->shared;
+        if ($this->shared === true) {
+            $spanAsArray['shared'] = true;
         }
 
         if ($this->kind !== null) {
