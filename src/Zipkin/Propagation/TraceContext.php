@@ -230,8 +230,8 @@ final class TraceContext implements SamplingFlags
             $this->parentId,
             $this->isSampled,
             $this->isDebug,
-            $this->usesTraceId128bits,
-            $isShared
+            $isShared,
+            $this->usesTraceId128bits
         );
     }
 
@@ -251,7 +251,6 @@ final class TraceContext implements SamplingFlags
             && $this->spanId === $samplingFlags->spanId
             && $this->parentId === $samplingFlags->parentId
             && $this->isSampled === $samplingFlags->isSampled
-            && $this->isDebug === $samplingFlags->isDebug
-            && $this->usesTraceId128bits === $samplingFlags->usesTraceId128bits;
+            && $this->isDebug === $samplingFlags->isDebug;
     }
 }
