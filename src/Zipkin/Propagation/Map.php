@@ -34,8 +34,16 @@ final class Map implements Getter, Setter
                 return null;
             }
 
-            $lcCarrier = \array_change_key_case($carrier, \CASE_LOWER);
-            return \array_key_exists($lKey, $lcCarrier) ? $lcCarrier[$lKey] : null;
+            /**
+             * @var string $k
+             */
+            foreach ($carrier as $k => $value) {
+                if (strtolower($k) === $lKey) {
+                    return $value;
+                }
+            }
+
+            return null;
         }
 
         throw InvalidPropagationCarrier::forCarrier($carrier);
