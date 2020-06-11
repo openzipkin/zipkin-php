@@ -46,6 +46,11 @@ class TracingBuilder
      */
     private $isNoop = false;
 
+    /**
+     * @var bool
+     */
+    private $supportsJoin = true;
+
     public static function create(): self
     {
         return new self();
@@ -145,6 +150,12 @@ class TracingBuilder
         return $this;
     }
 
+    public function supportingJoin(bool $supportsJoin): self
+    {
+        $this->supportsJoin = $supportsJoin;
+        return $this;
+    }
+
     /**
      * @return DefaultTracing
      */
@@ -168,7 +179,8 @@ class TracingBuilder
             $sampler,
             $this->usesTraceId128bits,
             $currentTraceContext,
-            $this->isNoop
+            $this->isNoop,
+            $this->supportsJoin
         );
     }
 }

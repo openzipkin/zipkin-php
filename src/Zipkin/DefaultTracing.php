@@ -40,7 +40,8 @@ final class DefaultTracing implements Tracing
         Sampler $sampler,
         $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
-        bool $isNoop = false
+        bool $isNoop,
+        bool $supportsJoin
     ) {
         $this->tracer = new Tracer(
             $localEndpoint,
@@ -48,7 +49,8 @@ final class DefaultTracing implements Tracing
             $sampler,
             $usesTraceId128bits,
             $currentTraceContext,
-            $isNoop
+            $isNoop,
+            $supportsJoin
         );
 
         $this->propagation = new B3();

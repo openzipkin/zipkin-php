@@ -79,6 +79,13 @@ final class Span
     private $debug;
 
     /**
+     * True if we are contributing to a span started by another tracer (ex on a different host).
+     *
+     * @var bool
+     */
+    private $shared;
+
+    /**
      * Associates events that explain latency with a timestamp. Unlike log
      * statements, annotations are often codes: for example SERVER_RECV("sr").
      * Annotations are sorted ascending by timestamp.
@@ -125,12 +132,14 @@ final class Span
         ?string $parentId,
         string $spanId,
         bool $debug,
+        bool $shared,
         Endpoint $localEndpoint
     ) {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
         $this->spanId = $spanId;
         $this->debug = $debug;
+        $this->shared = $shared;
         $this->localEndpoint = $localEndpoint;
     }
 
@@ -146,6 +155,7 @@ final class Span
             $context->getParentId(),
             $context->getSpanId(),
             $context->isDebug(),
+            $context->isShared(),
             $localEndpoint
         );
     }
@@ -248,6 +258,10 @@ final class Span
             'debug' => $this->debug,
             'localEndpoint' => $this->localEndpoint->toArray(),
         ];
+
+        if ($this->shared) {
+            $spanAsArray['shared'] = $this->shared;
+        }
 
         if ($this->kind !== null) {
             $spanAsArray['kind'] = $this->kind;

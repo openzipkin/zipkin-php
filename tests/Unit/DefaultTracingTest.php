@@ -27,7 +27,8 @@ final class DefaultTracingTest extends TestCase
             $sampler,
             false,
             new CurrentTraceContext,
-            $isNoop
+            $isNoop,
+            true
         );
 
         $this->assertInstanceOf(Tracing::class, $tracing);
