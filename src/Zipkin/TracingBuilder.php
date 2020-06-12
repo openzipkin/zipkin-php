@@ -58,6 +58,11 @@ class TracingBuilder
      */
     private $propagation = null;
 
+    /**
+     * @var bool
+     */
+    private $alwaysEmitSpans = false;
+
     public static function create(): self
     {
         return new self();
@@ -184,6 +189,16 @@ class TracingBuilder
     }
 
     /**
+     * @param bool $alwaysEmitSpans
+     * @return $this
+     */
+    public function alwaysEmittingSpans(bool $alwaysEmitSpans): self
+    {
+        $this->alwaysEmitSpans = $alwaysEmitSpans;
+        return $this;
+    }
+
+    /**
      * @return DefaultTracing
      */
     public function build(): Tracing
@@ -209,7 +224,8 @@ class TracingBuilder
             $currentTraceContext,
             $this->isNoop,
             $propagation,
-            $this->supportsJoin && $propagation->supportsJoin()
+            $this->supportsJoin && $propagation->supportsJoin(),
+            $this->alwaysEmitSpans
         );
     }
 }

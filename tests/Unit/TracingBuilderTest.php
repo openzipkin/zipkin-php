@@ -5,6 +5,7 @@ namespace ZipkinTests\Unit;
 use Zipkin\Tracing;
 use Zipkin\Endpoint;
 use Zipkin\Reporters\Noop;
+use Zipkin\Reporters\InMemory;
 use Zipkin\TracingBuilder;
 use Zipkin\Propagation\Getter;
 use Zipkin\Propagation\Setter;
@@ -84,5 +85,59 @@ final class TracingBuilderTest extends TestCase
     private function randomBool()
     {
         return (bool) mt_rand(0, 1);
+    }
+
+    public function testAlwaysEmitSpans()
+    {
+        // If `alwaysEmittingSpans(true)` is called, we should be emitting the
+        // spans even if the trace isn't sampled
+        $endpoint = Endpoint::createAsEmpty();
+        $reporter = new InMemory();
+        $sampler = BinarySampler::createAsNeverSample();
+
+        $tracing = TracingBuilder::create()
+            ->havingLocalServiceName(self::SERVICE_NAME)
+            ->havingLocalEndpoint($endpoint)
+            ->havingReporter($reporter)
+            ->havingSampler($sampler)
+            ->alwaysEmittingSpans(true)
+            ->build();
+        $tracer = $tracing->getTracer();
+
+        $span = $tracer->newTrace();
+        $span->setName('test');
+        $span->start();
+        $span->finish();
+
+        $tracer->flush();
+        $spans = $reporter->flush();
+        $this->assertCount(1, $spans);
+        $this->assertFalse($spans[0]->isSampled());
+    }
+
+    public function testDontEmitByDefault()
+    {
+        // By default, let's verify that we don't emit any span if the
+        // trace isn't sampled.
+        $endpoint = Endpoint::createAsEmpty();
+        $reporter = new InMemory();
+        $sampler = BinarySampler::createAsNeverSample();
+
+        $tracing = TracingBuilder::create()
+            ->havingLocalServiceName(self::SERVICE_NAME)
+            ->havingLocalEndpoint($endpoint)
+            ->havingReporter($reporter)
+            ->havingSampler($sampler)
+            ->build();
+        $tracer = $tracing->getTracer();
+
+        $span = $tracer->newTrace();
+        $span->setName('test');
+        $span->start();
+        $span->finish();
+
+        $tracer->flush();
+        $spans = $reporter->flush();
+        $this->assertCount(0, $spans);
     }
 }

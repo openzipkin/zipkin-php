@@ -49,12 +49,18 @@ final class Tracer
     private $supportsJoin;
 
     /**
+     * @var bool
+     */
+    private $alwaysEmitSpans;
+
+    /**
      * @param Endpoint $localEndpoint
      * @param Reporter $reporter
      * @param Sampler $sampler
      * @param bool $usesTraceId128bits
      * @param CurrentTraceContext $currentTraceContext
      * @param bool $isNoop
+     * @param bool $alwaysEmitSpans
      */
     public function __construct(
         Endpoint $localEndpoint,
@@ -63,7 +69,8 @@ final class Tracer
         bool $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
         bool $isNoop,
-        bool $supportsJoin = true
+        bool $supportsJoin = true,
+        bool $alwaysEmitSpans = false
     ) {
         $this->recorder = new Recorder($localEndpoint, $reporter, $isNoop);
         $this->sampler = $sampler;
@@ -71,6 +78,7 @@ final class Tracer
         $this->currentTraceContext = $currentTraceContext;
         $this->isNoop = $isNoop;
         $this->supportsJoin = $supportsJoin;
+        $this->alwaysEmitSpans = $alwaysEmitSpans;
     }
 
     /**
@@ -393,7 +401,7 @@ final class Tracer
      */
     private function toSpan(TraceContext $context): Span
     {
-        if (!$this->isNoop && $context->isSampled()) {
+        if (!$this->isNoop && ($context->isSampled() || $this->alwaysEmitSpans)) {
             return new RealSpan($context, $this->recorder);
         }
 
