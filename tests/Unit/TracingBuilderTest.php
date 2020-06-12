@@ -2,13 +2,16 @@
 
 namespace ZipkinTests\Unit;
 
-use PHPUnit\Framework\TestCase;
-use Zipkin\Endpoint;
-use Zipkin\Propagation\CurrentTraceContext;
-use Zipkin\Reporters\Noop;
-use Zipkin\Samplers\BinarySampler;
 use Zipkin\Tracing;
+use Zipkin\Endpoint;
+use Zipkin\Reporters\Noop;
 use Zipkin\TracingBuilder;
+use Zipkin\Propagation\Getter;
+use Zipkin\Propagation\Setter;
+use PHPUnit\Framework\TestCase;
+use Zipkin\Samplers\BinarySampler;
+use Zipkin\Propagation\Propagation;
+use Zipkin\Propagation\CurrentTraceContext;
 
 final class TracingBuilderTest extends TestCase
 {
@@ -19,6 +22,7 @@ final class TracingBuilderTest extends TestCase
         $tracing = TracingBuilder::create()->build();
         $this->assertInstanceOf(Tracing::class, $tracing);
         $this->assertEquals(false, $tracing->isNoop());
+        $this->assertInstanceOf(Propagation::class, $tracing->getPropagation());
     }
 
     /**
@@ -31,6 +35,26 @@ final class TracingBuilderTest extends TestCase
         $sampler = BinarySampler::createAsAlwaysSample();
         $usesTraceId128bits = $this->randomBool();
         $currentTraceContext = new CurrentTraceContext;
+        $propagation = new class() implements Propagation {
+            public function getKeys(): array
+            {
+                return [];
+            }
+            public function getInjector(Setter $setter): callable
+            {
+                return function () {
+                };
+            }
+            public function getExtractor(Getter $getter): callable
+            {
+                return function () {
+                };
+            }
+            public function supportsJoin(): bool
+            {
+                return true;
+            }
+        };
 
         $tracing = TracingBuilder::create()
             ->havingLocalServiceName(self::SERVICE_NAME)
@@ -40,10 +64,13 @@ final class TracingBuilderTest extends TestCase
             ->havingTraceId128bits($usesTraceId128bits)
             ->havingCurrentTraceContext($currentTraceContext)
             ->beingNoop($isNoop)
+            ->supportingJoin(true)
+            ->havingPropagation($propagation)
             ->build();
 
         $this->assertInstanceOf(Tracing::class, $tracing);
         $this->assertEquals($isNoop, $tracing->isNoop());
+        $this->assertSame($propagation, $tracing->getPropagation());
     }
 
     public function boolProvider()

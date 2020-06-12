@@ -41,6 +41,7 @@ final class DefaultTracing implements Tracing
         $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
         bool $isNoop,
+        Propagation $propagation,
         bool $supportsJoin
     ) {
         $this->tracer = new Tracer(
@@ -53,7 +54,7 @@ final class DefaultTracing implements Tracing
             $supportsJoin
         );
 
-        $this->propagation = new B3();
+        $this->propagation = $propagation;
         $this->isNoop = $isNoop;
     }
 

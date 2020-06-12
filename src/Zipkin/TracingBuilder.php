@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Zipkin;
 
 use Psr\Log\NullLogger;
-use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Reporters\Log;
+use Zipkin\Propagation\B3;
 use Zipkin\Samplers\BinarySampler;
+use Zipkin\Propagation\Propagation;
+use Zipkin\Propagation\CurrentTraceContext;
 
 class TracingBuilder
 {
@@ -50,6 +52,11 @@ class TracingBuilder
      * @var bool
      */
     private $supportsJoin = true;
+
+    /**
+     * @var Propagation
+     */
+    private $propagation = null;
 
     public static function create(): self
     {
@@ -141,6 +148,9 @@ class TracingBuilder
     }
 
     /**
+     * Set true to drop data and only return {@link Span#isNoop() noop spans} regardless of sampling
+     * policy. This allows operators to stop tracing in risk scenarios.
+     *
      * @param bool $isNoop
      * @return $this
      */
@@ -150,6 +160,23 @@ class TracingBuilder
         return $this;
     }
 
+    public function havingPropagation(Propagation $propagation): self
+    {
+        $this->propagation = $propagation;
+        return $this;
+    }
+
+    /**
+     * True means the tracing system supports sharing a span ID between a {@link Span\Kind\CLIENT}
+     * and {@link Span\Kind\SERVER} span. Defaults to true.
+     *
+     * <p>Set this to false when the tracing system requires the opposite. For example, if
+     * ultimately spans are sent to Amazon X-Ray or Google Stackdriver Trace, you should set this to
+     * false.
+     *
+     * <p>This is implicitly set to false when {@link Propagation::supportsJoin()} is false,
+     * as in that case, sharing IDs isn't possible anyway.
+     */
     public function supportingJoin(bool $supportsJoin): self
     {
         $this->supportsJoin = $supportsJoin;
@@ -169,8 +196,9 @@ class TracingBuilder
             }
         }
 
-        $reporter = $this->reporter ?: new Log(new NullLogger());
-        $sampler = $this->sampler ?: BinarySampler::createAsNeverSample();
+        $reporter = $this->reporter ?? new Log(new NullLogger);
+        $sampler = $this->sampler ?? BinarySampler::createAsNeverSample();
+        $propagation = $this->propagation ?? new B3;
         $currentTraceContext = $this->currentTraceContext ?: new CurrentTraceContext;
 
         return new DefaultTracing(
@@ -180,7 +208,8 @@ class TracingBuilder
             $this->usesTraceId128bits,
             $currentTraceContext,
             $this->isNoop,
-            $this->supportsJoin
+            $propagation,
+            $this->supportsJoin && $propagation->supportsJoin()
         );
     }
 }

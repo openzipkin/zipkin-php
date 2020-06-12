@@ -132,9 +132,12 @@ final class B3 implements Propagation
     /**
      * @param LoggerInterface $logger
      * @param array $kindInjectors is a map of kind and injectors, for example:
+     * <pre>{@code
      * $kindInjectors = [
      *      Kind\CLIENT => [B3::INJECT_SINGLE, B3::INJECT_MULTI],
      * ]
+     * </pre>
+     *
      * @throws InvalidArgumentException if the kind in the keys of $kindInjectors
      * or the injector name in the values are not recognized i.e. not any of
      *  - B3::INJECT_MULTI
@@ -217,6 +220,14 @@ final class B3 implements Propagation
                 ($injectorFn)($setter, $traceContext, $carrier);
             }
         };
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsJoin(): bool
+    {
+        return true;
     }
 
     private static function injectSingleValue(Setter $setter, TraceContext $traceContext, &$carrier): void
