@@ -213,11 +213,19 @@ Here's what server-side propagation might look like
 
 ```php
 // configure a function that extracts the trace context from a request
-$extractor = $tracing->getPropagation()->extractor(new RequestHeaders);
+$extractor = $tracing->getPropagation()->getExtractor(new RequestHeaders);
 $extracted = $extractor($request)
 
 $span = $tracer->newChild($extracted)
 $span->setKind(Kind\SERVER);
+```
+
+If you aren't using a framework or don't have access to the Request object, you
+can extract the context from the $_SERVER variable
+
+```php
+$extractor = $tracing->getPropagation()->getExtractor(new ServerHeaders);
+$extracted = $extractor($_SERVER)
 ```
 
 ### Extracting a propagated context
@@ -289,6 +297,7 @@ request. To do this, simply pass null to `openScope`.
 Tests can be run by
 
 ```bash
+composer update
 composer test
 ```
 
