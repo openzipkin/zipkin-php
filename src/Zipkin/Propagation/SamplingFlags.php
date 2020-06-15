@@ -19,6 +19,8 @@ interface SamplingFlags
      */
     public function isDebug(): bool;
 
+    public function isEmpty(): bool;
+
     /**
      * @param SamplingFlags $samplingFlags
      * @return bool

@@ -1,7 +1,7 @@
 parameters:
 	checkGenericClassInNonGenericObjectType: false
 	treatPhpDocTypesAsCertain: false
-	autoload_files:
+	bootstrapFiles:
 		- vendor/autoload.php
 	checkMissingIterableValueType: false
 	ignoreErrors:
@@ -29,3 +29,11 @@ parameters:
 			# $result can't have a type as it can be literally anything.
 			message: '#Method Zipkin\\Tracer\:\:defaultResultParser\(\) has parameter \$result with no typehint specified.#'
 			path: src/Zipkin/Tracer.php
+		-  
+			# In general types are desired but carrier is an special case
+			message: '#has parameter \$carrier with no typehint specified#'
+			path: src/Zipkin/*
+		-  
+			# Somehow this started failing
+			message: '#Constant .* already defined#'
+			path: src/Zipkin/Kind

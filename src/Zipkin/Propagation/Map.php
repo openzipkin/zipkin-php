@@ -8,7 +8,7 @@ use ArrayAccess;
 use Zipkin\Propagation\Exceptions\InvalidPropagationCarrier;
 use Zipkin\Propagation\Exceptions\InvalidPropagationKey;
 
-final class Map implements Getter, Setter
+class Map implements Getter, Setter
 {
     /**
      * {@inheritdoc}

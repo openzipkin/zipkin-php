@@ -2,32 +2,115 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use ArrayObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerTrait;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Zipkin\Propagation\B3;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Propagation\Map;
+use Zipkin\Propagation\RemoteSetter;
 use Zipkin\Propagation\TraceContext;
 
 final class B3Test extends TestCase
 {
-    const TRACE_ID_NAME = 'x-b3-Traceid';
-    const SPAN_ID_NAME = 'x-b3-SpanId';
-    const PARENT_SPAN_ID_NAME = 'x-b3-parentSpanId';
-    const SAMPLED_NAME = 'X-B3-Sampled';
+    const TRACE_ID_NAME = 'x-b3-traceid';
+    const SPAN_ID_NAME = 'x-b3-spanid';
+    const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
+    const SAMPLED_NAME = 'x-b3-sampled';
     const FLAGS_NAME = 'x-b3-flags';
+    const SINGLE_VALUE_NAME = 'b3';
 
     const TEST_TRACE_ID = 'bd7a977555f6b982';
     const TEST_PARENT_ID = 'bd7a977555f6b982';
     const TEST_SPAN_ID = 'be2d01e33cc78d97';
     const TEST_SAMPLE = true;
     const TEST_DEBUG = false;
+    const TEST_SINGLE_HEADER = 'bd7a977555f6b982-be2d01e33cc78d97-1-bd7a977555f6b982';
+    const TEST_SINGLE_HEADER_NO_PARENT = 'bd7a977555f6b982-be2d01e33cc78d97-1';
+
+    public function testKeysIncludesAllByDefault()
+    {
+        $b3Propagator = new B3();
+        $this->assertEquals([
+            'b3',
+            'X-B3-TraceId',
+            'X-B3-SpanId',
+            'X-B3-ParentSpanId',
+            'X-B3-Sampled',
+            'X-B3-Flags',
+        ], $b3Propagator->getKeys());
+    }
+
+    public function testKeysMultiOnly()
+    {
+        $b3Propagator = new B3(new NullLogger, [
+            'PRODUCER' => ['multi'],
+            'CLIENT' => ['multi'],
+            'default' => ['multi'],
+        ]);
+
+        $this->assertEquals([
+            'X-B3-TraceId',
+            'X-B3-SpanId',
+            'X-B3-ParentSpanId',
+            'X-B3-Sampled',
+            'X-B3-Flags',
+        ], $b3Propagator->getKeys());
+    }
+
+    public function testKeysSingleOnly()
+    {
+        $b3Propagator = new B3(new NullLogger, [
+            'PRODUCER' => ['single'],
+            'CLIENT' => ['single'],
+            'default' => ['single'],
+        ]);
+
+        $this->assertEquals(['b3'], $b3Propagator->getKeys());
+    }
+
+    public function injectorProvider(): array
+    {
+        return [
+            'multi' => [
+                ['default' => [B3::INJECT_MULTI]],
+                [
+                    self::TEST_TRACE_ID => self::TRACE_ID_NAME,
+                    self::TEST_SPAN_ID => self::SPAN_ID_NAME,
+                    self::TEST_PARENT_ID =>  self::PARENT_SPAN_ID_NAME,
+                ]
+            ],
+            'single' => [
+                ['default' => [B3::INJECT_SINGLE]],
+                [
+                    self::TEST_SINGLE_HEADER => self::SINGLE_VALUE_NAME,
+                ]
+            ],
+            'both single and multi' => [
+                ['default' => [B3::INJECT_MULTI, B3::INJECT_SINGLE]],
+                [
+                    self::TEST_TRACE_ID => self::TRACE_ID_NAME,
+                    self::TEST_SPAN_ID => self::SPAN_ID_NAME,
+                    self::TEST_PARENT_ID =>  self::PARENT_SPAN_ID_NAME,
+                    self::TEST_SINGLE_HEADER => self::SINGLE_VALUE_NAME,
+                ]
+            ],
+            'single no parent' => [
+                ['default' => [B3::INJECT_SINGLE_NO_PARENT]],
+                [
+                    self::TEST_SINGLE_HEADER_NO_PARENT => self::SINGLE_VALUE_NAME,
+                ]
+            ],
+        ];
+    }
 
     /**
-     * @dataProvider carrierProvider
+     * @dataProvider injectorProvider
      */
-    public function testGetInjectorReturnsTheExpectedFunction($carrier)
+    public function testGetInjectorReturnsTheExpectedFunction(array $injectorsFn, array $headerChecks)
     {
+        $carrier = [];
         $context = TraceContext::create(
             self::TEST_TRACE_ID,
             self::TEST_SPAN_ID,
@@ -36,20 +119,78 @@ final class B3Test extends TestCase
             self::TEST_DEBUG
         );
         $setterNGetter = new Map();
-        $b3Propagator = new B3();
+        $b3Propagator = new B3(new NullLogger, $injectorsFn);
         $injector = $b3Propagator->getInjector($setterNGetter);
         $injector($context, $carrier);
 
-        $this->assertEquals(self::TEST_TRACE_ID, $carrier[strtolower(self::TRACE_ID_NAME)]);
-        $this->assertEquals(self::TEST_SPAN_ID, $carrier[strtolower(self::SPAN_ID_NAME)]);
-        $this->assertEquals(self::TEST_PARENT_ID, $carrier[strtolower(self::PARENT_SPAN_ID_NAME)]);
+        foreach ($headerChecks as $key => $value) {
+            $this->assertEquals($key, $setterNGetter->get($carrier, $value));
+        }
+    }
+
+    public function kindRemoteSetter(): array
+    {
+        return [
+            'client' => [
+                new class() extends Map implements RemoteSetter {
+                    public function getKind(): string
+                    {
+                        return 'CLIENT';
+                    }
+                },
+                [
+                    self::TEST_TRACE_ID => self::TRACE_ID_NAME,
+                    self::TEST_SPAN_ID => self::SPAN_ID_NAME,
+                    self::TEST_PARENT_ID =>  self::PARENT_SPAN_ID_NAME,
+                ]
+            ],
+            'producer' => [
+                new class() extends Map implements RemoteSetter {
+                    public function getKind(): string
+                    {
+                        return 'PRODUCER';
+                    }
+                },
+                [
+                    self::TEST_SINGLE_HEADER_NO_PARENT => self::SINGLE_VALUE_NAME,
+                ]
+            ],
+            'default' => [
+                new Map(),
+                [
+                    self::TEST_TRACE_ID => self::TRACE_ID_NAME,
+                    self::TEST_SPAN_ID => self::SPAN_ID_NAME,
+                    self::TEST_PARENT_ID =>  self::PARENT_SPAN_ID_NAME,
+                ]
+            ],
+        ];
     }
 
     /**
-     * @dataProvider carrierProvider
+     * @dataProvider kindRemoteSetter
      */
-    public function testExtractorExtractsTheExpectedValuesForEmptySampling($carrier)
+    public function testGetInjectorReturnsTheExpectedFunctionPerKind($remoteSetter, array $headerChecks)
     {
+        $carrier = [];
+        $context = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            self::TEST_SAMPLE,
+            self::TEST_DEBUG
+        );
+        $b3Propagator = new B3(new NullLogger);
+        $injector = $b3Propagator->getInjector($remoteSetter);
+        $injector($context, $carrier);
+
+        foreach ($headerChecks as $key => $value) {
+            $this->assertEquals($key, $carrier[$value]);
+        }
+    }
+
+    public function testExtractorExtractsTheExpectedValuesForEmptySampling()
+    {
+        $carrier = [];
         $getter = new Map();
         $b3Propagator = new B3();
         $extractor = $b3Propagator->getExtractor($getter);
@@ -59,36 +200,65 @@ final class B3Test extends TestCase
         $this->assertNull($samplingFlags->isSampled());
     }
 
-    /**
-     * @dataProvider carrierProvider
-     */
-    public function testExtractorExtractsTheExpectedValuesForSamplingDebug($carrier)
+    public function samplingDebugCarrierProvider(): array
     {
-        $isSampled = $this->randomBoolean();
+        return [
+            'multi' => [
+                [strtolower(self::FLAGS_NAME) => '1'],
+            ],
+            'single' => [
+                [strtolower(self::SINGLE_VALUE_NAME) => 'd'],
+            ],
+        ];
+    }
 
-        $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled ? '1' : '0';
-        $carrier[strtolower(self::FLAGS_NAME)] = '1';
-
+    /**
+     * @dataProvider samplingDebugCarrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForSamplingDebug(array $carrier)
+    {
         $getter = new Map();
         $b3Propagator = new B3();
         $extractor = $b3Propagator->getExtractor($getter);
         $samplingFlags = $extractor($carrier);
 
         $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
+        $this->assertNull($samplingFlags->isSampled());
         $this->assertTrue($samplingFlags->isDebug());
     }
 
-    /**
-     * @dataProvider carrierProvider
-     */
-    public function testExtractorExtractsTheExpectedValuesForSampling($carrier)
+    public function samplingCarrierProvider(): array
     {
-        $isSampled = $this->randomBoolean();
+        return [
+            'multi sampled' => [
+                [
+                    strtolower(self::TRACE_ID_NAME) => self::TEST_TRACE_ID,
+                    strtolower(self::SAMPLED_NAME) => '1',
+                ],
+                true
+            ],
+            'multi not sampled' => [
+                [
+                    strtolower(self::SAMPLED_NAME) => '0',
+                ],
+                false
+            ],
+            'single sampled' => [
+                [strtolower(self::SINGLE_VALUE_NAME) => '1'],
+                true
+            ],
+            'single not sampled' => [
+                [strtolower(self::SINGLE_VALUE_NAME) => '0'],
+                false
+            ],
+        ];
+    }
 
-        $carrier[strtolower(self::TRACE_ID_NAME)] = self::TEST_TRACE_ID;
-        $carrier[strtolower(self::SAMPLED_NAME)] = $isSampled ? '1' : '0';
-        $carrier[strtolower(self::FLAGS_NAME)] = '0';
-
+    /**
+     * @dataProvider samplingCarrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForSampling(array $carrier, bool $isSampled)
+    {
         $getter = new Map();
         $b3Propagator = new B3();
         $extractor = $b3Propagator->getExtractor($getter);
@@ -98,36 +268,64 @@ final class B3Test extends TestCase
         $this->assertEquals($isSampled, $samplingFlags->isSampled());
     }
 
-    /**
-     * @dataProvider carrierProvider
-     */
-    public function testExtractorExtractsTheExpectedValuesForTraceContext($carrier)
+    public function traceContextCarrierProvider(): array
     {
-        $carrier[strtolower(self::TRACE_ID_NAME)] = self::TEST_TRACE_ID;
-        $carrier[strtolower(self::SPAN_ID_NAME)] = self::TEST_SPAN_ID;
-        $carrier[strtolower(self::PARENT_SPAN_ID_NAME)] = self::TEST_PARENT_ID;
+        return [
+            'multi' => [
+                [
+                    strtolower(self::TRACE_ID_NAME) => self::TEST_TRACE_ID,
+                    strtolower(self::SPAN_ID_NAME) => self::TEST_SPAN_ID,
+                    strtolower(self::PARENT_SPAN_ID_NAME) => self::TEST_PARENT_ID,
+                ]
+            ],
+            'single' => [
+                [
+                    strtolower(self::SINGLE_VALUE_NAME) => self::TEST_SINGLE_HEADER,
+                ]
+            ],
+        ];
+    }
 
+    /**
+     * @dataProvider traceContextCarrierProvider
+     */
+    public function testExtractorExtractsTheExpectedValuesForTraceContext(array $carrier)
+    {
         $getter = new Map();
         $b3Propagator = new B3();
         $extractor = $b3Propagator->getExtractor($getter);
         $context = $extractor($carrier);
-
         $this->assertInstanceOf(TraceContext::class, $context);
         $this->assertEquals(self::TEST_TRACE_ID, $context->getTraceId());
         $this->assertEquals(self::TEST_SPAN_ID, $context->getSpanId());
         $this->assertEquals(self::TEST_PARENT_ID, $context->getParentId());
     }
 
-    public function carrierProvider()
+    public function testInvalidPropagationValuesFail()
     {
-        return [
-            [new ArrayObject()],
-            [[]]
-        ];
-    }
+        $carrier = [];
+        $carrier[strtolower(self::TRACE_ID_NAME)] = 'xyz';
+        $carrier[strtolower(self::SPAN_ID_NAME)] = 'mno';
+        $test = $this;
 
-    private function randomBoolean(): bool
-    {
-        return (mt_rand(0, 1) === 1);
+        $logger = new class($test) implements LoggerInterface {
+            use LoggerTrait;
+
+            private $test;
+
+            public function __construct(TestCase $test)
+            {
+                $this->test = $test;
+            }
+            
+            public function log($level, $message, array $context = array())
+            {
+                $this->test->assertEquals('debug', $level);
+            }
+        };
+        $getter = new Map();
+        $b3Propagator = new B3($logger);
+        $extractor = $b3Propagator->getExtractor($getter);
+        $this->assertNull($extractor($carrier)->isSampled());
     }
 }

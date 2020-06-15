@@ -61,7 +61,7 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public static function createAsDebug(): self
     {
-        return new self(true, true);
+        return new self(null, true);
     }
 
     /**
@@ -78,6 +78,12 @@ final class DefaultSamplingFlags implements SamplingFlags
     public function isDebug(): bool
     {
         return $this->isDebug;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->isSampled === self::EMPTY_SAMPLED &&
+        $this->isDebug === self::EMPTY_DEBUG;
     }
 
     /**
