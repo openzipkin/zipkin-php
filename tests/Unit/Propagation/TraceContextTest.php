@@ -275,7 +275,7 @@ final class TraceContextTest extends TestCase
         $this->hasAtLeastOneMutation = true;
 
         if ($value === (string) $value) {
-            $value = substr($value, 0, -1) . mt_rand(0, 9);
+            $value = dechex(hexdec($value) + 1);
         }
 
         if ($value === (bool) $value) {
