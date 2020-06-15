@@ -297,7 +297,6 @@ request. To do this, simply pass null to `openScope`.
 Tests can be run by
 
 ```bash
-composer update
 composer test
 ```
 
