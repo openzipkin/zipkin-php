@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
-// This class implements the Zipkin getter interface to extract the zipkin
-// headers out of the $_SERVER variable.
-// Due to how the api is written, $_SERVER gets passed in as $carrier rather
-// than get accessed here directly.
-//
-// Example:
-//   $extractor = $this->tracing->getPropagation()->getExtractor(new ServerHeaders);
-//   $extractedContext = $extractor($_SERVER);
+/**
+ *
+ * This class implements the Zipkin\Propagation\Getter interface to extract the zipkin
+ * headers out of the $_SERVER variable.
+ * Due to the Getter::get signature, $_SERVER gets passed in as $carrier rather
+ * than get accessed here directly.
+ *
+ * Example:
+ *   $extractor = $this->tracing->getPropagation()->getExtractor(new ServerHeaders);
+ *   $extractedContext = $extractor($_SERVER);
+*/
 final class ServerHeaders implements Getter
 {
     /**
