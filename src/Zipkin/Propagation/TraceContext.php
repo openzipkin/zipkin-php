@@ -39,6 +39,11 @@ final class TraceContext implements SamplingFlags
     /**
      * @var bool
      */
+    private $isShared;
+
+    /**
+     * @var bool
+     */
     private $usesTraceId128bits;
 
     private function __construct(
@@ -47,6 +52,7 @@ final class TraceContext implements SamplingFlags
         ?string $parentId,
         ?bool $isSampled,
         bool $isDebug,
+        bool $isShared,
         bool $usesTraceId128bits
     ) {
         $this->traceId = $traceId;
@@ -54,6 +60,7 @@ final class TraceContext implements SamplingFlags
         $this->parentId = $parentId;
         $this->isSampled = $isSampled;
         $this->isDebug = $isDebug;
+        $this->isShared = $isShared;
         $this->usesTraceId128bits = $usesTraceId128bits;
     }
 
@@ -71,7 +78,8 @@ final class TraceContext implements SamplingFlags
         string $spanId,
         ?string $parentId = null,
         ?bool $isSampled = SamplingFlags::EMPTY_SAMPLED,
-        bool $isDebug = SamplingFlags::EMPTY_DEBUG
+        bool $isDebug = SamplingFlags::EMPTY_DEBUG,
+        bool $isShared = false
     ): TraceContext {
         if (!Id\isValidTraceId($traceId)) {
             throw InvalidTraceContextArgument::forTraceId($traceId);
@@ -85,7 +93,7 @@ final class TraceContext implements SamplingFlags
             throw InvalidTraceContextArgument::forParentSpanId($parentId);
         }
 
-        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, strlen($traceId) === 32);
+        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $isShared, strlen($traceId) === 32);
     }
 
     /**
@@ -112,6 +120,7 @@ final class TraceContext implements SamplingFlags
             null,
             $samplingFlags->isSampled(),
             $samplingFlags->isDebug(),
+            false,
             $usesTraceId128bits
         );
     }
@@ -130,6 +139,7 @@ final class TraceContext implements SamplingFlags
             $parent->spanId,
             $parent->isSampled,
             $parent->isDebug,
+            false,
             $parent->usesTraceId128bits
         );
     }
@@ -190,6 +200,11 @@ final class TraceContext implements SamplingFlags
         return $this->parentId;
     }
 
+    public function isShared(): bool
+    {
+        return $this->isShared;
+    }
+
     /**
      * @param bool $isSampled
      * @return TraceContext
@@ -202,6 +217,28 @@ final class TraceContext implements SamplingFlags
             $this->parentId,
             $isSampled,
             $this->isDebug,
+            $this->usesTraceId128bits,
+            $this->isShared
+        );
+    }
+
+    /**
+     * IMPORTANT: This is an internal method.
+     *
+     * Returns the same context but flagged as shared. This method
+     * is only meant to be used by the Tracer::joinSpan and it is
+     * only exposed because of the visibility limitations of the
+     * language.
+     */
+    public function withShared(bool $isShared): TraceContext
+    {
+        return new TraceContext(
+            $this->traceId,
+            $this->spanId,
+            $this->parentId,
+            $this->isSampled,
+            $this->isDebug,
+            $isShared,
             $this->usesTraceId128bits
         );
     }
@@ -222,7 +259,6 @@ final class TraceContext implements SamplingFlags
             && $this->spanId === $samplingFlags->spanId
             && $this->parentId === $samplingFlags->parentId
             && $this->isSampled === $samplingFlags->isSampled
-            && $this->isDebug === $samplingFlags->isDebug
-            && $this->usesTraceId128bits === $samplingFlags->usesTraceId128bits;
+            && $this->isDebug === $samplingFlags->isDebug;
     }
 }

@@ -3,14 +3,15 @@
 namespace ZipkinTests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use Zipkin\DefaultTracing;
-use Zipkin\Endpoint;
-use Zipkin\Propagation\CurrentTraceContext;
-use Zipkin\Propagation\Propagation;
-use Zipkin\Reporters\Noop;
-use Zipkin\Samplers\BinarySampler;
 use Zipkin\Tracer;
 use Zipkin\Tracing;
+use Zipkin\Endpoint;
+use Zipkin\DefaultTracing;
+use Zipkin\Propagation\B3;
+use Zipkin\Reporters\Noop;
+use Zipkin\Samplers\BinarySampler;
+use Zipkin\Propagation\Propagation;
+use Zipkin\Propagation\CurrentTraceContext;
 
 final class DefaultTracingTest extends TestCase
 {
@@ -27,7 +28,9 @@ final class DefaultTracingTest extends TestCase
             $sampler,
             false,
             new CurrentTraceContext,
-            $isNoop
+            $isNoop,
+            new B3,
+            true
         );
 
         $this->assertInstanceOf(Tracing::class, $tracing);

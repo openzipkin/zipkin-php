@@ -44,6 +44,11 @@ final class Tracer
     private $currentTraceContext;
 
     /**
+     * @var bool
+     */
+    private $supportsJoin;
+
+    /**
      * @param Endpoint $localEndpoint
      * @param Reporter $reporter
      * @param Sampler $sampler
@@ -57,13 +62,15 @@ final class Tracer
         Sampler $sampler,
         bool $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
-        bool $isNoop
+        bool $isNoop,
+        bool $supportsJoin = true
     ) {
         $this->recorder = new Recorder($localEndpoint, $reporter, $isNoop);
         $this->sampler = $sampler;
         $this->usesTraceId128bits = $usesTraceId128bits;
         $this->currentTraceContext = $currentTraceContext;
         $this->isNoop = $isNoop;
+        $this->supportsJoin = $supportsJoin;
     }
 
     /**
@@ -134,7 +141,11 @@ final class Tracer
      */
     public function joinSpan(TraceContext $context): Span
     {
-        return $this->toSpan($context);
+        if (!$this->supportsJoin) {
+            return $this->newChild($context);
+        }
+
+        return $this->toSpan($context->withShared(true));
     }
 
     /**

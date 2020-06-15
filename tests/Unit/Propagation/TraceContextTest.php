@@ -209,6 +209,47 @@ final class TraceContextTest extends TestCase
         $this->assertFalse($traceContext1->isEqual($traceContext2));
     }
 
+    public function testIsSharedSuccess()
+    {
+        $traceContext = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            null,
+            false,
+            true
+        );
+        
+        $this->assertTrue($traceContext->isShared());
+
+        $traceContext = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            null,
+            false,
+            false
+        );
+        
+        $this->assertFalse($traceContext->isShared());
+    }
+
+    public function testWithSharedSuccess()
+    {
+        $traceContext = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            null,
+            false,
+            false
+        );
+        
+        $sharedTraceContext = $traceContext->withShared(true);
+        
+        $this->assertTrue($sharedTraceContext->isEqual($traceContext));
+    }
+
     public function boolProvider()
     {
         return [
