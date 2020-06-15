@@ -222,6 +222,14 @@ final class TraceContext implements SamplingFlags
         );
     }
 
+    /**
+     * IMPORTANT: This is an internal method.
+     *
+     * Returns the same context but flagged as shared. This method
+     * is only meant to be used by the Tracer::joinSpan and it is
+     * only exposed because of the visibility limitations of the
+     * language.
+     */
     public function withShared(bool $isShared): TraceContext
     {
         return new TraceContext(

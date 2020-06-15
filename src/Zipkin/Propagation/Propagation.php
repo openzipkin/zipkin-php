@@ -64,7 +64,7 @@ interface Propagation
      * identifiers. Other propagation formats, like <a href="https://github.com/w3c/trace-context">trace-context</a>
      * only propagate the calling trace and span ID, with an assumption that the receiver always
      * starts a new child span. When join is supported, you can assume that when {@link
-     * TraceContext#parentId() the parent span ID} is null, you've been propagated a root span. When
+     * TraceContex::getParentId() the parent span ID} is null, you've been propagated a root span. When
      * join is not supported, you must always fork a new child.
      */
     public function supportsJoin(): bool;
