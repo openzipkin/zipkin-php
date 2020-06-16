@@ -57,7 +57,6 @@ final class SpanTest extends TestCase
             'timestamp' => $timestamp,
             'name' => 'test_name',
             'duration' => 100,
-            'debug' => false,
             'localEndpoint' => [
                 'serviceName' => 'test_service_name',
                 'ipv4' => '127.0.0.1',

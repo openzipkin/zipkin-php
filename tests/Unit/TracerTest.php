@@ -247,12 +247,12 @@ final class TracerTest extends TestCase
     public function samplingFlagsDataProvider()
     {
         return [
-            [ null, true ],
-            [ null, false ],
-            [ true, true ],
-            [ true, false ],
-            [ false, true ],
-            [ false, false ],
+            [null, true],
+            [null, false],
+            [true, true],
+            [true, false],
+            [false, true],
+            [false, false],
         ];
     }
 
@@ -321,15 +321,7 @@ final class TracerTest extends TestCase
      */
     public function testInSpanForSuccessfullCall($sumCallable)
     {
-        $reporter = new InMemory();
-        $tracer = new Tracer(
-            Endpoint::createAsEmpty(),
-            $reporter,
-            BinarySampler::createAsAlwaysSample(),
-            false,
-            new CurrentTraceContext,
-            false
-        );
+        list($tracer, $flusher) = self::createDefaultTestTracer();
 
         $result = $tracer->inSpan(
             $sumCallable,
@@ -345,8 +337,7 @@ final class TracerTest extends TestCase
         );
 
         $this->assertEquals(3, $result);
-        $tracer->flush();
-        $spans = $reporter->flush();
+        $spans = $flusher();
         $this->assertCount(1, $spans);
 
         $span = $spans[0]->toArray();
@@ -361,23 +352,14 @@ final class TracerTest extends TestCase
      */
     public function testInSpanNamesAreSuccessfullyGenerated($sumCallable, $expectedName)
     {
-        $reporter = new InMemory();
-        $tracer = new Tracer(
-            Endpoint::createAsEmpty(),
-            $reporter,
-            BinarySampler::createAsAlwaysSample(),
-            false,
-            new CurrentTraceContext,
-            false
-        );
+        list($tracer, $flusher) = self::createDefaultTestTracer();
 
         $tracer->inSpan(
             $sumCallable,
             [1, 2]
         );
 
-        $tracer->flush();
-        $spans = $reporter->flush();
+        $spans = $flusher();
 
         $span = $spans[0]->toArray();
         $this->assertEquals($expectedName, $span['name']);
@@ -416,15 +398,7 @@ final class TracerTest extends TestCase
 
     public function testInSpanForFailingCall()
     {
-        $reporter = new InMemory();
-        $tracer = new Tracer(
-            Endpoint::createAsEmpty(),
-            $reporter,
-            BinarySampler::createAsAlwaysSample(),
-            false,
-            new CurrentTraceContext,
-            false
-        );
+        list($tracer, $flusher) = self::createDefaultTestTracer();
 
         $sum = new class() {
             public function __invoke(int $a, int $b)
@@ -439,11 +413,47 @@ final class TracerTest extends TestCase
         } catch (OutOfBoundsException $e) {
         }
 
-        $tracer->flush();
-        $spans = $reporter->flush();
+        $spans = $flusher();
         $this->assertCount(1, $spans);
 
         $span = $spans[0]->toArray();
         $this->assertEquals('too small values', $span['tags']['error']);
+    }
+
+    public function testJoinSpans()
+    {
+        $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsSampled());
+
+        list($tracer, $flusher) = self::createDefaultTestTracer();
+
+        $span = $tracer->joinSpan($context);
+        $span->start();
+        $span->finish();
+
+        $spans = $flusher();
+
+        $span = $spans[0]->toArray();
+        $this->assertTrue($span['shared']);
+    }
+
+    private static function createDefaultTestTracer(): array
+    {
+        $reporter = new InMemory();
+        $tracer = new Tracer(
+            Endpoint::createAsEmpty(),
+            $reporter,
+            BinarySampler::createAsAlwaysSample(),
+            false,
+            new CurrentTraceContext,
+            false
+        );
+
+        return [
+            $tracer,
+            function () use ($tracer, $reporter): array {
+                $tracer->flush();
+                return $reporter->flush();
+            },
+        ];
     }
 }
