@@ -255,9 +255,12 @@ final class Span
             'parentId' => $this->parentId ? $this->parentId : null,
             'timestamp' => $this->timestamp,
             'duration' => $this->duration,
-            'debug' => $this->debug,
             'localEndpoint' => $this->localEndpoint->toArray(),
         ];
+
+        if ($this->debug === true) {
+            $spanAsArray['debug'] = true;
+        }
 
         if ($this->shared === true) {
             $spanAsArray['shared'] = true;

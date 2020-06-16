@@ -15,7 +15,7 @@ use Zipkin\Reporters\Http\CurlFactory;
 final class HttpTest extends TestCase
 {
     const PAYLOAD = '[{"id":"%s","name":null,"traceId":"%s","parentId":null,'
-        . '"timestamp":null,"duration":null,"debug":false,"localEndpoint":{"serviceName":""}}]';
+        . '"timestamp":null,"duration":null,"localEndpoint":{"serviceName":""}}]';
 
     public function testConstructorIsRetrocompatible()
     {

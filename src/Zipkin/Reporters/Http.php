@@ -35,7 +35,7 @@ final class Http implements Reporter
     /**
      * logger is only meant to be used for development purposes. Enabling
      * an actual logger in production could cause a massive amount of data
-     * that will flood the logs.
+     * that will flood the logs on failure.
      *
      * @var LoggerInterface
      */
