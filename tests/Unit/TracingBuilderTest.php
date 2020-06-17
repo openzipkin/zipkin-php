@@ -89,7 +89,7 @@ final class TracingBuilderTest extends TestCase
 
     public function testAlwaysEmitSpans()
     {
-        // If `alwaysEmittingSpans(true)` is called, we should be emitting the
+        // If `alwaysReportingSpans(true)` is called, we should be emitting the
         // spans even if the trace isn't sampled
         $endpoint = Endpoint::createAsEmpty();
         $reporter = new InMemory();
@@ -100,7 +100,7 @@ final class TracingBuilderTest extends TestCase
             ->havingLocalEndpoint($endpoint)
             ->havingReporter($reporter)
             ->havingSampler($sampler)
-            ->alwaysEmittingSpans(true)
+            ->alwaysReportingSpans(true)
             ->build();
         $tracer = $tracing->getTracer();
 

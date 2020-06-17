@@ -43,7 +43,7 @@ final class DefaultTracing implements Tracing
         bool $isNoop,
         Propagation $propagation,
         bool $supportsJoin,
-        bool $alwaysEmitSpans = false
+        bool $alwaysReportSpans = false
     ) {
         $this->tracer = new Tracer(
             $localEndpoint,
@@ -53,7 +53,7 @@ final class DefaultTracing implements Tracing
             $currentTraceContext,
             $isNoop,
             $supportsJoin,
-            $alwaysEmitSpans
+            $alwaysReportSpans
         );
 
         $this->propagation = $propagation;

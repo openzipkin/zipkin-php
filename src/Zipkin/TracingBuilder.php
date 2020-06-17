@@ -61,7 +61,7 @@ class TracingBuilder
     /**
      * @var bool
      */
-    private $alwaysEmitSpans = false;
+    private $alwaysReportSpans = false;
 
     public static function create(): self
     {
@@ -189,12 +189,12 @@ class TracingBuilder
     }
 
     /**
-     * @param bool $alwaysEmitSpans
+     * @param bool $alwaysReportSpans
      * @return $this
      */
-    public function alwaysEmittingSpans(bool $alwaysEmitSpans): self
+    public function alwaysReportingSpans(bool $alwaysReportSpans): self
     {
-        $this->alwaysEmitSpans = $alwaysEmitSpans;
+        $this->alwaysReportSpans = $alwaysReportSpans;
         return $this;
     }
 
@@ -225,7 +225,7 @@ class TracingBuilder
             $this->isNoop,
             $propagation,
             $this->supportsJoin && $propagation->supportsJoin(),
-            $this->alwaysEmitSpans
+            $this->alwaysReportSpans
         );
     }
 }
