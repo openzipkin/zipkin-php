@@ -9,21 +9,13 @@ interface SamplingFlags
     const EMPTY_SAMPLED = null;
     const EMPTY_DEBUG = false;
 
-    /**
-     * @return bool|null
-     */
     public function isSampled(): ?bool;
 
-    /**
-     * @return bool
-     */
     public function isDebug(): bool;
 
     public function isEmpty(): bool;
 
-    /**
-     * @param SamplingFlags $samplingFlags
-     * @return bool
-     */
     public function isEqual(SamplingFlags $samplingFlags): bool;
+
+    public function withSampled(bool $isSampled): SamplingFlags;
 }

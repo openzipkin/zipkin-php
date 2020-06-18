@@ -206,10 +206,9 @@ final class TraceContext implements SamplingFlags
     }
 
     /**
-     * @param bool $isSampled
      * @return TraceContext
      */
-    public function withSampled(bool $isSampled): TraceContext
+    public function withSampled(bool $isSampled): SamplingFlags
     {
         return new TraceContext(
             $this->traceId,
@@ -248,17 +247,11 @@ final class TraceContext implements SamplingFlags
         return false;
     }
 
-    /**
-     * @param SamplingFlags $samplingFlags
-     * @return bool
-     */
     public function isEqual(SamplingFlags $samplingFlags): bool
     {
         return ($samplingFlags instanceof TraceContext)
             && $this->traceId === $samplingFlags->traceId
             && $this->spanId === $samplingFlags->spanId
-            && $this->parentId === $samplingFlags->parentId
-            && $this->isSampled === $samplingFlags->isSampled
-            && $this->isDebug === $samplingFlags->isDebug;
+            && $this->parentId === $samplingFlags->parentId;
     }
 }
