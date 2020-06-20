@@ -1,4 +1,4 @@
-# Zipkin instrumentation for PHP
+# Zipkin PHP
 
 [![Build Status](https://travis-ci.org/openzipkin/zipkin-php.svg?branch=master)](https://travis-ci.org/openzipkin/zipkin-php)
 [![Build status](https://ci.appveyor.com/api/projects/status/f02q896uv1m3crg1?svg=true)](https://ci.appveyor.com/project/jcchavezs/zipkin-php)
@@ -291,6 +291,10 @@ created in scope as the current span.
 In edge cases, you may need to clear the current span temporarily. For
 example, launching a task that should not be associated with the current
 request. To do this, simply pass null to `openScope`.
+
+## Instrumentation
+
+- [PSR18 HTTP Client](src/Zipkin/Instrumentation/Http/Client)
 
 ## Tests
 

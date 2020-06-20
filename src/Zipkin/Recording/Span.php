@@ -252,11 +252,14 @@ final class Span
             'id' => $this->spanId,
             'name' => $this->name,
             'traceId' => $this->traceId,
-            'parentId' => $this->parentId ? $this->parentId : null,
             'timestamp' => $this->timestamp,
             'duration' => $this->duration,
             'localEndpoint' => $this->localEndpoint->toArray(),
         ];
+
+        if ($this->parentId !== null) {
+            $spanAsArray['parentId'] = $this->parentId;
+        }
 
         if ($this->debug === true) {
             $spanAsArray['debug'] = true;
