@@ -237,6 +237,43 @@ final class Tracer
     }
 
     /**
+     * Like Tracer::nextSpan but with the ability of overriding the sampling decision
+     * when sampling is not true.
+     *
+     * This is particularly useful when the need of override a
+     *
+     * @param callable $sampler is the sampling function with signature
+     * function(...$args): ?bool {}. If the function returns null, sampling decision
+     * is not overriden.
+     * @param array $args are the args to be passed onto the sampling function.
+     * @param SamplingFlags|TraceContext $contextOrFlags to be used as a parent if
+     * passed, otherwise tracer will look at an active scope.
+     */
+    public function nextSpanWithSampler(
+        callable $sampler,
+        array $args = [],
+        SamplingFlags $contextOrFlags = null
+    ): Span {
+        if ($contextOrFlags === null) {
+            $contextOrFlags = $this->currentTraceContext->getContext();
+        }
+        
+        if ($contextOrFlags === null) {
+            $samplingFlags = DefaultSamplingFlags::create(($sampler)(...$args));
+            return $this->nextSpan($samplingFlags);
+        }
+
+        if ($contextOrFlags->isSampled()) {
+            return $this->nextSpan($contextOrFlags);
+        }
+
+        $isSampled = (($sampler)(...$args));
+
+        $sampledParent = $isSampled === null ? $contextOrFlags : $contextOrFlags->withSampled($isSampled);
+        return $this->nextSpan($sampledParent);
+    }
+
+    /**
      * This creates a new span based on a function call and the passed arguments. There are many
      * situations where instrumentation can be a very manual process and this convenience method
      * abstracts all that complexity. This method is mainly for local tracing (e.g. complex marshaling

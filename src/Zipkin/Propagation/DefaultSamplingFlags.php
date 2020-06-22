@@ -22,59 +22,36 @@ final class DefaultSamplingFlags implements SamplingFlags
         $this->isDebug = $isDebug;
     }
 
-    /**
-     * @param bool|null $isSampled
-     * @param bool $isDebug
-     * @return DefaultSamplingFlags
-     */
     public static function create(?bool $isSampled, bool $isDebug = false): self
     {
         return new self($isSampled, $isDebug);
     }
 
-    /**
-     * @return DefaultSamplingFlags
-     */
     public static function createAsEmpty(): self
     {
         return new self(SamplingFlags::EMPTY_SAMPLED, SamplingFlags::EMPTY_DEBUG);
     }
 
-    /**
-     * @return DefaultSamplingFlags
-     */
     public static function createAsSampled(): self
     {
         return new self(true, false);
     }
 
-    /**
-     * @return DefaultSamplingFlags
-     */
     public static function createAsNotSampled(): self
     {
         return new self(false, false);
     }
 
-    /**
-     * @return DefaultSamplingFlags
-     */
     public static function createAsDebug(): self
     {
         return new self(null, true);
     }
 
-    /**
-     * @return bool|null
-     */
     public function isSampled(): ?bool
     {
         return $this->isSampled;
     }
 
-    /**
-     * @return bool
-     */
     public function isDebug(): bool
     {
         return $this->isDebug;
@@ -86,13 +63,17 @@ final class DefaultSamplingFlags implements SamplingFlags
         $this->isDebug === self::EMPTY_DEBUG;
     }
 
-    /**
-     * @param SamplingFlags $samplingFlags
-     * @return bool
-     */
     public function isEqual(SamplingFlags $samplingFlags): bool
     {
-        return $this->isDebug() === $samplingFlags->isDebug()
-            && $this->isSampled() === $samplingFlags->isSampled();
+        return $this->isDebug === $samplingFlags->isDebug()
+            && $this->isSampled === $samplingFlags->isSampled();
+    }
+
+    /**
+     * @return DefaultSamplingFlags
+     */
+    public function withSampled(bool $isSampled): SamplingFlags
+    {
+        return new self($isSampled, $this->isDebug);
     }
 }
