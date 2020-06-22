@@ -11,25 +11,20 @@ use Zipkin\Propagation\TraceContext;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class DefaultHandler implements Handler
+class DefaultParser implements Parser
 {
     public function spanName(RequestInterface $request): string
     {
         return $request->getMethod();
     }
 
-    public function requestSampler(RequestInterface $request): ?bool
-    {
-        return null;
-    }
-
-    public function parseRequest(RequestInterface $request, TraceContext $context, SpanCustomizer $span): void
+    public function request(RequestInterface $request, TraceContext $context, SpanCustomizer $span): void
     {
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
-        $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath());
+        $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath() ?: "/");
     }
 
-    public function parseResponse(ResponseInterface $response, TraceContext $context, SpanCustomizer $span): void
+    public function response(ResponseInterface $response, TraceContext $context, SpanCustomizer $span): void
     {
         $span->tag(Tags\HTTP_STATUS_CODE, (string) $response->getStatusCode());
         if ($response->getStatusCode() > 399) {
@@ -37,7 +32,7 @@ class DefaultHandler implements Handler
         }
     }
 
-    public function parseError(Throwable $e, TraceContext $context, SpanCustomizer $span): void
+    public function error(Throwable $e, TraceContext $context, SpanCustomizer $span): void
     {
         $span->tag(Tags\ERROR, $e->getMessage());
     }

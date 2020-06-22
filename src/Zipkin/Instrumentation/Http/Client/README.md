@@ -19,7 +19,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Zipkin\Instrumentation\Http\Client\Client as ZipkinClient;
 
-$tracing = create_my_tracing('my_service_name');
+$tracing = create_my_client_tracing('my_service_name');
 
 ...
 
