@@ -132,6 +132,7 @@ final class ClientTest extends TestCase
 
             public function sendRequest(RequestInterface $request): ResponseInterface
             {
+                $this->lastRequest = $request;
                 throw new RuntimeException('transport error');
             }
 
@@ -144,8 +145,11 @@ final class ClientTest extends TestCase
         list($tracing, $flusher) = self::createTracing();
         $tracedClient = new Client($client, $tracing);
         $request = new Request('GET', 'http://mytest');
-        $this->expectException(RuntimeException::class);
-        $tracedClient->sendRequest($request);
+        try {
+            $tracedClient->sendRequest($request);
+            $this->fail('should not reach this');
+        } catch (\Throwable $e) {
+        }
 
         $this->assertTrue($client->getLastRequest()->hasHeader('X-B3-TraceId'));
         $this->assertTrue($client->getLastRequest()->hasHeader('X-B3-SpanId'));
@@ -160,8 +164,7 @@ final class ClientTest extends TestCase
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
-            'http.status_code' => '404',
-            'error' => 'tranport error',
+            'error' => 'transport error',
         ], $span['tags']);
     }
 }
