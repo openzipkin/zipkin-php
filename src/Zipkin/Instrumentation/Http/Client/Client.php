@@ -9,7 +9,6 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Zipkin\Tracer;
-use Zipkin\Propagation\RequestHeaders;
 use Zipkin\SpanCustomizerShield;
 
 final class Client implements ClientInterface

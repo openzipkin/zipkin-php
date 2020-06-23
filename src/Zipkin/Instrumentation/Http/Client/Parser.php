@@ -12,6 +12,10 @@ use Psr\Http\Message\ResponseInterface;
 
 interface Parser
 {
+    /**
+     * spanName returns an appropiate span name based on the request,
+     * usually the HTTP method is good enough.
+     */
     public function spanName(RequestInterface $request): string;
 
     /**
@@ -34,5 +38,10 @@ interface Parser
      */
     public function response(ResponseInterface $response, TraceContext $context, SpanCustomizer $span): void;
 
+    /**
+     * error parses the exception when doing a HTTP call, usually it is good enough to tag
+     * the throwable message but depending on the wrapping client, one might want to enrich
+     * the error with meaningful information from the exception.
+     */
     public function error(Throwable $e, TraceContext $context, SpanCustomizer $span): void;
 }

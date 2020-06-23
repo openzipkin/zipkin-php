@@ -6,7 +6,7 @@ namespace Zipkin\Propagation;
 
 use Psr\Http\Message\RequestInterface;
 
-final class RequestHeaders implements Getter, Setter
+class RequestHeaders implements Getter, Setter
 {
     /**
      * {@inheritdoc}
