@@ -59,6 +59,9 @@
         "test": "phpunit tests",
         "static-check": "phpstan analyse src --level 8"
     },
+    "suggest": {
+        "psr/http-client": "Allows to instrument HTTP clients following PSR18."
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "2.0.x-dev"
