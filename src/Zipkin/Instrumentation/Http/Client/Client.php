@@ -40,7 +40,7 @@ final class Client implements ClientInterface
 
     public function __construct(
         ClientInterface $delegate,
-        ClientTracing $tracing
+        Tracing $tracing
     ) {
         $this->delegate = $delegate;
         $this->injector = $tracing->getTracing()->getPropagation()->getInjector(new RequestHeaders());

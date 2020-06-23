@@ -10,11 +10,15 @@ use Zipkin\Propagation\TraceContext;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Parser includes the methods to obtain meaningful span information
+ * out of HTTP request/response elements.
+ */
 interface Parser
 {
     /**
      * spanName returns an appropiate span name based on the request,
-     * usually the HTTP method is good enough.
+     * usually the HTTP method is good enough (e.g GET or POST).
      */
     public function spanName(RequestInterface $request): string;
 

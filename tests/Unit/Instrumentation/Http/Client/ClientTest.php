@@ -14,7 +14,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Zipkin\Instrumentation\Http\Client\Client;
-use Zipkin\Instrumentation\Http\Client\ClientTracing;
+use Zipkin\Instrumentation\Http\Client\Tracing as HttpClientTracing;
 use Zipkin\Samplers\BinarySampler;
 
 final class ClientTest extends TestCase
@@ -30,7 +30,7 @@ final class ClientTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new ClientTracing($tracing),
+            new HttpClientTracing($tracing),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();
