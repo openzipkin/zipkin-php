@@ -36,4 +36,4 @@ parameters:
 		-  
 			# Somehow this started failing
 			message: '#Constant .* already defined#'
-			path: src/Zipkin/Kind
+			path: src/Zipkin

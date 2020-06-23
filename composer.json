@@ -25,6 +25,7 @@
         "jcchavezs/httptest": "~0.2",
         "phpstan/phpstan": "~0.12.28",
         "phpunit/phpunit": "~7.5.20",
+        "psr/http-client": "^1.0",
         "squizlabs/php_codesniffer": "3.*"
     },
     "config": {
@@ -57,6 +58,9 @@
         "lint": "phpcs --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
         "test": "phpunit tests",
         "static-check": "phpstan analyse src --level 8"
+    },
+    "suggest": {
+        "psr/http-client": "Allows to instrument HTTP clients following PSR18."
     },
     "extra": {
         "branch-alias": {
