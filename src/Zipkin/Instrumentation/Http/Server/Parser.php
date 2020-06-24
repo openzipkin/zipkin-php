@@ -22,7 +22,7 @@ interface Parser
      * usually the HTTP method is enough (e.g GET or POST) but ideally
      * the http.route is desired (e.g. /user/{user_id}).
      */
-    public function spanName(RequestInterface $request): string;
+    public function spanName(ServerRequestInterface $request): string;
 
     /**
      * request parses the incoming data related to a request in order to add

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZipkinTests\Instrumentation\Http\Client;
+namespace ZipkinTests\Unit\Instrumentation\Http\Client;
 
 use Zipkin\TracingBuilder;
 use Zipkin\Samplers\BinarySampler;
