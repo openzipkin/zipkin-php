@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http\Client;
 
-use Throwable;
 use Zipkin\SpanCustomizer;
 use Zipkin\Propagation\TraceContext;
-use Psr\Http\Message\RequestInterface;
+use Throwable;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Parser includes the methods to obtain meaningful span information
