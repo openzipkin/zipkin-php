@@ -69,7 +69,8 @@
     },
     "suggest": {
         "psr/http-client": "Allows to instrument HTTP clients following PSR18.",
-        "psr/http-server": "Allows to instrument HTTP servers following PSR15."
+        "psr/http-server-middleware": "Allows to instrument HTTP servers following PSR15.",
+        "psr/http-server-handler": "Allows to instrument HTTP servers following PSR15."
     },
     "extra": {
         "branch-alias": {
