@@ -18,12 +18,16 @@ In this example we use Guzzle 7 but any HTTP client supporting PSR18 clients wil
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Zipkin\Instrumentation\Http\Client\Client as ZipkinClient;
+use Zipkin\Instrumentation\Http\Client\ClientTracing;
 
-$tracing = create_my_client_tracing('my_service_name');
+$tracing = TracingBuilder::create()
+            ->havingLocalServiceName('my_service')
+            ->build();
 
+$httpClientTracing = new ClientTracing($tracing);
 ...
 
-$httpClient = new ZipkinClient(new Client, $tracing);
+$httpClient = new ZipkinClient(new Client, $httpClientTracing);
 $request = new Request('POST', 'http://myurl.test');
 $response = $httpClient->sendRequest($request);
 ```

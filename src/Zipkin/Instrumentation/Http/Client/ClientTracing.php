@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http\Client;
 
-use Zipkin\Tracing as BaseTracing;
-use Psr\Http\Message\RequestInterface;
+use Zipkin\Tracing;
 
 /**
- * Tracing includes all the elements needed to trace and HTTP client
+ * ClientTracing includes all the elements needed to instrument a
+ * HTTP client.
  */
-class Tracing
+class ClientTracing
 {
     /**
-     * @var BaseTracing
+     * @var Tracing
      */
     private $tracing;
 
@@ -23,30 +23,28 @@ class Tracing
     private $parser;
 
     /**
-     * @var callable
-     *
      * function that decides to sample or not an unsampled
      * request. The signature is:
      *
      * <pre>
      * function (RequestInterface $request): ?bool {}
      * </pre>
+     *
+     * @var callable|null
      */
     private $requestSampler;
 
     public function __construct(
-        BaseTracing $tracing,
+        Tracing $tracing,
         Parser $parser = null,
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
         $this->parser = $parser ?? new DefaultParser;
-        $this->requestSampler = $requestSampler ?? static function (RequestInterface $request): ?bool {
-            return null;
-        };
+        $this->requestSampler = $requestSampler;
     }
 
-    public function getTracing(): BaseTracing
+    public function getTracing(): Tracing
     {
         return $this->tracing;
     }
@@ -58,7 +56,7 @@ class Tracing
      * function (RequestInterface $request): ?bool
      * </pre>
      */
-    public function getRequestSampler(): callable
+    public function getRequestSampler(): ?callable
     {
         return $this->requestSampler;
     }

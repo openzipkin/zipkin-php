@@ -34,13 +34,13 @@ final class Client implements ClientInterface
     private $parser;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     private $requestSampler;
 
     public function __construct(
         ClientInterface $delegate,
-        Tracing $tracing
+        ClientTracing $tracing
     ) {
         $this->delegate = $delegate;
         $this->injector = $tracing->getTracing()->getPropagation()->getInjector(new RequestHeaders());
@@ -51,10 +51,14 @@ final class Client implements ClientInterface
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        $span = $this->tracer->nextSpanWithSampler(
-            $this->requestSampler,
-            [$request]
-        );
+        if ($this->requestSampler === null) {
+            $span = $this->tracer->nextSpan();
+        } else {
+            $span = $this->tracer->nextSpanWithSampler(
+                $this->requestSampler,
+                [$request]
+            );
+        }
 
         $spanCustomizer = null;
         if (!$span->isNoop()) {
