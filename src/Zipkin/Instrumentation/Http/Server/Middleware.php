@@ -32,7 +32,7 @@ final class Middleware implements MiddlewareInterface
     private $parser;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     private $requestSampler;
 
