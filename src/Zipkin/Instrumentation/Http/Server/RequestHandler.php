@@ -37,7 +37,7 @@ final class RequestHandler implements RequestHandlerInterface
     private $parser;
 
     /**
-     * @var callable
+     * @var callable|null
      */
     private $requestSampler;
 
