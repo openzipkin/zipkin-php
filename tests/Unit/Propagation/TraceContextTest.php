@@ -2,10 +2,10 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use PHPUnit\Framework\TestCase;
+use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 use Zipkin\Propagation\DefaultSamplingFlags;
-use Zipkin\Propagation\TraceContext;
+use PHPUnit\Framework\TestCase;
 
 final class TraceContextTest extends TestCase
 {
@@ -193,9 +193,9 @@ final class TraceContextTest extends TestCase
         $traceContext1 = TraceContext::create(
             $this->maybeMutate(self::TEST_TRACE_ID),
             $this->maybeMutate(self::TEST_SPAN_ID),
-            $this->maybeMutate(self::TEST_PARENT_ID),
-            $this->maybeMutate($sampled),
-            $this->maybeMutate($debug, self::IS_FINAL_MUTATION)
+            $this->maybeMutate(self::TEST_PARENT_ID, self::IS_FINAL_MUTATION),
+            $sampled,
+            $debug
         );
 
         $traceContext2 = TraceContext::create(
@@ -219,7 +219,7 @@ final class TraceContextTest extends TestCase
             false,
             true
         );
-        
+
         $this->assertTrue($traceContext->isShared());
 
         $traceContext = TraceContext::create(
@@ -230,7 +230,7 @@ final class TraceContextTest extends TestCase
             false,
             false
         );
-        
+
         $this->assertFalse($traceContext->isShared());
     }
 
@@ -244,9 +244,9 @@ final class TraceContextTest extends TestCase
             false,
             false
         );
-        
+
         $sharedTraceContext = $traceContext->withShared(true);
-        
+
         $this->assertTrue($sharedTraceContext->isEqual($traceContext));
     }
 

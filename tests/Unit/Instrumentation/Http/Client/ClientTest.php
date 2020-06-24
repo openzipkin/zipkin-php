@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace ZipkinTests\Instrumentation\Http\Client;
 
 use Zipkin\TracingBuilder;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use Zipkin\Reporters\InMemory;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
-use Zipkin\Instrumentation\Http\Client\Client;
-use Zipkin\Instrumentation\Http\Client\Tracing as HttpClientTracing;
 use Zipkin\Samplers\BinarySampler;
+use Zipkin\Reporters\InMemory;
+use Zipkin\Instrumentation\Http\Client\ClientTracing;
+use Zipkin\Instrumentation\Http\Client\Client;
+use RuntimeException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Client\ClientInterface;
+use PHPUnit\Framework\TestCase;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request;
 
 final class ClientTest extends TestCase
 {
@@ -30,7 +30,7 @@ final class ClientTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new HttpClientTracing($tracing),
+            new ClientTracing($tracing),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();
@@ -117,6 +117,7 @@ final class ClientTest extends TestCase
         $span = $spans[0]->toArray();
 
         $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('CLIENT', $span['kind']);
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
