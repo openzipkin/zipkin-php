@@ -59,7 +59,6 @@ final class Middleware implements MiddlewareInterface
                 $extractedContext
             );
         }
-
         $spanCustomizer = null;
         if (!$span->isNoop()) {
             $span->setKind(Kind\SERVER);
