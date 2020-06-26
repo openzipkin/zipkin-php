@@ -38,19 +38,22 @@ final class ServerTest extends TestCase
         ];
     }
 
-    public function testMiddlewareHandlesRequestSuccessfully()
+    private static function createRequestHandler($response = null): RequestHandlerInterface
     {
-        list($tracing, $flusher) = self::createTracing();
-        $request = new ServerRequest('GET', 'http://mytest');
-
-        $handler = new class() implements RequestHandlerInterface {
+        return new class($response) implements RequestHandlerInterface {
+            private $response;
             private $lastRequest;
+
+            public function __construct(?ResponseInterface $response)
+            {
+                $this->response = $response ?? new Psr7Response();
+            }
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 $this->lastRequest = $request;
 
-                return new Psr7Response();
+                return $this->response;
             }
 
             public function getLastRequest(): ?RequestInterface
@@ -58,6 +61,14 @@ final class ServerTest extends TestCase
                 return $this->lastRequest;
             }
         };
+    }
+
+    public function testMiddlewareHandlesRequestSuccessfully()
+    {
+        list($tracing, $flusher) = self::createTracing();
+        $request = new ServerRequest('GET', 'http://mytest');
+
+        $handler = self::createRequestHandler();
 
         $middleware = new Middleware($tracing);
         $middleware->process($request, $handler);
@@ -83,21 +94,7 @@ final class ServerTest extends TestCase
         list($tracing, $flusher) = self::createTracing();
         $request = new ServerRequest('GET', 'http://mytest');
 
-        $handler = new class() implements RequestHandlerInterface {
-            private $lastRequest;
-
-            public function handle(ServerRequestInterface $request): ResponseInterface
-            {
-                $this->lastRequest = $request;
-
-                return new Psr7Response(404);
-            }
-
-            public function getLastRequest(): ?RequestInterface
-            {
-                return $this->lastRequest;
-            }
-        };
+        $handler = self::createRequestHandler(new Psr7Response(404));
 
         $middleware = new Middleware($tracing);
         $middleware->process($request, $handler);
