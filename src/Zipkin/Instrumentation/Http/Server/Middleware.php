@@ -59,29 +59,32 @@ final class Middleware implements MiddlewareInterface
                 $extractedContext
             );
         }
-        $spanCustomizer = null;
-        if (!$span->isNoop()) {
-            $span->setKind(Kind\SERVER);
-            // If span is NOOP it does not make sense to add customizations
-            // to it like tags or annotations.
-            $spanCustomizer = new SpanCustomizerShield($span);
-            $span->setName($this->parser->spanName($request));
-            $this->parser->request($request, $span->getContext(), $spanCustomizer);
+        $scopeCloser = $this->tracer->openScope($span);
+
+        if ($span->isNoop()) {
+            try {
+                return $handler->handle($request);
+            } finally {
+                $span->finish();
+                $scopeCloser();
+            }
         }
+
+        $span->setKind(Kind\SERVER);
+        $spanCustomizer = new SpanCustomizerShield($span);
+        $span->setName($this->parser->spanName($request));
+        $this->parser->request($request, $span->getContext(), $spanCustomizer);
 
         try {
             $response = $handler->handle($request);
-            if ($spanCustomizer !== null) {
-                $this->parser->response($response, $span->getContext(), $spanCustomizer);
-            }
+            $this->parser->response($response, $span->getContext(), $spanCustomizer);
             return $response;
         } catch (Throwable $e) {
-            if ($spanCustomizer !== null) {
-                $this->parser->error($e, $span->getContext(), $spanCustomizer);
-            }
+            $this->parser->error($e, $span->getContext(), $spanCustomizer);
             throw $e;
         } finally {
             $span->finish();
+            $scopeCloser();
         }
     }
 }
