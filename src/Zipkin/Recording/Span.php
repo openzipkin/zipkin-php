@@ -128,7 +128,7 @@ final class Span
     private $localEndpoint;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isSampled;
 
@@ -139,7 +139,7 @@ final class Span
         bool $debug,
         bool $shared,
         Endpoint $localEndpoint,
-        bool $isSampled = false
+        ?bool $isSampled = false
     ) {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
@@ -238,7 +238,7 @@ final class Span
      */
     public function isSampled(): bool
     {
-        return $this->isSampled;
+        return $this->isSampled === true;
     }
 
     /**
