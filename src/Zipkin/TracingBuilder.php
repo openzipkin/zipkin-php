@@ -189,6 +189,13 @@ class TracingBuilder
     }
 
     /**
+     * True means that spans will always be recorded, even if the current trace is not sampled.
+     * Defaults to False.
+     *
+     * This has the side effect that your reporter will receive all spans, irrespective of the
+     * sampling decision. Use this if you want to have some custom smart logic in the reporter
+     * that needs to have access to both sampled and unsampled traces.
+     *
      * @param bool $alwaysReportSpans
      * @return $this
      */
