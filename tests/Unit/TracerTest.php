@@ -330,11 +330,11 @@ final class TracerTest extends TestCase
             $sumCallable,
             [1, 2],
             'sum',
-            function (SpanCustomizer $span, ?array $args = []) {
+            function (array $args = [], TraceContext $context, SpanCustomizer $span) {
                 $span->tag('arg0', (string) $args[0]);
                 $span->tag('arg1', (string) $args[1]);
             },
-            function (SpanCustomizer $span, $output = null, ?Throwable $e = null) {
+            function ($output = null, TraceContext $context, SpanCustomizer $span) {
                 $span->tag('result', (string) $output);
             }
         );

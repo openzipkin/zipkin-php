@@ -6,8 +6,9 @@ namespace Zipkin\Recording;
 
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Endpoint;
+use Throwable;
 
-final class Span
+final class Span implements ReadbackSpan
 {
     /**
      * Epoch microseconds of the start of this span, absent if this an incomplete
@@ -105,6 +106,11 @@ final class Span
     private $tags = [];
 
     /**
+     * @var Throwable|null
+     */
+    private $error;
+
+    /**
      * Measurement in microseconds of the critical path, if known. Durations of
      * less than one microsecond must be rounded up to 1 microsecond.
      *
@@ -168,42 +174,105 @@ final class Span
         );
     }
 
+    public function getSpanId(): string
+    {
+        return $this->spanId;
+    }
+    
+    public function getTraceId(): string
+    {
+        return $this->traceId;
+    }
+
+    public function getParentId(): ?string
+    {
+        return $this->parentId;
+    }
+
+    public function isSampled(): bool
+    {
+        return $this->isSampled === true;
+    }
+
+    public function isDebug(): bool
+    {
+        return $this->isDebug;
+    }
+
+    public function isShared(): bool
+    {
+        return $this->isShared;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+    
+    public function getKind(): ?string
+    {
+        return $this->kind;
+    }
+
     public function getTimestamp(): int
     {
         return $this->timestamp;
     }
 
+    public function getDuration(): int
+    {
+        return $this->duration;
+    }
+
+    public function getLocalEndpoint(): ?Endpoint
+    {
+        return $this->localEndpoint;
+    }
+
+    public function getRemoteEndpoint(): ?Endpoint
+    {
+        return $this->remoteEndpoint;
+    }
+
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    public function getAnnotations(): array
+    {
+        return $this->annotations;
+    }
+
+    public function getError(): ?Throwable
+    {
+        return $this->error;
+    }
+
     /**
-     * @param int $timestamp
-     * @return void
+     * @param int $timestamp created by the usage of Timestamp\now
      */
     public function start(int $timestamp): void
     {
         $this->timestamp = $timestamp;
     }
 
-    /**
-     * @param string $name
-     * @return void
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
     }
 
     /**
-     * @param string $kind
-     * @return void
+     * @param string $kind one of Kind\CLIENT, Kind\SERVER, Kind\CONSUMER and
+     * kind\PRODUCER.
+     *
+     * @see Zipkin\Kind
      */
     public function setKind(string $kind): void
     {
         $this->kind = $kind;
     }
 
-    /**
-     * @param int $timestamp
-     * @param string $value
-     */
     public function annotate(int $timestamp, string $value): void
     {
         $this->annotations[] = [
@@ -212,31 +281,24 @@ final class Span
         ];
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     */
     public function tag(string $key, string $value): void
     {
         $this->tags[$key] = $value;
     }
 
-    /**
-     * @param Endpoint $remoteEndpoint
-     * @return void
-     */
+
+    public function setError(Throwable $e): void
+    {
+        $this->error = $e;
+    }
+
     public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
         $this->remoteEndpoint = $remoteEndpoint;
     }
 
-    public function isSampled(): bool
-    {
-        return $this->isSampled === true;
-    }
-
     /**
-     * Completes and reports the span
+     * Completes and reports the span.
      *
      * @param int|null $finishTimestamp
      */
@@ -254,7 +316,7 @@ final class Span
     }
 
     /**
-     * @return array
+     * @deprecated
      */
     public function toArray(): array
     {

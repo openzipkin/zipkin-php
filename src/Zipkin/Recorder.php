@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use Zipkin\Propagation\TraceContext;
-use Zipkin\Recording\SpanMap;
 use Zipkin\Reporters\Noop;
+use Zipkin\Recording\SpanMap;
+use Zipkin\Propagation\TraceContext;
+use Throwable;
 
 class Recorder
 {
@@ -138,6 +139,16 @@ class Recorder
 
         $span = $this->spanMap->getOrCreate($context, $this->endpoint);
         $span->tag($key, $value);
+    }
+
+    public function setError(TraceContext $context, Throwable $e): void
+    {
+        if ($this->noop) {
+            return;
+        }
+
+        $span = $this->spanMap->getOrCreate($context, $this->endpoint);
+        $span->setError($e);
     }
 
     /**

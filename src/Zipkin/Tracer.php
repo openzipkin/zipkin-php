@@ -265,7 +265,7 @@ final class Tracer
         if ($contextOrFlags === null) {
             $contextOrFlags = $this->currentTraceContext->getContext();
         }
-        
+
         if ($contextOrFlags === null) {
             $samplingFlags = DefaultSamplingFlags::create(($sampler)(...$args));
             return $this->nextSpan($samplingFlags);
@@ -297,11 +297,11 @@ final class Tracer
      * curl_setopt($ch, CURLOPT_HEADER, TRUE);
      * curl_setopt($ch, CURLOPT_NOBODY, TRUE); // remove body
      * curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-     * $response = $tracer->inSpan('curl_exec', [$ch], 'api_call', function($span, $args) {
+     * $response = $tracer->inSpan('curl_exec', [$ch], 'api_call', function($args, $context, $span) {
      *     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-     *     $span->setTag('http.status_code', $httpCode);
+     *     $span->setTag('http.status_code', (string) $httpCode);
      *     if ($httpCode/100 >= 5) {
-     *         $span->setTag('error', $httpCode);
+     *         $span->setTag('error', (string) $httpCode);
      *     }
      * );
      * curl_close($ch);
@@ -311,8 +311,7 @@ final class Tracer
      * set tags based on the args passed to the function. Arguments' copy can be expensive so
      * user should be careful about passing this function. The fifth parameter is an result parser
      * which allows the user to set tags based on the output of the function and a exception thrown
-     * by the callable. By default, this function will tag with an error if the callable throws an
-     * exception.
+     * by the callable.
      *
      * <p><em>Note:</em> argsParser and resultParser are not executed in a natural order mainly
      * because some functions (like curl) require that the first argument to be passed to obtain
@@ -324,9 +323,9 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
-     * @param callable|null $argsParser with signature function (SpanCustomizer $span, array $args = []): void
+     * @param callable|null $argsParser with signature function (array $args = [], TraceContext $context, SpanCustomizer $span): void
      * @param callable|null $resultParser with signature
-     * function (SpanCustomizer $span, $output = null, ?Throwable $e): void
+     * function ($output, TraceContext $context, SpanCustomizer $span): void
      * @return mixed
      */
     public function inSpan(
@@ -337,31 +336,36 @@ final class Tracer
         ?callable $resultParser = null
     ) {
         $span = $this->nextSpan();
-        $span->setName($name ?: generateSpanName($fn));
-
-        $spanCustomizer = new SpanCustomizerShield($span);
-        $resultParser = $resultParser ?? [self::class, 'defaultResultParser'];
-
+        if ($span->isNoop()) {
+            try {
+                return \call_user_func_array($fn, $args);
+            } finally {
+                $span->finish();
+            }
+        }
+        
+        $spanCustomizer = null;
+        if ($resultParser !== null || $argsParser !== null) {
+            $spanCustomizer = new SpanCustomizerShield($span);
+        }
+        
+        $span->setName($name ?? generateSpanName($fn));
         $span->start();
+        
         try {
             $result = \call_user_func_array($fn, $args);
-            ($resultParser)($spanCustomizer, $result, null);
+            if ($resultParser !== null) {
+                ($resultParser)($result, $span->getContext(), $spanCustomizer);
+            }
             return $result;
         } catch (Throwable $e) {
-            ($resultParser)($spanCustomizer, null, $e);
+            $span->setError($e);
             throw $e;
         } finally {
             if ($argsParser !== null) {
-                $argsParser($spanCustomizer, $args);
+                $argsParser($args, $span->getContext(), $spanCustomizer);
             }
             $span->finish();
-        }
-    }
-    
-    private static function defaultResultParser(SpanCustomizer $spanCustomizer, $result, ?Throwable $e): void
-    {
-        if ($e != null) {
-            $spanCustomizer->tag(Tags\ERROR, $e->getMessage());
         }
     }
 

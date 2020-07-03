@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Zipkin\Reporters;
 
-use TypeError;
-use Zipkin\Reporter;
-use RuntimeException;
-use Psr\Log\NullLogger;
-use Zipkin\Recording\Span;
-use Psr\Log\LoggerInterface;
-use InvalidArgumentException;
+use Zipkin\Reporters\SpanSerializer;
+use Zipkin\Reporters\JsonV2Serializer;
 use Zipkin\Reporters\Http\CurlFactory;
 use Zipkin\Reporters\Http\ClientFactory;
+use Zipkin\Reporter;
+use Zipkin\Recording\Span;
+use Zipkin\Recording\ReadbackSpan;
+use TypeError;
+use RuntimeException;
+use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
+use InvalidArgumentException;
 
 final class Http implements Reporter
 {
@@ -42,6 +45,11 @@ final class Http implements Reporter
     private $logger;
 
     /**
+     * @var SpanSerializer
+     */
+    private $serializer;
+
+    /**
      * @param array $options the options for HTTP call:
      *
      * <code>
@@ -55,11 +63,13 @@ final class Http implements Reporter
      * @param ClientFactory $requesterFactory the factory for the client
      * that will do the HTTP call
      * @param LoggerInterface $logger the logger for output
+     * @param Serializer $serializer
      */
     public function __construct(
         $options = self::EMPTY_ARG,
         $requesterFactory = null,
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        SpanSerializer $serializer = null
     ) {
         // V1 signature did not make much sense as in 99% of the cases, you don't
         // want to pass a ClientFactory to it but $options instead. There was a plan
@@ -90,12 +100,13 @@ final class Http implements Reporter
         }
 
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $parsedOptions);
-        $this->clientFactory = $requesterFactory ?: CurlFactory::create();
-        $this->logger = $logger ?: new NullLogger();
+        $this->clientFactory = $requesterFactory ?? CurlFactory::create();
+        $this->logger = $logger ?? new NullLogger();
+        $this->serializer = new JsonV2Serializer();
     }
 
     /**
-     * @param Span[] $spans
+     * @param ReadbackSpan[] $spans
      * @return void
      */
     public function report(array $spans): void
@@ -104,9 +115,7 @@ final class Http implements Reporter
             return;
         }
 
-        $payload = \json_encode(\array_map(function (Span $span) {
-            return $span->toArray();
-        }, $spans));
+        $payload = $this->serializer->serialize($spans);
         if ($payload === false) {
             $this->logger->error(
                 \sprintf('failed to encode spans with code %d', \json_last_error())

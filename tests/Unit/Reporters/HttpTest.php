@@ -2,15 +2,15 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use TypeError;
-use Zipkin\Endpoint;
-use Prophecy\Argument;
-use Zipkin\Recording\Span;
-use Zipkin\Reporters\Http;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
-use Zipkin\Propagation\TraceContext;
 use Zipkin\Reporters\Http\CurlFactory;
+use Zipkin\Reporters\Http;
+use Zipkin\Recording\Span;
+use Zipkin\Propagation\TraceContext;
+use Zipkin\Endpoint;
+use TypeError;
+use Psr\Log\LoggerInterface;
+use Prophecy\Argument;
+use PHPUnit\Framework\TestCase;
 
 final class HttpTest extends TestCase
 {
@@ -57,6 +57,8 @@ final class HttpTest extends TestCase
         $context = TraceContext::createAsRoot();
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
+        $span->setTimestamp(Timestamp\now());
+        $span->setDuration(1);
         $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
         $logger = $this->prophesize(LoggerInterface::class);
         $logger->error()->shouldNotBeCalled();

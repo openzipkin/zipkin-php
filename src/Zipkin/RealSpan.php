@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use InvalidArgumentException;
-use Zipkin\Propagation\TraceContext;
 use function Zipkin\Timestamp\now;
 use function Zipkin\Timestamp\isValid;
+use Zipkin\Propagation\TraceContext;
+use Throwable;
+use InvalidArgumentException;
 
 final class RealSpan implements Span
 {
@@ -93,9 +94,7 @@ final class RealSpan implements Span
     }
 
     /**
-     * Tags give your span context for search, viewing and analysis. For example, a key
-     * "your_app.version" would let you lookup spans by version. A tag {@link Zipkin\Tags\SQL_QUERY}
-     * isn't searchable, but it can help in debugging when viewing a trace.
+     * {@inheritdoc}
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
      * standard ones.
@@ -105,6 +104,14 @@ final class RealSpan implements Span
     public function tag(string $key, string $value): void
     {
         $this->recorder->tag($this->traceContext, $key, $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setError(Throwable $e): void
+    {
+        $this->recorder->setError($this->traceContext, $e);
     }
 
     /**

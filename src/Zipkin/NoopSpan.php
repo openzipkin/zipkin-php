@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
+use Throwable;
 
 final class NoopSpan implements Span
 {
@@ -86,6 +87,14 @@ final class NoopSpan implements Span
     public function tag(string $key, string $value): void
     {
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setError(Throwable $e): void
+    {
+    }
+
 
     /**
      * Associates an event that explains latency with the current system time.
