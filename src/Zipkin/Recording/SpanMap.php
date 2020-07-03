@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace Zipkin\Recording;
 
-use Zipkin\Endpoint;
 use Zipkin\Propagation\TraceContext;
+use Zipkin\Endpoint;
 
 final class SpanMap
 {
     /**
-     * @var Span[]
+     * @var Span[]|array
      */
     private $map = [];
 
-    /**
-     * @param TraceContext $context
-     * @return Span|null
-     */
     public function get(TraceContext $context): ?Span
     {
         $contextHash = self::getHash($context);
@@ -25,11 +21,6 @@ final class SpanMap
         return $this->map[$contextHash] ?? null;
     }
 
-    /**
-     * @param TraceContext $context
-     * @param Endpoint $endpoint
-     * @return Span
-     */
     public function getOrCreate(TraceContext $context, Endpoint $endpoint): Span
     {
         $contextHash = self::getHash($context);
@@ -41,10 +32,6 @@ final class SpanMap
         return $this->map[$contextHash];
     }
 
-    /**
-     * @param TraceContext $context
-     * @return Span|null
-     */
     public function remove(TraceContext $context): ?Span
     {
         $contextHash = self::getHash($context);
@@ -70,10 +57,6 @@ final class SpanMap
         return \array_values($spans);
     }
 
-    /**
-     * @param TraceContext $context
-     * @return int
-     */
     private static function getHash(TraceContext $context): int
     {
         return \crc32($context->getSpanId() . $context->getTraceId());

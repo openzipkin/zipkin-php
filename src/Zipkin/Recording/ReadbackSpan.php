@@ -9,6 +9,10 @@ use Zipkin\ErrorParser;
 use Zipkin\Endpoint;
 use Throwable;
 
+/**
+ * ReadbackSpan is an interface for accessing the recording
+ * span without the possibility to mutate it.
+ */
 interface ReadbackSpan
 {
     public function getSpanId(): string;

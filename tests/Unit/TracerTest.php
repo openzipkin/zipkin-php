@@ -343,11 +343,12 @@ final class TracerTest extends TestCase
         $spans = $flusher();
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
-        $this->assertEquals('sum', $span['name']);
-        $this->assertEquals('1', $span['tags']['arg0']);
-        $this->assertEquals('2', $span['tags']['arg1']);
-        $this->assertEquals('3', $span['tags']['result']);
+        $span = $spans[0];
+        $this->assertEquals('sum', $span->getName());
+        $tags = $span->getTags();
+        $this->assertEquals('1', $tags['arg0']);
+        $this->assertEquals('2', $tags['arg1']);
+        $this->assertEquals('3', $tags['result']);
     }
 
     /**
@@ -364,8 +365,8 @@ final class TracerTest extends TestCase
 
         $spans = $flusher();
 
-        $span = $spans[0]->toArray();
-        $this->assertEquals($expectedName, $span['name']);
+        $span = $spans[0];
+        $this->assertEquals($expectedName, $span->getName());
     }
 
     public function sumCallables(): array
@@ -435,8 +436,8 @@ final class TracerTest extends TestCase
 
         $spans = $flusher();
 
-        $span = $spans[0]->toArray();
-        $this->assertTrue($span['shared']);
+        $span = $spans[0];
+        $this->assertTrue($span->isShared());
     }
 
     private static function createDefaultTestTracer(): array

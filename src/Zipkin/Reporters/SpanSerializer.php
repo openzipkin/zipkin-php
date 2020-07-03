@@ -6,6 +6,10 @@ namespace Zipkin\Reporters;
 
 use Zipkin\Recording\ReadbackSpan;
 
+/**
+ * SpanSerializer turns a list of spans into a series of
+ * bytes (byte = character).
+ */
 interface SpanSerializer
 {
     /**

@@ -251,6 +251,8 @@ final class Span implements ReadbackSpan
 
     /**
      * @param int $timestamp created by the usage of Timestamp\now
+     *
+     * @see Zipkin\Timestamp\now
      */
     public function start(int $timestamp): void
     {
@@ -285,7 +287,6 @@ final class Span implements ReadbackSpan
     {
         $this->tags[$key] = $value;
     }
-
 
     public function setError(Throwable $e): void
     {
@@ -362,9 +363,6 @@ final class Span implements ReadbackSpan
         return $spanAsArray;
     }
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return \json_encode($this->toArray()) ?: '';
