@@ -173,7 +173,7 @@ final class RealSpan implements Span
             throw new InvalidArgumentException('Invalid timestamp');
         }
 
-        $this->recorder->finish($this->traceContext, $timestamp ?: now());
+        $this->recorder->finish($this->traceContext, $timestamp ?? now());
     }
 
     /**

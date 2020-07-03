@@ -2,6 +2,7 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
+use Zipkin\Timestamp;
 use Zipkin\Reporters\Http\CurlFactory;
 use Zipkin\Reporters\Http;
 use Zipkin\Recording\Span;
@@ -14,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 
 final class HttpTest extends TestCase
 {
-    const PAYLOAD = '[{"id":"%s","name":null,"traceId":"%s",'
-        . '"timestamp":null,"duration":null,"localEndpoint":{"serviceName":""}}]';
+    const PAYLOAD = '[{"id":"%s","name":"test","traceId":"%s",'
+        . '"timestamp":%d,"localEndpoint":{"serviceName":""}}]';
 
     public function testConstructorIsRetrocompatible()
     {
@@ -57,9 +58,10 @@ final class HttpTest extends TestCase
         $context = TraceContext::createAsRoot();
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
-        $span->setTimestamp(Timestamp\now());
-        $span->setDuration(1);
-        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId());
+        $now = Timestamp\now();
+        $span->start($now);
+        $span->setName('test');
+        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId(), $now);
         $logger = $this->prophesize(LoggerInterface::class);
         $logger->error()->shouldNotBeCalled();
 
@@ -75,6 +77,7 @@ final class HttpTest extends TestCase
         $context = TraceContext::createAsRoot();
         $localEndpoint = Endpoint::createAsEmpty();
         $span = Span::createFromContext($context, $localEndpoint);
+        $span->start(Timestamp\now());
         $logger = $this->prophesize(LoggerInterface::class);
         $logger->error(Argument::containingString(HttpMockFactory::ERROR_MESSAGE))->shouldBeCalled();
 

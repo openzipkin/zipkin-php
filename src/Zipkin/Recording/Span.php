@@ -124,7 +124,7 @@ final class Span implements ReadbackSpan
      *
      * This field is i64 vs i32 to support spans longer than 35 minutes.
      *
-     * @var int
+     * @var int|null
      */
     private $duration;
 
@@ -196,12 +196,12 @@ final class Span implements ReadbackSpan
 
     public function isDebug(): bool
     {
-        return $this->isDebug;
+        return $this->debug;
     }
 
     public function isShared(): bool
     {
-        return $this->isShared;
+        return $this->shared;
     }
 
     public function getName(): ?string
@@ -219,7 +219,7 @@ final class Span implements ReadbackSpan
         return $this->timestamp;
     }
 
-    public function getDuration(): int
+    public function getDuration(): ?int
     {
         return $this->duration;
     }
@@ -298,7 +298,9 @@ final class Span implements ReadbackSpan
     }
 
     /**
-     * Completes and reports the span.
+     * Completes and reports the span. If no finish timestamp is specified
+     * we don't compute the duration but the span is still reporterd. This
+     * usually happens when a span is flushed manually.
      *
      * @param int|null $finishTimestamp
      */

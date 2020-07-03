@@ -419,8 +419,8 @@ final class TracerTest extends TestCase
         $spans = $flusher();
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
-        $this->assertEquals('too small values', $span['tags']['error']);
+        $span = $spans[0];
+        $this->assertEquals('too small values', $span->getError()->getMessage());
     }
 
     public function testJoinSpans()

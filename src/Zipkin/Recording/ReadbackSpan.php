@@ -19,7 +19,7 @@ interface ReadbackSpan
     public function getName(): ?string;
     public function getKind(): ?string;
     public function getTimestamp(): int;
-    public function getDuration(): int;
+    public function getDuration(): ?int;
     public function getLocalEndpoint(): ?Endpoint;
     public function getTags(): array;
     public function getAnnotations(): array;

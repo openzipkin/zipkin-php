@@ -159,13 +159,13 @@ final class ClientTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('GET', $span->getName());
         $this->assertEquals([
             'http.method' => 'GET',
-            'http.path' => '/',
-            'error' => 'transport error',
-        ], $span['tags']);
+            'http.path' => '/'
+        ], $span->getTags());
+        $this->assertEquals('transport error', $span->getError()->getMessage());
     }
 }

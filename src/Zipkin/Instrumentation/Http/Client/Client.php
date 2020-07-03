@@ -61,28 +61,30 @@ final class Client implements ClientInterface
             );
         }
 
-        $spanCustomizer = null;
-        if (!$span->isNoop()) {
-            $span->setKind(Kind\CLIENT);
-            // If span is NOOP it does not make sense to add customizations
-            // to it like tags or annotations.
-            $spanCustomizer = new SpanCustomizerShield($span);
-            $span->setName($this->parser->spanName($request));
-            $this->parser->request($request, $span->getContext(), $spanCustomizer);
+        ($this->injector)($span->getContext(), $request);
+
+        if ($span->isNoop()) {
+            try {
+                return $this->delegate->sendRequest($request);
+            } finally {
+                $span->finish();
+            }
         }
 
-        ($this->injector)($span->getContext(), $request);
+        $span->setKind(Kind\CLIENT);
+        // If span is NOOP it does not make sense to add customizations
+        // to it like tags or annotations.
+        $spanCustomizer = new SpanCustomizerShield($span);
+        $span->setName($this->parser->spanName($request));
+        $this->parser->request($request, $span->getContext(), $spanCustomizer);
+
         try {
             $span->start();
             $response = $this->delegate->sendRequest($request);
-            if ($spanCustomizer !== null) {
-                $this->parser->response($response, $span->getContext(), $spanCustomizer);
-            }
+            $this->parser->response($response, $span->getContext(), $spanCustomizer);
             return $response;
         } catch (Throwable $e) {
-            if ($spanCustomizer !== null) {
-                $this->parser->error($e, $span->getContext(), $spanCustomizer);
-            }
+            $span->setError($e);
             throw $e;
         } finally {
             $span->finish();

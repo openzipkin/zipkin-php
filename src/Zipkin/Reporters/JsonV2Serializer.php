@@ -31,9 +31,16 @@ class JsonV2Serializer implements SpanSerializer
                 'name' => $span->getName(),
                 'traceId' => $span->getTraceId(),
                 'timestamp' => $span->getTimestamp(),
-                'duration' => $span->getDuration(),
-                'localEndpoint' => $span->getLocalEndpoint()->toArray(),
             ];
+
+            if ($span->getDuration() !== null) {
+                $spanAsArray['duration'] = $span->getDuration();
+            }
+            
+            if ($span->getLocalEndpoint() !== null) {
+                $spanAsArray['localEndpoint'] = $span->getLocalEndpoint()->toArray();
+            }
+
     
             if ($span->getParentId() !== null) {
                 $spanAsArray['parentId'] = $span->getParentId();

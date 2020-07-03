@@ -11,9 +11,4 @@ class DefaultErrorParser implements ErrorParser
     {
         return [Tags\ERROR => $e->getMessage()];
     }
-
-    public function parseAnnotations(Throwable $e): array
-    {
-        return [];
-    }
 }
