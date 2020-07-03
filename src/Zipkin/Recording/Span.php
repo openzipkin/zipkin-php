@@ -127,13 +127,19 @@ final class Span
      */
     private $localEndpoint;
 
+    /**
+     * @var bool|null
+     */
+    private $isSampled;
+
     private function __construct(
         string $traceId,
         ?string $parentId,
         string $spanId,
         bool $debug,
         bool $shared,
-        Endpoint $localEndpoint
+        Endpoint $localEndpoint,
+        ?bool $isSampled = false
     ) {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
@@ -141,6 +147,7 @@ final class Span
         $this->debug = $debug;
         $this->shared = $shared;
         $this->localEndpoint = $localEndpoint;
+        $this->isSampled = $isSampled;
     }
 
     /**
@@ -156,7 +163,8 @@ final class Span
             $context->getSpanId(),
             $context->isDebug(),
             $context->isShared(),
-            $localEndpoint
+            $localEndpoint,
+            $context->isSampled()
         );
     }
 
@@ -223,6 +231,14 @@ final class Span
     public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
         $this->remoteEndpoint = $remoteEndpoint;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSampled(): bool
+    {
+        return $this->isSampled === true;
     }
 
     /**

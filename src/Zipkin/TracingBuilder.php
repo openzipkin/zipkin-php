@@ -58,6 +58,11 @@ class TracingBuilder
      */
     private $propagation = null;
 
+    /**
+     * @var bool
+     */
+    private $alwaysReportSpans = false;
+
     public static function create(): self
     {
         return new self();
@@ -184,6 +189,23 @@ class TracingBuilder
     }
 
     /**
+     * True means that spans will always be recorded, even if the current trace is not sampled.
+     * Defaults to False.
+     *
+     * This has the side effect that your reporter will receive all spans, irrespective of the
+     * sampling decision. Use this if you want to have some custom smart logic in the reporter
+     * that needs to have access to both sampled and unsampled traces.
+     *
+     * @param bool $alwaysReportSpans
+     * @return $this
+     */
+    public function alwaysReportingSpans(bool $alwaysReportSpans): self
+    {
+        $this->alwaysReportSpans = $alwaysReportSpans;
+        return $this;
+    }
+
+    /**
      * @return DefaultTracing
      */
     public function build(): Tracing
@@ -209,7 +231,8 @@ class TracingBuilder
             $currentTraceContext,
             $this->isNoop,
             $propagation,
-            $this->supportsJoin && $propagation->supportsJoin()
+            $this->supportsJoin && $propagation->supportsJoin(),
+            $this->alwaysReportSpans
         );
     }
 }

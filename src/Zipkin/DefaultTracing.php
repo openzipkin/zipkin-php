@@ -42,7 +42,8 @@ final class DefaultTracing implements Tracing
         CurrentTraceContext $currentTraceContext,
         bool $isNoop,
         Propagation $propagation,
-        bool $supportsJoin
+        bool $supportsJoin,
+        bool $alwaysReportSpans = false
     ) {
         $this->tracer = new Tracer(
             $localEndpoint,
@@ -51,7 +52,8 @@ final class DefaultTracing implements Tracing
             $usesTraceId128bits,
             $currentTraceContext,
             $isNoop,
-            $supportsJoin
+            $supportsJoin,
+            $alwaysReportSpans
         );
 
         $this->propagation = $propagation;
