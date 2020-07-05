@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Zipkin\Recording;
 
-use Zipkin\Endpoint;
 use Zipkin\Propagation\TraceContext;
+use Zipkin\Endpoint;
 
 final class Span
 {
@@ -72,6 +72,11 @@ final class Span
     private $spanId;
 
     /**
+     * @var bool|null
+     */
+    private $isSampled;
+
+    /**
      * True is a request to store this span even if it overrides sampling policy.
      *
      * @var bool
@@ -127,27 +132,22 @@ final class Span
      */
     private $localEndpoint;
 
-    /**
-     * @var bool|null
-     */
-    private $isSampled;
-
     private function __construct(
         string $traceId,
         ?string $parentId,
         string $spanId,
+        ?bool $isSampled,
         bool $debug,
         bool $shared,
-        Endpoint $localEndpoint,
-        ?bool $isSampled = false
+        Endpoint $localEndpoint
     ) {
         $this->traceId = $traceId;
         $this->parentId = $parentId;
         $this->spanId = $spanId;
+        $this->isSampled = $isSampled;
         $this->debug = $debug;
         $this->shared = $shared;
         $this->localEndpoint = $localEndpoint;
-        $this->isSampled = $isSampled;
     }
 
     /**
@@ -161,16 +161,13 @@ final class Span
             $context->getTraceId(),
             $context->getParentId(),
             $context->getSpanId(),
+            $context->isSampled(),
             $context->isDebug(),
             $context->isShared(),
-            $localEndpoint,
-            $context->isSampled()
+            $localEndpoint
         );
     }
 
-    /**
-     * @return int
-     */
     public function getTimestamp(): int
     {
         return $this->timestamp;
@@ -233,9 +230,6 @@ final class Span
         $this->remoteEndpoint = $remoteEndpoint;
     }
 
-    /**
-     * @return bool
-     */
     public function isSampled(): bool
     {
         return $this->isSampled === true;
