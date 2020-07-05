@@ -2,17 +2,17 @@
 
 namespace ZipkinTests\Unit;
 
+use Zipkin\TracingBuilder;
 use Zipkin\Tracing;
-use Zipkin\Endpoint;
+use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\Noop;
 use Zipkin\Reporters\InMemory;
-use Zipkin\TracingBuilder;
-use Zipkin\Propagation\Getter;
 use Zipkin\Propagation\Setter;
-use PHPUnit\Framework\TestCase;
-use Zipkin\Samplers\BinarySampler;
 use Zipkin\Propagation\Propagation;
+use Zipkin\Propagation\Getter;
 use Zipkin\Propagation\CurrentTraceContext;
+use Zipkin\Endpoint;
+use PHPUnit\Framework\TestCase;
 
 final class TracingBuilderTest extends TestCase
 {
@@ -87,7 +87,7 @@ final class TracingBuilderTest extends TestCase
         return (bool) mt_rand(0, 1);
     }
 
-    public function testAlwaysEmitSpans()
+    public function testAlwaysReportSpans()
     {
         // If `alwaysReportingSpans(true)` is called, we should be emitting the
         // spans even if the trace isn't sampled
@@ -115,7 +115,7 @@ final class TracingBuilderTest extends TestCase
         $this->assertFalse($spans[0]->isSampled());
     }
 
-    public function testDontEmitByDefault()
+    public function testDoNotReportByDefault()
     {
         // By default, let's verify that we don't emit any span if the
         // trace isn't sampled.

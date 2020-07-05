@@ -2,24 +2,24 @@
 
 namespace ZipkinTests\Unit;
 
-use OutOfBoundsException;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
-use Throwable;
 use Zipkin\Tracer;
-use Zipkin\Sampler;
-use Zipkin\Endpoint;
-use Zipkin\NoopSpan;
-use Zipkin\RealSpan;
-use Zipkin\Reporter;
 use Zipkin\SpanCustomizer;
-use Zipkin\Reporters\InMemory;
 use Zipkin\Samplers\BinarySampler;
+use Zipkin\Sampler;
+use Zipkin\Reporters\InMemory;
+use Zipkin\Reporter;
+use Zipkin\RealSpan;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\SamplingFlags;
-use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
+use Zipkin\Propagation\CurrentTraceContext;
+use Zipkin\NoopSpan;
+use Zipkin\Endpoint;
 use ZipkinTests\Unit\InSpan\Sumer;
+use Throwable;
+use Prophecy\Prophecy\ObjectProphecy;
+use PHPUnit\Framework\TestCase;
+use OutOfBoundsException;
 
 final class TracerTest extends TestCase
 {
@@ -214,6 +214,7 @@ final class TracerTest extends TestCase
         $span = $tracer->nextSpan($samplingFlags);
 
         $this->assertSameSamplingFlags($samplingFlags, $span->getContext());
+        $this->assertNotNull($span->getContext()->isSampled());
     }
 
     /**
@@ -234,6 +235,7 @@ final class TracerTest extends TestCase
 
         $span = $tracer->nextSpan($samplingFlags);
         $this->assertEquals($isNoop, $span->isNoop());
+        $this->assertNotNull($span->getContext()->isSampled());
     }
 
     public function emptySamplingFlagsDataProvider()
@@ -247,6 +249,7 @@ final class TracerTest extends TestCase
     public function samplingFlagsDataProvider()
     {
         return [
+            // [$isSampled, $isDebug]
             [null, true],
             [null, false],
             [true, true],
