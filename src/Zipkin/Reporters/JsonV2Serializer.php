@@ -70,11 +70,11 @@ class JsonV2Serializer implements SpanSerializer
             $spanStr .= ',"parentId":"' . $span->getParentId() . '"';
         }
     
-        if ($span->isDebug() === true) {
+        if ($span->isDebug()) {
             $spanStr .= ',"debug":true';
         }
     
-        if ($span->isShared() === true) {
+        if ($span->isShared()) {
             $spanStr .= ',"shared":true';
         }
     
