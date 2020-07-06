@@ -40,7 +40,7 @@ class JsonV2Serializer implements SpanSerializer
         }
     
         if ($endpoint->getPort() !== null) {
-            $endpointStr .= ',"port":' . $endpoint->getPort() . '';
+            $endpointStr .= ',"port":' . $endpoint->getPort();
         }
     
         if ($endpoint->getIpv6() !== null) {
@@ -52,18 +52,18 @@ class JsonV2Serializer implements SpanSerializer
 
     private function serializeSpan(ReadbackSpan $span): string
     {
-        $spanStr = '{'
-            . '"id":"' . $span->getSpanId() . '",'
-            . '"name":"'. $span->getName() . '",'
-            . '"traceId":"'. $span->getTraceId() . '",'
-            . '"timestamp":'. $span->getTimestamp();
+        $spanStr =
+            '{"id":"' . $span->getSpanId() . '"'
+            . ',"name":"'. $span->getName() . '"'
+            . ',"traceId":"'. $span->getTraceId() . '"'
+            . ',"timestamp":'. $span->getTimestamp();
 
         if ($span->getDuration() !== null) {
             $spanStr .= ',"duration":' . $span->getDuration();
         }
             
-        if ($span->getLocalEndpoint() !== null) {
-            $spanStr .= ',"localEndpoint":' . self::serializeEndpoint($span->getLocalEndpoint());
+        if (null !== ($localEndpoint = $span->getLocalEndpoint())) {
+            $spanStr .= ',"localEndpoint":' . self::serializeEndpoint($localEndpoint);
         }
 
         if ($span->getParentId() !== null) {
@@ -82,12 +82,12 @@ class JsonV2Serializer implements SpanSerializer
             $spanStr .= ',"debug":"'. $span->getKind(). '"';
         }
     
-        if ($span->getRemoteEndpoint() !== null) {
-            $spanStr .= ',"remoteEndpoint":' . self::serializeEndpoint($span->getLocalEndpoint());
+        if (null !== ($remoteEndpoint = $span->getRemoteEndpoint())) {
+            $spanStr .= ',"remoteEndpoint":' . self::serializeEndpoint($remoteEndpoint);
         }
     
         if (!empty($span->getAnnotations())) {
-            $spanStr .= ',[';
+            $spanStr .= ',"annotations":[';
             $firstIteration = true;
             foreach ($span->getAnnotations() as $annotation) {
                 if ($firstIteration) {
@@ -95,7 +95,7 @@ class JsonV2Serializer implements SpanSerializer
                 } else {
                     $spanStr .= ',';
                 }
-                $spanStr .= '{"value":"' . $annotation['value'] . '","timestamp":' . $annotation['timestamp'];
+                $spanStr .= '{"value":"' . $annotation['value'] . '","timestamp":' . $annotation['timestamp'] . '}';
             }
             $spanStr .= ']';
         }
@@ -107,7 +107,7 @@ class JsonV2Serializer implements SpanSerializer
         }
 
         if (!empty($tags)) {
-            $spanStr .= ',{';
+            $spanStr .= ',"tags":{';
             $firstIteration = true;
             foreach ($tags as $key => $value) {
                 if ($firstIteration) {

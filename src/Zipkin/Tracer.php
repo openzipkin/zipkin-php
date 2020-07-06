@@ -323,7 +323,8 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
-     * @param callable|null $argsParser with signature function (array $args = [], TraceContext $context, SpanCustomizer $span): void
+     * @param callable|null $argsParser with signature
+     * function(array $args, TraceContext $context, SpanCustomizer $span): void
      * @param callable|null $resultParser with signature
      * function ($output, TraceContext $context, SpanCustomizer $span): void
      * @return mixed

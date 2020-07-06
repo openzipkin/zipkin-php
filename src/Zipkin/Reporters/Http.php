@@ -63,7 +63,7 @@ final class Http implements Reporter
      * @param ClientFactory $requesterFactory the factory for the client
      * that will do the HTTP call
      * @param LoggerInterface $logger the logger for output
-     * @param Serializer $serializer
+     * @param SpanSerializer $serializer
      */
     public function __construct(
         $options = self::EMPTY_ARG,
@@ -102,7 +102,7 @@ final class Http implements Reporter
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $parsedOptions);
         $this->clientFactory = $requesterFactory ?? CurlFactory::create();
         $this->logger = $logger ?? new NullLogger();
-        $this->serializer = new JsonV2Serializer();
+        $this->serializer = $serializer ?? new JsonV2Serializer();
     }
 
     /**
