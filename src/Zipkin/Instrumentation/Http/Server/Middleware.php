@@ -80,7 +80,7 @@ final class Middleware implements MiddlewareInterface
             $this->parser->response($response, $span->getContext(), $spanCustomizer);
             return $response;
         } catch (Throwable $e) {
-            $this->parser->error($e, $span->getContext(), $spanCustomizer);
+            $span->setError($e);
             throw $e;
         } finally {
             $span->finish();

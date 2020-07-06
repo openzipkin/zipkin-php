@@ -31,9 +31,4 @@ class DefaultParser implements Parser
             $span->tag(Tags\ERROR, (string) $response->getStatusCode());
         }
     }
-
-    public function error(Throwable $e, TraceContext $context, SpanCustomizer $span): void
-    {
-        $span->tag(Tags\ERROR, $e->getMessage());
-    }
 }
