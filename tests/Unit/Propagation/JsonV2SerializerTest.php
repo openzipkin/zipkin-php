@@ -53,9 +53,11 @@ final class JsonV2SerializerTest extends TestCase
         $serializer = new JsonV2Serializer();
         $serializedSpans = $serializer->serialize([$span]);
 
-        $expectedSerialization = '[{"id":"186f11b67460db4d","name":"test","traceId":"186f11b67460db4d","timestamp":1594044779509688,'
+        $expectedSerialization = '[{'
+            . '"id":"186f11b67460db4d","name":"test","traceId":"186f11b67460db4d","timestamp":1594044779509688,'
             . '"duration":1000,"localEndpoint":{"serviceName":"service1","ipv4":"192.168.0.11","port":3301},'
-            . '"tags":{"test_key":"test_value","error":"another error"}}]';
+            . '"tags":{"test_key":"test_value","error":"another error"}'
+            . '}]';
         $this->assertEquals($expectedSerialization, $serializedSpans);
     }
 }
