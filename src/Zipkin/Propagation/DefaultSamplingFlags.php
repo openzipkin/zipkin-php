@@ -18,13 +18,13 @@ final class DefaultSamplingFlags implements SamplingFlags
 
     private function __construct(?bool $isSampled, bool $isDebug)
     {
-        $this->isSampled = $isSampled;
+        $this->isSampled = $isDebug ?: $isSampled;
         $this->isDebug = $isDebug;
     }
 
     public static function create(?bool $isSampled, bool $isDebug = false): self
     {
-        return new self($isDebug ?: $isSampled, $isDebug);
+        return new self($isSampled, $isDebug);
     }
 
     public static function createAsEmpty(): self
