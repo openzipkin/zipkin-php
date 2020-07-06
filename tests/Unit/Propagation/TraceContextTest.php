@@ -255,7 +255,7 @@ final class TraceContextTest extends TestCase
         return [
             [true, true],
             [true, false],
-            // [false, false] is a non sense combination, hence ignored.
+            // [false, true] is a non sense combination, hence ignored.
             [false, false],
         ];
     }
