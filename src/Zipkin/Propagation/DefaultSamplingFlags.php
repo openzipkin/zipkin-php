@@ -74,6 +74,6 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public function withSampled(bool $isSampled): SamplingFlags
     {
-        return new self($isSampled, SamplingFlags::EMPTY_DEBUG);
+        return new self($isSampled, false);
     }
 }
