@@ -2,15 +2,15 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use PHPUnit\Framework\TestCase;
+use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\RemoteSetter;
+use Zipkin\Propagation\Map;
+use Zipkin\Propagation\DefaultSamplingFlags;
+use Zipkin\Propagation\B3;
+use Psr\Log\NullLogger;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Zipkin\Propagation\B3;
-use Zipkin\Propagation\DefaultSamplingFlags;
-use Zipkin\Propagation\Map;
-use Zipkin\Propagation\RemoteSetter;
-use Zipkin\Propagation\TraceContext;
+use PHPUnit\Framework\TestCase;
 
 final class B3Test extends TestCase
 {
@@ -42,7 +42,7 @@ final class B3Test extends TestCase
         ], $b3Propagator->getKeys());
     }
 
-    public function testKeysMultiOnly()
+    public function testKeysIncludeMultiOnly()
     {
         $b3Propagator = new B3(new NullLogger, [
             'PRODUCER' => ['multi'],
@@ -59,7 +59,7 @@ final class B3Test extends TestCase
         ], $b3Propagator->getKeys());
     }
 
-    public function testKeysSingleOnly()
+    public function testKeysIncludeSingleOnly()
     {
         $b3Propagator = new B3(new NullLogger, [
             'PRODUCER' => ['single'],
@@ -128,7 +128,26 @@ final class B3Test extends TestCase
         }
     }
 
-    public function kindRemoteSetter(): array
+    public function testGetInjectorInjectsDebugAndNotSampling()
+    {
+        $carrier = [];
+        $context = TraceContext::create(
+            self::TEST_TRACE_ID,
+            self::TEST_SPAN_ID,
+            self::TEST_PARENT_ID,
+            true,
+            true
+        );
+        $setterNGetter = new Map();
+        $b3Propagator = new B3(new NullLogger);
+        $injector = $b3Propagator->getInjector($setterNGetter);
+        $injector($context, $carrier);
+
+        $this->assertArrayHasKey('x-b3-flags', $carrier);
+        $this->assertArrayNotHasKey('x-b3-sampled', $carrier);
+    }
+
+    public function kindRemoteSetterProvider(): array
     {
         return [
             'client' => [
@@ -167,7 +186,7 @@ final class B3Test extends TestCase
     }
 
     /**
-     * @dataProvider kindRemoteSetter
+     * @dataProvider kindRemoteSetterProvider
      */
     public function testGetInjectorReturnsTheExpectedFunctionPerKind($remoteSetter, array $headerChecks)
     {
@@ -223,7 +242,7 @@ final class B3Test extends TestCase
         $samplingFlags = $extractor($carrier);
 
         $this->assertInstanceOf(DefaultSamplingFlags::class, $samplingFlags);
-        $this->assertNull($samplingFlags->isSampled());
+        $this->assertTrue($samplingFlags->isSampled());
         $this->assertTrue($samplingFlags->isDebug());
     }
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
-use Zipkin\Propagation\DefaultSamplingFlags;
+use function Zipkin\Propagation\Id\generateTraceIdWith128bits;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
-use function Zipkin\Propagation\Id\generateTraceIdWith128bits;
+use Zipkin\Propagation\DefaultSamplingFlags;
 
 final class TraceContext implements SamplingFlags
 {
@@ -58,7 +58,7 @@ final class TraceContext implements SamplingFlags
         $this->traceId = $traceId;
         $this->spanId = $spanId;
         $this->parentId = $parentId;
-        $this->isSampled = $isSampled;
+        $this->isSampled = $isDebug ?: $isSampled;
         $this->isDebug = $isDebug;
         $this->isShared = $isShared;
         $this->usesTraceId128bits = $usesTraceId128bits;
@@ -215,7 +215,7 @@ final class TraceContext implements SamplingFlags
             $this->spanId,
             $this->parentId,
             $isSampled,
-            $this->isDebug,
+            false,
             $this->usesTraceId128bits,
             $this->isShared
         );

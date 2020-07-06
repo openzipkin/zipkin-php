@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Zipkin\Propagation;
 
-use InvalidArgumentException;
+use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\RemoteSetter;
+use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
 use Zipkin\Kind;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
-use Zipkin\Propagation\RemoteSetter;
-use Zipkin\Propagation\TraceContext;
-use Zipkin\Propagation\Exceptions\InvalidTraceContextArgument;
+use InvalidArgumentException;
 
 /**
  * @see https://github.com/openzipkin/b3-propagation
@@ -251,12 +251,12 @@ final class B3 implements Propagation
             }
         }
 
-        if ($traceContext->isSampled() !== null) {
-            $setter->put($carrier, self::SAMPLED_NAME, $traceContext->isSampled() ? '1' : '0');
-        }
-
         if ($traceContext->isDebug()) {
             $setter->put($carrier, self::FLAGS_NAME, '1');
+        } elseif ($traceContext->isSampled() !== null) {
+            // according to https://github.com/openzipkin/b3-propagation#debug-flag if debug
+            // is set we don't pass the sampling bit.
+            $setter->put($carrier, self::SAMPLED_NAME, $traceContext->isSampled() ? '1' : '0');
         }
     }
 
@@ -364,20 +364,23 @@ final class B3 implements Propagation
 
     public static function parseMultiValue(Getter $getter, $carrier): SamplingFlags
     {
-        $isSampledRaw = $getter->get($carrier, self::SAMPLED_NAME);
-
-        $isSampled = SamplingFlags::EMPTY_SAMPLED;
-        if ($isSampledRaw !== null) {
-            if ($isSampledRaw === '1' || \strtolower($isSampledRaw) === 'true') {
-                $isSampled = true;
-            } elseif ($isSampledRaw === '0' || \strtolower($isSampledRaw) === 'false') {
-                $isSampled = false;
-            }
-        }
-
         $isDebugRaw = $getter->get($carrier, self::FLAGS_NAME);
         $isDebug = $isDebugRaw === '1';
 
+        $isSampled = SamplingFlags::EMPTY_SAMPLED;
+        if ($isDebug) {
+            $isSampled = true;
+        } else {
+            $isSampledRaw = $getter->get($carrier, self::SAMPLED_NAME);
+            if ($isSampledRaw !== null) {
+                if ($isSampledRaw === '1' || \strtolower($isSampledRaw) === 'true') {
+                    $isSampled = true;
+                } elseif ($isSampledRaw === '0' || \strtolower($isSampledRaw) === 'false') {
+                    $isSampled = false;
+                }
+            }
+        }
+        
         $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
         if ($traceId === null) {
             return DefaultSamplingFlags::create($isSampled, $isDebug);
