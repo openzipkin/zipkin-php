@@ -19,7 +19,7 @@ final class JsonV2SerializerTest extends TestCase
         $span->start($startTime);
         $span->setName('test');
         $span->setKind('CLIENT');
-        $remoteEndpoint = Endpoint::create('service2', '192.168.0.12', null, 3302);
+        $remoteEndpoint = Endpoint::create('service2', null, '2001:0db8:85a3:0000:0000:8a2e:0370:7334', 3302);
         $span->setRemoteEndpoint($remoteEndpoint);
         $span->tag('test_key', 'test_value');
         $span->annotate($startTime + 100, 'test_annotarion');
@@ -31,7 +31,8 @@ final class JsonV2SerializerTest extends TestCase
         $expectedSerialization = '[{'
             . '"id":"186f11b67460db4d","name":"test","traceId":"186f11b67460db4d","timestamp":1594044779509687,'
             . '"duration":1000,"localEndpoint":{"serviceName":"service1","ipv4":"192.168.0.11","port":3301},'
-            . '"debug":"CLIENT","remoteEndpoint":{"serviceName":"service2","ipv4":"192.168.0.12","port":3302},'
+            . '"debug":"CLIENT",'
+            .'"remoteEndpoint":{"serviceName":"service2","ipv6":"2001:0db8:85a3:0000:0000:8a2e:0370:7334","port":3302},'
             . '"annotations":[{"value":"test_annotarion","timestamp":1594044779509787}],'
             . '"tags":{"test_key":"test_value","error":"test_error"}'
             . '}]';

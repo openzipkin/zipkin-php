@@ -38,15 +38,15 @@ class JsonV2Serializer implements SpanSerializer
         if ($endpoint->getIpv4() !== null) {
             $endpointStr .= ',"ipv4":"' . $endpoint->getIpv4() . '"';
         }
-    
-        if ($endpoint->getPort() !== null) {
-            $endpointStr .= ',"port":' . $endpoint->getPort();
-        }
-    
+
         if ($endpoint->getIpv6() !== null) {
             $endpointStr .= ',"ipv6":"' . $endpoint->getIpv6() . '"';
         }
 
+        if ($endpoint->getPort() !== null) {
+            $endpointStr .= ',"port":' . $endpoint->getPort();
+        }
+    
         return $endpointStr . '}';
     }
 
