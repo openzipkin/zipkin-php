@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use Throwable;
-use Zipkin\Sampler;
-use RuntimeException;
-use Zipkin\SpanCustomizer;
-use BadMethodCallException;
+use function Zipkin\SpanName\generateSpanName;
 use Zipkin\SpanCustomizerShield;
+use Zipkin\SpanCustomizer;
+use Zipkin\Sampler;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\SamplingFlags;
-use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
-use function Zipkin\SpanName\generateSpanName;
+use Zipkin\Propagation\CurrentTraceContext;
+use Throwable;
+use RuntimeException;
+use BadMethodCallException;
 
 final class Tracer
 {

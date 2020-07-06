@@ -24,7 +24,7 @@ final class DefaultSamplingFlags implements SamplingFlags
 
     public static function create(?bool $isSampled, bool $isDebug = false): self
     {
-        return new self($isSampled, $isDebug);
+        return new self($isDebug ?: $isSampled, $isDebug);
     }
 
     public static function createAsEmpty(): self
@@ -44,7 +44,7 @@ final class DefaultSamplingFlags implements SamplingFlags
 
     public static function createAsDebug(): self
     {
-        return new self(null, true);
+        return new self(true, true);
     }
 
     public function isSampled(): ?bool
@@ -74,6 +74,6 @@ final class DefaultSamplingFlags implements SamplingFlags
      */
     public function withSampled(bool $isSampled): SamplingFlags
     {
-        return new self($isSampled, $this->isDebug);
+        return new self($isSampled, SamplingFlags::EMPTY_DEBUG);
     }
 }

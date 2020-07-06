@@ -31,7 +31,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testCreateAsRootSuccess($sampled, $debug)
     {
@@ -46,7 +46,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testCreateAsRootSuccessWithTraceId128bits($sampled, $debug)
     {
@@ -63,7 +63,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testCreateFromParentSuccess($sampled, $debug)
     {
@@ -86,7 +86,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testChangeSampledSuccess($sampled, $debug)
     {
@@ -107,11 +107,11 @@ final class TraceContextTest extends TestCase
         $this->assertEquals($traceContext->getTraceId(), $newTraceContext->getTraceId());
         $this->assertEquals($traceContext->getParentId(), $newTraceContext->getParentId());
         $this->assertEquals($newSampled, $newTraceContext->isSampled());
-        $this->assertEquals($traceContext->isDebug(), $newTraceContext->isDebug());
+        $this->assertFalse($newTraceContext->isDebug());
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testCreateFailsDueToInvalidId($sampled, $debug)
     {
@@ -128,7 +128,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testCreateFailsDueToInvalidSpanId($sampled, $debug)
     {
@@ -145,7 +145,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testCreateFailsDueToInvalidParentSpanId($sampled, $debug)
     {
@@ -162,7 +162,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testIsEqualSuccessOnEqualContexts($sampled, $debug)
     {
@@ -186,7 +186,7 @@ final class TraceContextTest extends TestCase
     }
 
     /**
-     * @dataProvider boolProvider
+     * @dataProvider sampledDebugProvider
      */
     public function testIsEqualSuccessOnDifferentContexts($sampled, $debug)
     {
@@ -250,12 +250,12 @@ final class TraceContextTest extends TestCase
         $this->assertTrue($sharedTraceContext->isEqual($traceContext));
     }
 
-    public function boolProvider()
+    public function sampledDebugProvider()
     {
         return [
             [true, true],
             [true, false],
-            [false, true],
+            // [false, false] is a non sense combination, hence ignored.
             [false, false],
         ];
     }
