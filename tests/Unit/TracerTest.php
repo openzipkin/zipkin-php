@@ -330,11 +330,11 @@ final class TracerTest extends TestCase
             $sumCallable,
             [1, 2],
             'sum',
-            function (SpanCustomizer $span, ?array $args = []) {
+            function (array $args, TraceContext $context, SpanCustomizer $span) {
                 $span->tag('arg0', (string) $args[0]);
                 $span->tag('arg1', (string) $args[1]);
             },
-            function (SpanCustomizer $span, $output = null, ?Throwable $e = null) {
+            function ($output, TraceContext $context, SpanCustomizer $span) {
                 $span->tag('result', (string) $output);
             }
         );
@@ -343,11 +343,12 @@ final class TracerTest extends TestCase
         $spans = $flusher();
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
-        $this->assertEquals('sum', $span['name']);
-        $this->assertEquals('1', $span['tags']['arg0']);
-        $this->assertEquals('2', $span['tags']['arg1']);
-        $this->assertEquals('3', $span['tags']['result']);
+        $span = $spans[0];
+        $this->assertEquals('sum', $span->getName());
+        $tags = $span->getTags();
+        $this->assertEquals('1', $tags['arg0']);
+        $this->assertEquals('2', $tags['arg1']);
+        $this->assertEquals('3', $tags['result']);
     }
 
     /**
@@ -364,8 +365,8 @@ final class TracerTest extends TestCase
 
         $spans = $flusher();
 
-        $span = $spans[0]->toArray();
-        $this->assertEquals($expectedName, $span['name']);
+        $span = $spans[0];
+        $this->assertEquals($expectedName, $span->getName());
     }
 
     public function sumCallables(): array
@@ -419,8 +420,8 @@ final class TracerTest extends TestCase
         $spans = $flusher();
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
-        $this->assertEquals('too small values', $span['tags']['error']);
+        $span = $spans[0];
+        $this->assertEquals('too small values', $span->getError()->getMessage());
     }
 
     public function testJoinSpans()
@@ -435,8 +436,8 @@ final class TracerTest extends TestCase
 
         $spans = $flusher();
 
-        $span = $spans[0]->toArray();
-        $this->assertTrue($span['shared']);
+        $span = $spans[0];
+        $this->assertTrue($span->isShared());
     }
 
     private static function createDefaultTestTracer(): array

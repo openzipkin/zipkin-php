@@ -2,10 +2,11 @@
 
 namespace ZipkinTests\Unit;
 
-use LogicException;
-use Zipkin\Endpoint;
 use Zipkin\Propagation\TraceContext;
+use Zipkin\Endpoint;
+use Throwable;
 use PHPUnit\Framework\TestCase;
+use LogicException;
 
 trait SpanCustomizerShieldSpan
 {
@@ -41,6 +42,11 @@ trait SpanCustomizerShieldSpan
     }
 
     public function setKind(string $kind): void
+    {
+        throw new LogicException('should not be called');
+    }
+
+    public function setError(Throwable $e): void
     {
         throw new LogicException('should not be called');
     }

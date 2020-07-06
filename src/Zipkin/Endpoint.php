@@ -141,7 +141,7 @@ class Endpoint
     }
 
     /**
-     * @return array
+     * @deprecated
      */
     public function toArray(): array
     {

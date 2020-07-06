@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
+use Throwable;
 
 interface Span
 {
@@ -64,6 +65,11 @@ interface Span
      * @return void
      */
     public function tag(string $key, string $value): void;
+
+    /**
+     * Adds tags depending on the configured {@link Tracing::errorParser() error parser}
+     */
+    public function setError(Throwable $e): void;
 
     /**
      * Associates an event that explains latency with the current system time.

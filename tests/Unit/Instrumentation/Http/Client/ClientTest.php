@@ -71,14 +71,14 @@ final class ClientTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('GET', $span->getName());
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
             'http.status_code' => '200',
-        ], $span['tags']);
+        ], $span->getTags());
     }
 
     public function testClientSendRequestSuccessWithNon2xx()
@@ -114,16 +114,16 @@ final class ClientTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
-        $this->assertEquals('CLIENT', $span['kind']);
+        $this->assertEquals('GET', $span->getName());
+        $this->assertEquals('CLIENT', $span->getKind());
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
             'http.status_code' => '404',
             'error' => '404',
-        ], $span['tags']);
+        ], $span->getTags());
     }
 
     public function testClientSendRequestFails()
@@ -159,13 +159,13 @@ final class ClientTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('GET', $span->getName());
         $this->assertEquals([
             'http.method' => 'GET',
-            'http.path' => '/',
-            'error' => 'transport error',
-        ], $span['tags']);
+            'http.path' => '/'
+        ], $span->getTags());
+        $this->assertEquals('transport error', $span->getError()->getMessage());
     }
 }
