@@ -6,7 +6,6 @@ namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
-use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
 use Throwable;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -32,33 +31,24 @@ final class Middleware implements MiddlewareInterface
     private $parser;
 
     /**
-     * @var callable|null
+     * @var callable
      */
-    private $requestSampler;
+    private $nextSpanHandler;
 
     public function __construct(ServerTracing $tracing)
     {
         $this->tracer = $tracing->getTracing()->getTracer();
         $this->extractor = $tracing->getTracing()->getPropagation()->getExtractor(new RequestHeaders());
         $this->parser = $tracing->getParser();
-        $this->requestSampler = $tracing->getRequestSampler();
+        $this->nextSpanHandler = $tracing->getNextSpanHandler();
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $extractedContext = ($this->extractor)($request);
 
-        if ($extractedContext instanceof TraceContext) {
-            $span = $this->tracer->joinSpan($extractedContext);
-        } elseif ($this->requestSampler === null) {
-            $span = $this->tracer->nextSpan($extractedContext);
-        } else {
-            $span = $this->tracer->nextSpanWithSampler(
-                $this->requestSampler,
-                [$request],
-                $extractedContext
-            );
-        }
+        $span = ($this->nextSpanHandler)($extractedContext, $request);
+
         $scopeCloser = $this->tracer->openScope($span);
 
         if ($span->isNoop()) {
