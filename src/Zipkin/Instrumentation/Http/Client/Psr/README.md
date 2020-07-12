@@ -24,7 +24,7 @@ $tracing = TracingBuilder::create()
             ->havingLocalServiceName('my_service')
             ->build();
 
-$httpClientTracing = new ClientTracing($tracing);
+$httpClientTracing = new ClientTracing($tracing, new DefaultParser);
 ...
 
 $httpClient = new ZipkinClient(new Client, $httpClientTracing);

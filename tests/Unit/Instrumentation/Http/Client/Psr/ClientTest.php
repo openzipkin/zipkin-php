@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ZipkinTests\Unit\Instrumentation\Http\Client;
+namespace ZipkinTests\Unit\Instrumentation\Http\Client\Psr;
 
 use Zipkin\TracingBuilder;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
+use Zipkin\Instrumentation\Http\Client\Psr\DefaultParser;
+use Zipkin\Instrumentation\Http\Client\Psr\Client;
 use Zipkin\Instrumentation\Http\Client\ClientTracing;
-use Zipkin\Instrumentation\Http\Client\Client;
 use RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -30,7 +31,7 @@ final class ClientTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new ClientTracing($tracing),
+            new ClientTracing($tracing, new DefaultParser),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();

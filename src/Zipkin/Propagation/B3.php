@@ -21,23 +21,23 @@ final class B3 implements Propagation
      * 128 or 64-bit trace ID lower-hex encoded into 32 or 16 characters (required)
      */
     private const TRACE_ID_NAME = 'X-B3-TraceId';
-    
+
     /**
      * 64-bit span ID lower-hex encoded into 16 characters (required)
      */
     private const SPAN_ID_NAME = 'X-B3-SpanId';
-    
+
     /**
      * 64-bit parent span ID lower-hex encoded into 16 characters (absent on root span)
      */
     private const PARENT_SPAN_ID_NAME = 'X-B3-ParentSpanId';
-    
+
     /**
      * '1' means report this span to the tracing system, '0' means do not. (absent means defer the
      * decision to the receiver of this header).
      */
     private const SAMPLED_NAME = 'X-B3-Sampled';
-    
+
     /**
      * '1' implies sampled and is a request to override collection-tier sampling policy.
      */
@@ -78,7 +78,7 @@ final class B3 implements Propagation
      * Inject the single value context
      */
     public const INJECT_SINGLE = 'single';
-    
+
     /**
      * Inject the single value context excluding the parent (e.g. for messaging)
      */
@@ -151,7 +151,7 @@ final class B3 implements Propagation
         array $kindInjectors = []
     ) {
         $this->logger = $logger ?: new NullLogger();
-        
+
         foreach ($kindInjectors as $kind => $injectorsNames) {
             if ($kind !== Kind\CLIENT && $kind !== Kind\PRODUCER && $kind !== self::DEFAULT_INJECTOR) {
                 throw new InvalidArgumentException(sprintf(
@@ -164,10 +164,11 @@ final class B3 implements Propagation
             }
 
             if (array_key_exists(self::INJECT_SINGLE, $injectorsNames) &&
-                array_key_exists(self::INJECT_SINGLE_NO_PARENT, $injectorsNames)) {
+                array_key_exists(self::INJECT_SINGLE_NO_PARENT, $injectorsNames)
+            ) {
                 throw new InvalidArgumentException(sprintf(
                     'Both \"B3::INJECT_SINGLE\" and \"B3::INJECT_SINGLE_NO_PARENT\" ' .
-                    'can\'t be included for the same kind \"%d\".',
+                        'can\'t be included for the same kind \"%d\".',
                     $kind
                 ));
             }
@@ -206,12 +207,7 @@ final class B3 implements Propagation
     {
         $injectorKind = ($setter instanceof RemoteSetter) ? $setter->getKind() : self::DEFAULT_INJECTOR;
 
-        /**
-         * @param TraceContext $traceContext
-         * @param &$carrier
-         * @return void
-         */
-        return function (SamplingFlags $traceContext, &$carrier) use ($setter, $injectorKind) {
+        return function (SamplingFlags $traceContext, &$carrier) use ($setter, $injectorKind): void {
             if ($traceContext->isEmpty()) {
                 return;
             }
@@ -271,7 +267,7 @@ final class B3 implements Propagation
 
         if ($traceContext instanceof TraceContext) {
             $value = $traceContext->getTraceId()
-            . '-' . $traceContext->getSpanId();
+                . '-' . $traceContext->getSpanId();
 
             if ($samplingBit !== null) {
                 $value .= '-' . $samplingBit;
@@ -380,7 +376,7 @@ final class B3 implements Propagation
                 }
             }
         }
-        
+
         $traceId = $getter->get($carrier, self::TRACE_ID_NAME);
         if ($traceId === null) {
             return DefaultSamplingFlags::create($isSampled, $isDebug);

@@ -29,18 +29,14 @@ class ServerTracing
     /**
      * @var callable
      */
-    private $nextSpanHandler;
+    private $nextSpanResolver;
 
     /**
      * @param Tracing $tracing
      * @param Parser $parser HTTP server parser to obtain meaningful information from
      * request and response and tag the span accordingly.
-     * @param callable $requestSampler function that decides to sample or not an unsampled
-     * request. The signature is:
-     *
-     * <pre>
-     * function (RequestInterface $request): ?bool {}
-     * </pre>
+     * @param callable(mixed):?bool $requestSampler function that decides to sample or not an unsampled
+     * request.
      */
     public function __construct(
         Tracing $tracing,
@@ -48,8 +44,8 @@ class ServerTracing
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser ?? new DefaultParser;
-        $this->nextSpanHandler = self::buildNextSpanHandler($tracing->getTracer(), $requestSampler);
+        $this->parser = $parser ?? new NoopParser;
+        $this->nextSpanResolver = self::buildNextSpanResolver($tracing->getTracer(), $requestSampler);
     }
 
     public function getTracing(): Tracing
@@ -57,17 +53,24 @@ class ServerTracing
         return $this->tracing;
     }
 
+    /**
+     * @return Parser the server parser for enriching span information based on the request
+     */
     public function getParser(): Parser
     {
         return $this->parser;
     }
 
-    public function getNextSpanHandler(): callable
+    /**
+     * @return callable(TraceContext, $request): Span the next span handler which creates an appropriate span based
+     * on the extracted context.
+     */
+    public function getNextSpanResolver(): callable
     {
-        return $this->nextSpanHandler;
+        return $this->nextSpanResolver;
     }
 
-    private static function buildNextSpanHandler(Tracer $tracer, ?callable $requestSampler): callable
+    private static function buildNextSpanResolver(Tracer $tracer, ?callable $requestSampler): callable
     {
         return static function (SamplingFlags $extractedContext, $request) use ($tracer, $requestSampler): Span {
             if ($extractedContext instanceof TraceContext) {

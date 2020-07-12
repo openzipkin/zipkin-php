@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ZipkinTests\Unit\Instrumentation\Http\Server;
+namespace ZipkinTests\Unit\Instrumentation\Http\Server\Psr;
 
 use Zipkin\TracingBuilder;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
 use Zipkin\Instrumentation\Http\Server\ServerTracing;
-use Zipkin\Instrumentation\Http\Server\Middleware;
+use Zipkin\Instrumentation\Http\Server\Psr\Middleware;
+use Zipkin\Instrumentation\Http\Server\Psr\DefaultParser;
 use RingCentral\Psr7\Response as Psr7Response;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,7 +31,7 @@ final class ServerTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new ServerTracing($tracing),
+            new ServerTracing($tracing, new DefaultParser()),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();

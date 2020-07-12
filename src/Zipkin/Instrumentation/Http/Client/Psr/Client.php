@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Client;
+namespace Zipkin\Instrumentation\Http\Client\Psr;
 
-use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
+use Zipkin\Span;
+use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Client\Parser;
+use Zipkin\Instrumentation\Http\Client\ClientTracing;
 use Throwable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -20,14 +23,9 @@ final class Client implements ClientInterface
     private $delegate;
 
     /**
-     * @var callable
+     * @var callable(TraceContext,mixed):void
      */
     private $injector;
-
-    /**
-     * @var Tracer
-     */
-    private $tracer;
 
     /**
      * @var Parser
@@ -35,9 +33,9 @@ final class Client implements ClientInterface
     private $parser;
 
     /**
-     * @var callable|null
+     * @var callable(mixed):Span
      */
-    private $requestSampler;
+    private $nextSpanResolver;
 
     public function __construct(
         ClientInterface $delegate,
@@ -45,22 +43,16 @@ final class Client implements ClientInterface
     ) {
         $this->delegate = $delegate;
         $this->injector = $tracing->getTracing()->getPropagation()->getInjector(new RequestHeaders());
-        $this->tracer = $tracing->getTracing()->getTracer();
         $this->parser = $tracing->getParser();
-        $this->requestSampler = $tracing->getRequestSampler();
+        $this->nextSpanResolver = $tracing->getNextSpanResolver();
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        if ($this->requestSampler === null) {
-            $span = $this->tracer->nextSpan();
-        } else {
-            $span = $this->tracer->nextSpanWithSampler(
-                $this->requestSampler,
-                [$request]
-            );
-        }
-
+        /**
+         * @var Span $span
+         */
+        $span = ($this->nextSpanResolver)($request);
         ($this->injector)($span->getContext(), $request);
 
         if ($span->isNoop()) {

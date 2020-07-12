@@ -6,14 +6,15 @@ namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\SpanCustomizer;
 use Zipkin\Propagation\TraceContext;
-use Throwable;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\RequestInterface;
 
 /**
  * Parser includes the methods to obtain meaningful span information
  * out of HTTP request/response elements.
+ *
+ * $request and $response in methods are not typed on purpose as they
+ * should be flexible to accept different types defined by the implementations
+ * of this interface. Since PHP does not support generics this is the only way
+ * to go.
  */
 interface Parser
 {
@@ -22,7 +23,7 @@ interface Parser
      * usually the HTTP method is enough (e.g GET or POST) but ideally
      * the http.route is desired (e.g. /user/{user_id}).
      */
-    public function spanName(ServerRequestInterface $request): string;
+    public function spanName($request): string;
 
     /**
      * request parses the incoming data related to a request in order to add
@@ -31,7 +32,7 @@ interface Parser
      * Basic data being tagged is HTTP method, HTTP path but other information
      * such as query parameters can be added to enrich the span information.
      */
-    public function request(ServerRequestInterface $request, TraceContext $context, SpanCustomizer $span): void;
+    public function request($request, TraceContext $context, SpanCustomizer $span): void;
 
 
     /**
@@ -42,5 +43,5 @@ interface Parser
      * as any response header or more granular information based on the response
      * payload can be added.
      */
-    public function response(ResponseInterface $response, TraceContext $context, SpanCustomizer $span): void;
+    public function response($response, TraceContext $context, SpanCustomizer $span): void;
 }

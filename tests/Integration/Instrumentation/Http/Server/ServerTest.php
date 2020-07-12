@@ -12,9 +12,9 @@ use Zipkin\Reporters\InMemory;
 use Zipkin\Propagation\TraceContext;
 
 use Zipkin\Instrumentation\Http\Server\ServerTracing;
+use Zipkin\Instrumentation\Http\Server\Psr\Middleware;
+use Zipkin\Instrumentation\Http\Server\Psr\DefaultParser;
 use Zipkin\Instrumentation\Http\Server\Parser;
-use Zipkin\Instrumentation\Http\Server\Middleware;
-use Zipkin\Instrumentation\Http\Server\DefaultParser;
 use RingCentral\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use PHPUnit\Framework\TestCase;
@@ -47,8 +47,9 @@ final class ServerTest extends TestCase
     public function testMiddleware()
     {
         $parser = new class() extends DefaultParser {
-            public function request(ServerRequestInterface $request, TraceContext $context, SpanCustomizer $span): void
+            public function request($request, TraceContext $context, SpanCustomizer $span): void
             {
+                assert($request instanceof ServerRequestInterface);
                 // This parser retrieves the user_id from the request and add
                 // is a tag.
                 $userId = $request->getAttribute('user_id');

@@ -29,7 +29,16 @@ parameters:
 			# In general types are desired but carrier is an special case
 			message: '#has parameter \$carrier with no typehint specified#'
 			path: src/Zipkin/*
-		-  
-			# Somehow this started failing
-			message: '#Constant .* already defined#'
-			path: src/Zipkin
+		-
+			message: '#Method .* with no typehint specified.#'                      
+			path: src/Zipkin/Instrumentation/Http/Server
+		-
+			message: '#Method .* with no typehint specified.#'                      
+			path: src/Zipkin/Instrumentation/Http/Client
+		#-  
+		#	# Somehow this started failing
+		#	message: '#Constant .* already defined#'
+		#	path: src/Zipkin
+		-
+			message: '#should return static#'
+			path: src/Zipkin/Instrumentation/Http/Client/Psr/Request.php

@@ -40,7 +40,7 @@ interface Propagation
      * being passed by reference.</b>
      *
      * @param Setter $setter invoked for each propagation key to add.
-     * @return callable
+     * @return callable(TraceContext,mixed):void
      */
     public function getInjector(Setter $setter): callable;
 
