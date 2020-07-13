@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Client;
+namespace Zipkin\Instrumentation\Http\Client\Psr18;
 
 use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Client\Parser;
+use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
 use Throwable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -42,7 +44,7 @@ final class Client implements ClientInterface
 
     public function __construct(
         ClientInterface $delegate,
-        ClientTracing $tracing
+        HttpClientTracing $tracing
     ) {
         $this->delegate = $delegate;
         $this->injector = $tracing->getTracing()->getPropagation()->getInjector(new RequestHeaders());

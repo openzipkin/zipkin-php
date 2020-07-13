@@ -11,7 +11,7 @@ use Psr\Http\Message\RequestInterface;
  * ClientTracing includes all the elements needed to instrument a
  * HTTP client.
  */
-class ClientTracing
+class HttpClientTracing
 {
     /**
      * @var Tracing
@@ -25,11 +25,7 @@ class ClientTracing
 
     /**
      * function that decides to sample or not an unsampled
-     * request. The signature is:
-     *
-     * <pre>
-     * function (RequestInterface $request): ?bool {}
-     * </pre>
+     * request.
      *
      * @var callable(RequestInterface):?bool|null
      */
@@ -37,11 +33,11 @@ class ClientTracing
 
     public function __construct(
         Tracing $tracing,
-        Parser $parser = null,
+        Parser $parser,
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser ?? new DefaultParser;
+        $this->parser = $parser;
         $this->requestSampler = $requestSampler;
     }
 

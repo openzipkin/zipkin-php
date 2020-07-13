@@ -17,14 +17,15 @@ In this example we use Guzzle 7 but any HTTP client supporting PSR18 clients wil
 ```php
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
-use Zipkin\Instrumentation\Http\Client\Client as ZipkinClient;
-use Zipkin\Instrumentation\Http\Client\ClientTracing;
+use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
+use Zipkin\Instrumentation\Http\Client\Psr\Client as ZipkinClient;
+use Zipkin\Instrumentation\Http\Client\Psr\DefaultParser;
 
 $tracing = TracingBuilder::create()
             ->havingLocalServiceName('my_service')
             ->build();
 
-$httpClientTracing = new ClientTracing($tracing);
+$httpClientTracing = new HttpClientTracing($tracing, new DefaultParser);
 ...
 
 $httpClient = new ZipkinClient(new Client, $httpClientTracing);

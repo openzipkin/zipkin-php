@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Server;
+namespace Zipkin\Instrumentation\Http\Server\Psr15;
 
 use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Server\Parser;
+use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
 use Throwable;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -36,7 +38,7 @@ final class Middleware implements MiddlewareInterface
      */
     private $requestSampler;
 
-    public function __construct(ServerTracing $tracing)
+    public function __construct(HttpServerTracing $tracing)
     {
         $this->tracer = $tracing->getTracing()->getTracer();
         $this->extractor = $tracing->getTracing()->getPropagation()->getExtractor(new RequestHeaders());

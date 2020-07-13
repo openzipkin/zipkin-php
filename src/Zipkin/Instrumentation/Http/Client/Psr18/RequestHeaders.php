@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Client;
+namespace Zipkin\Instrumentation\Http\Client\Psr18;
 
 use Zipkin\Propagation\RequestHeaders as BaseRequestHeaders;
 use Zipkin\Propagation\RemoteSetter;

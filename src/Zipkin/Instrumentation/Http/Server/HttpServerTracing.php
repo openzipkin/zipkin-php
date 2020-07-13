@@ -10,7 +10,7 @@ use Zipkin\Tracing;
  * Tracing includes all the elements needed to trace a HTTP server
  * middleware or request handler.
  */
-class ServerTracing
+class HttpServerTracing
 {
     /**
      * @var Tracing
@@ -24,23 +24,19 @@ class ServerTracing
 
     /**
      * function that decides to sample or not an unsampled
-     * request. The signature is:
+     * request.
      *
-     * <pre>
-     * function (RequestInterface $request): ?bool {}
-     * </pre>
-     *
-     * @var callable|null
+     * @var (callable(mixed):?bool)|null
      */
     private $requestSampler;
 
     public function __construct(
         Tracing $tracing,
-        Parser $parser = null,
+        Parser $parser,
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser ?? new DefaultParser;
+        $this->parser = $parser;
         $this->requestSampler = $requestSampler;
     }
 
@@ -50,11 +46,7 @@ class ServerTracing
     }
 
     /**
-     * @return callable|null with the signature:
-     *
-     * <pre>
-     * function (RequestInterface $request): ?bool
-     * </pre>
+     * @return (callable(mixed):?bool)|null
      */
     public function getRequestSampler(): ?callable
     {
