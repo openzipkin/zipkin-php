@@ -6,7 +6,10 @@ namespace Zipkin\Instrumentation\Http\Server\Psr15;
 
 use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
+use Zipkin\Span;
 use Zipkin\Propagation\TraceContext;
+use Zipkin\Propagation\SamplingFlags;
+use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Kind;
 use Zipkin\Instrumentation\Http\Server\Parser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
@@ -50,17 +53,7 @@ final class Middleware implements MiddlewareInterface
     {
         $extractedContext = ($this->extractor)($request);
 
-        if ($extractedContext instanceof TraceContext) {
-            $span = $this->tracer->joinSpan($extractedContext);
-        } elseif ($this->requestSampler === null) {
-            $span = $this->tracer->nextSpan($extractedContext);
-        } else {
-            $span = $this->tracer->nextSpanWithSampler(
-                $this->requestSampler,
-                [$request],
-                $extractedContext
-            );
-        }
+        $span = $this->nextSpan($extractedContext, $request);
         $scopeCloser = $this->tracer->openScope($span);
 
         if ($span->isNoop()) {
@@ -88,5 +81,23 @@ final class Middleware implements MiddlewareInterface
             $span->finish();
             $scopeCloser();
         }
+    }
+
+    private function nextSpan(?SamplingFlags $extractedContext, ServerRequestInterface $request): Span
+    {
+        if ($extractedContext instanceof TraceContext) {
+            return $this->tracer->joinSpan($extractedContext);
+        }
+
+        $extractedContext = $extractedContext ?? DefaultSamplingFlags::createAsEmpty();
+        if ($this->requestSampler === null) {
+            return $this->tracer->nextSpan($extractedContext);
+        }
+
+        return $this->tracer->nextSpanWithSampler(
+            $this->requestSampler,
+            [$request],
+            $extractedContext
+        );
     }
 }
