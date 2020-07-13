@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Zipkin\Reporters\Http;
 
-use BadFunctionCallException;
 use RuntimeException;
+use BadFunctionCallException;
 
 final class CurlFactory implements ClientFactory
 {
@@ -36,7 +36,7 @@ final class CurlFactory implements ClientFactory
          * @throws RuntimeException
          * @return void
          */
-        return static function ($payload) use ($options) {
+        return static function (string $payload) use ($options): void {
             $handle = \curl_init($options['endpoint_url']);
             if ($handle === false) {
                 throw new RuntimeException(

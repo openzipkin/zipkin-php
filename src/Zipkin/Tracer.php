@@ -167,7 +167,7 @@ final class Tracer
      *
      * @param Span $span to place into scope or null to clear the scope
      *
-     * @return callable The scope closer
+     * @return callable():void The scope closer
      */
     public function openScope(Span $span = null): callable
     {
@@ -323,9 +323,9 @@ final class Tracer
      * @param callable $fn
      * @param array $args
      * @param string|null $name the name of the span
-     * @param callable|null $argsParser with signature
+     * @param callable(array,TraceContext,SpanCustomizer):void|null $argsParser with signature
      * function(array $args, TraceContext $context, SpanCustomizer $span): void
-     * @param callable|null $resultParser with signature
+     * @param callable(mixed,TraceContext,SpanCustomizer):void|null $resultParser with signature
      * function ($output, TraceContext $context, SpanCustomizer $span): void
      * @return mixed
      */
@@ -344,15 +344,15 @@ final class Tracer
                 $span->finish();
             }
         }
-        
+
         $spanCustomizer = null;
         if ($resultParser !== null || $argsParser !== null) {
             $spanCustomizer = new SpanCustomizerShield($span);
         }
-        
+
         $span->setName($name ?? generateSpanName($fn));
         $span->start();
-        
+
         try {
             $result = \call_user_func_array($fn, $args);
             if ($resultParser !== null) {

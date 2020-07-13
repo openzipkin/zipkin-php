@@ -33,3 +33,7 @@ parameters:
 			# Somehow this started failing
 			message: '#Constant .* already defined#'
 			path: src/Zipkin
+		-
+			# SpanCustomizer is definitively not null
+			message: '#Parameter \#3 \$ of callable callable\(.*, Zipkin\\Propagation\\TraceContext, Zipkin\\SpanCustomizer\): void expects Zipkin\\SpanCustomizer, Zipkin\\SpanCustomizerShield\|null given.#'
+			path: src/Zipkin/Tracer

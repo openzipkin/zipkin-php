@@ -43,7 +43,7 @@ final class CurrentTraceContext
      * error to drop or never close the result.
      *
      * @param TraceContext|null $currentContext
-     * @return callable The scope closed
+     * @return callable():void The scope closed
      */
     public function createScopeAndRetrieveItsCloser(TraceContext $currentContext = null): callable
     {
@@ -51,7 +51,7 @@ final class CurrentTraceContext
         $self = $this;
         $this->context = $currentContext;
 
-        return function () use ($previous, $self) {
+        return static function () use ($previous, $self): void {
             $self->context = $previous;
         };
     }
