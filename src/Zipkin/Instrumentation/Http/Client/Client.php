@@ -6,6 +6,7 @@ namespace Zipkin\Instrumentation\Http\Client;
 
 use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
+use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
 use Throwable;
 use Psr\Http\Message\ResponseInterface;
@@ -20,7 +21,7 @@ final class Client implements ClientInterface
     private $delegate;
 
     /**
-     * @var callable
+     * @var callable(TraceContext,mixed):void
      */
     private $injector;
 
@@ -35,7 +36,7 @@ final class Client implements ClientInterface
     private $parser;
 
     /**
-     * @var callable|null
+     * @var (callable(RequestInterface):?bool)|null
      */
     private $requestSampler;
 

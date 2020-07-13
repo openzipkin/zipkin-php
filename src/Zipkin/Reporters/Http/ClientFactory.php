@@ -8,7 +8,7 @@ interface ClientFactory
 {
     /**
      * @param array $options
-     * @return callable
+     * @return callable(string):void
      */
     public function build(array $options): callable;
 }

@@ -40,7 +40,7 @@ interface Propagation
      * being passed by reference.</b>
      *
      * @param Setter $setter invoked for each propagation key to add.
-     * @return callable
+     * @return callable(TraceContext,mixed):void
      */
     public function getInjector(Setter $setter): callable;
 
@@ -51,7 +51,7 @@ interface Propagation
      * - return TraceContext if the context contains a traceId and a spanId.
      *
      * @param Getter $getter invoked for each propagation key to get.
-     * @return callable
+     * @return callable(mixed):SamplingFlags
      */
     public function getExtractor(Getter $getter): callable;
 

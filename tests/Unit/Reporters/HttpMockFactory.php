@@ -2,8 +2,8 @@
 
 namespace ZipkinTests\Unit\Reporters;
 
-use RuntimeException;
 use Zipkin\Reporters\Http\ClientFactory;
+use RuntimeException;
 
 final class HttpMockFactory implements ClientFactory
 {
@@ -41,13 +41,13 @@ final class HttpMockFactory implements ClientFactory
 
     /**
      * @param array $options
-     * @return callable
+     * @return callable(string):void
      */
     public function build(array $options): callable
     {
         $self = $this;
 
-        return function (string $payload) use (&$self) {
+        return function (string $payload) use (&$self): void {
             if ($self->shouldFail) {
                 throw new RuntimeException(self::ERROR_MESSAGE);
             }
