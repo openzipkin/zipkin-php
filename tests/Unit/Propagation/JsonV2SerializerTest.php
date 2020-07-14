@@ -31,9 +31,9 @@ final class JsonV2SerializerTest extends TestCase
         $expectedSerialization = '[{'
             . '"id":"186f11b67460db4d","name":"test","traceId":"186f11b67460db4d","timestamp":1594044779509687,'
             . '"duration":1000,"localEndpoint":{"serviceName":"service1","ipv4":"192.168.0.11","port":3301},'
-            . '"debug":"CLIENT",'
-            .'"remoteEndpoint":{"serviceName":"service2","ipv6":"2001:0db8:85a3:0000:0000:8a2e:0370:7334","port":3302},'
-            . '"annotations":[{"value":"test_annotarion","timestamp":1594044779509787}],'
+            . '"kind":"CLIENT",'
+            . '"remoteEndpoint":{"serviceName":"service2","ipv6":"2001:0db8:85a3:0000:0000:8a2e:0370:7334","port":3302}'
+            . ',"annotations":[{"value":"test_annotarion","timestamp":1594044779509787}],'
             . '"tags":{"test_key":"test_value","error":"test_error"}'
             . '}]';
         $this->assertEquals($expectedSerialization, $serializedSpans);

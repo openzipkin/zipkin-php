@@ -46,7 +46,7 @@ class JsonV2Serializer implements SpanSerializer
         if ($endpoint->getPort() !== null) {
             $endpointStr .= ',"port":' . $endpoint->getPort();
         }
-    
+
         return $endpointStr . '}';
     }
 
@@ -54,14 +54,14 @@ class JsonV2Serializer implements SpanSerializer
     {
         $spanStr =
             '{"id":"' . $span->getSpanId() . '"'
-            . ',"name":"'. $span->getName() . '"'
-            . ',"traceId":"'. $span->getTraceId() . '"'
-            . ',"timestamp":'. $span->getTimestamp();
+            . ',"name":"' . $span->getName() . '"'
+            . ',"traceId":"' . $span->getTraceId() . '"'
+            . ',"timestamp":' . $span->getTimestamp();
 
         if ($span->getDuration() !== null) {
             $spanStr .= ',"duration":' . $span->getDuration();
         }
-            
+
         if (null !== ($localEndpoint = $span->getLocalEndpoint())) {
             $spanStr .= ',"localEndpoint":' . self::serializeEndpoint($localEndpoint);
         }
@@ -69,23 +69,23 @@ class JsonV2Serializer implements SpanSerializer
         if ($span->getParentId() !== null) {
             $spanStr .= ',"parentId":"' . $span->getParentId() . '"';
         }
-    
+
         if ($span->isDebug()) {
             $spanStr .= ',"debug":true';
         }
-    
+
         if ($span->isShared()) {
             $spanStr .= ',"shared":true';
         }
-    
+
         if ($span->getKind() !== null) {
-            $spanStr .= ',"debug":"'. $span->getKind(). '"';
+            $spanStr .= ',"kind":"' . $span->getKind() . '"';
         }
-    
+
         if (null !== ($remoteEndpoint = $span->getRemoteEndpoint())) {
             $spanStr .= ',"remoteEndpoint":' . self::serializeEndpoint($remoteEndpoint);
         }
-    
+
         if (!empty($span->getAnnotations())) {
             $spanStr .= ',"annotations":[';
             $firstIteration = true;
@@ -99,7 +99,7 @@ class JsonV2Serializer implements SpanSerializer
             }
             $spanStr .= ']';
         }
-    
+
         if ($span->getError() === null) {
             $tags = $span->getTags();
         } else {
@@ -115,11 +115,11 @@ class JsonV2Serializer implements SpanSerializer
                 } else {
                     $spanStr .= ',';
                 }
-                $spanStr .= '"'. $key .'":"' . $value . '"';
+                $spanStr .= '"' . $key . '":"' . $value . '"';
             }
             $spanStr .= '}';
         }
-    
+
         return $spanStr . '}';
     }
 }
