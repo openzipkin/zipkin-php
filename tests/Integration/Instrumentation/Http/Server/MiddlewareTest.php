@@ -23,7 +23,7 @@ use Middlewares\Utils\Dispatcher;
 use Middlewares;
 use FastRoute\RouteCollector;
 
-final class ServerTest extends TestCase
+final class MiddlewareTest extends TestCase
 {
     private static function createTracing(Parser $parser): array
     {

@@ -7,7 +7,7 @@ namespace Zipkin\Instrumentation\Http\Server;
 use Zipkin\Tracing;
 
 /**
- * Tracing includes all the elements needed to trace a HTTP server
+ * HttpServerTracing includes all the elements needed to trace a HTTP server
  * middleware or request handler.
  */
 class HttpServerTracing
