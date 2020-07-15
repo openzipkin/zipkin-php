@@ -8,6 +8,7 @@ use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Client\Psr18\Propagation\RequestHeaders;
 use Zipkin\Instrumentation\Http\Client\Parser;
 use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
 use Throwable;

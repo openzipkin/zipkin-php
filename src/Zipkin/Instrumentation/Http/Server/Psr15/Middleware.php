@@ -11,6 +11,7 @@ use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Server\Psr15\Propagation\RequestHeaders;
 use Zipkin\Instrumentation\Http\Server\Parser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
 use Throwable;

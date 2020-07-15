@@ -18,12 +18,18 @@ use Psr\Http\Message\ResponseInterface;
  */
 class DefaultParser implements Parser
 {
+    /**
+     * @param ServerRequestInterface $request
+     */
     public function spanName($request): string
     {
         self::assertRequestType($request);
         return $request->getMethod();
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     */
     public function request($request, TraceContext $context, SpanCustomizer $span): void
     {
         self::assertRequestType($request);
@@ -31,6 +37,9 @@ class DefaultParser implements Parser
         $span->tag(Tags\HTTP_PATH, $request->getUri()->getPath() ?: "/");
     }
 
+    /**
+     * @param ResponseInterface $response
+     */
     public function response($response, TraceContext $context, SpanCustomizer $span): void
     {
         self::assertResponseType($response);
