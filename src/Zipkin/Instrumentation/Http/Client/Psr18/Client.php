@@ -42,11 +42,9 @@ final class Client implements ClientInterface
      */
     private $requestSampler;
 
-    public function __construct(
-        ClientInterface $delegate,
-        HttpClientTracing $tracing
-    ) {
-        $this->delegate = $delegate;
+    public function __construct(ClientInterface $client, HttpClientTracing $tracing)
+    {
+        $this->delegate = $client;
         $this->injector = $tracing->getTracing()->getPropagation()->getInjector(new RequestHeaders());
         $this->tracer = $tracing->getTracing()->getTracer();
         $this->parser = $tracing->getParser();

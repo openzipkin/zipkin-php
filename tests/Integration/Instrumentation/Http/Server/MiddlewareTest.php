@@ -44,7 +44,7 @@ final class MiddlewareTest extends TestCase
         ];
     }
 
-    public function testMiddleware()
+    public function testMiddlewareRecordsRequestSuccessfully()
     {
         $parser = new class() extends DefaultParser {
             public function request($request, TraceContext $context, SpanCustomizer $span): void

@@ -27,7 +27,7 @@ final class Middleware implements MiddlewareInterface
     private $tracer;
 
     /**
-     * @var callable
+     * @var callable(ServerRequestInterface):SamplingFlags
      */
     private $extractor;
 
@@ -37,7 +37,7 @@ final class Middleware implements MiddlewareInterface
     private $parser;
 
     /**
-     * @var callable|null
+     * @var (callable(ServerRequestInterface):?bool)|null
      */
     private $requestSampler;
 
