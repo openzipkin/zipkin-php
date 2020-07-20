@@ -15,8 +15,6 @@ interface Response
      * The HTTP status code or zero if unreadable.
      *
      * <p>Conventionally associated with the key "http.status_code"
-     *
-     * @since 5.10
      */
     public function getStatusCode(): int;
 

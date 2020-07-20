@@ -18,8 +18,7 @@ interface Request extends HttpRequest
      * identify the route. Parsing should expect this and look at {@link HttpResponse#route()} as
      * needed.
      *
-     * @see Tags#HTTP_ROUTE
-     * @since 5.10
+     * @see Tags\HTTP_ROUTE
      */
     public function getRoute(): ?string;
 }
