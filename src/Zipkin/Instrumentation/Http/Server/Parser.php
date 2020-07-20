@@ -10,13 +10,6 @@ use Zipkin\Propagation\TraceContext;
 /**
  * Parser includes the methods to obtain meaningful span information
  * out of HTTP request/response elements.
- *
- * $request and $response objects are not typed on purpose as different
- * frameworks can use different request models (e.g. symfony uses a list
- * parameters including method, url and options). Since PHP does not support
- * generics this is the only way to make this interface reusable but
- * implementors have to make sure the request/response objects have the right
- * type.
  */
 interface Parser
 {
@@ -25,7 +18,7 @@ interface Parser
      * usually the HTTP method is enough (e.g GET or POST) but ideally
      * the http.route is desired (e.g. /user/{user_id}).
      */
-    public function spanName($request): string;
+    public function spanName(Request $request): string;
 
     /**
      * request parses the incoming data related to a request in order to add
@@ -34,7 +27,7 @@ interface Parser
      * Basic data being tagged is HTTP method, HTTP path but other information
      * such as query parameters can be added to enrich the span information.
      */
-    public function request($request, TraceContext $context, SpanCustomizer $span): void;
+    public function request(Request $request, TraceContext $context, SpanCustomizer $span): void;
 
 
     /**
@@ -45,5 +38,5 @@ interface Parser
      * as any response header or more granular information based on the response
      * payload can be added.
      */
-    public function response($response, TraceContext $context, SpanCustomizer $span): void;
+    public function response(Response $response, TraceContext $context, SpanCustomizer $span): void;
 }

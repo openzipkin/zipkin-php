@@ -11,12 +11,12 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
 use Zipkin\Propagation\TraceContext;
 
+use Zipkin\Instrumentation\Http\Server\Request;
 use Zipkin\Instrumentation\Http\Server\Psr15\Middleware;
-use Zipkin\Instrumentation\Http\Server\Psr15\DefaultParser;
 use Zipkin\Instrumentation\Http\Server\Parser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
+use Zipkin\Instrumentation\Http\Server\DefaultParser;
 use RingCentral\Psr7\Response;
-use Psr\Http\Message\ServerRequestInterface;
 use PHPUnit\Framework\TestCase;
 use Middlewares\Utils\Factory;
 use Middlewares\Utils\Dispatcher;
@@ -47,12 +47,11 @@ final class MiddlewareTest extends TestCase
     public function testMiddlewareRecordsRequestSuccessfully()
     {
         $parser = new class() extends DefaultParser {
-            public function request($request, TraceContext $context, SpanCustomizer $span): void
+            public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
             {
-                assert($request instanceof ServerRequestInterface);
                 // This parser retrieves the user_id from the request and add
                 // is a tag.
-                $userId = $request->getAttribute('user_id');
+                $userId = $request->unwrap()->getAttribute('user_id');
                 $span->tag('user_id', $userId);
                 parent::request($request, $context, $span);
             }

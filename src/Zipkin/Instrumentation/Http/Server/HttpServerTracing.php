@@ -26,7 +26,7 @@ class HttpServerTracing
      * function that decides to sample or not an unsampled
      * request.
      *
-     * @var (callable(mixed):?bool)|null
+     * @var (callable(Request):?bool)|null
      */
     private $requestSampler;
 
@@ -46,7 +46,7 @@ class HttpServerTracing
     }
 
     /**
-     * @return (callable(mixed):?bool)|null
+     * @return (callable(Request):?bool)|null
      */
     public function getRequestSampler(): ?callable
     {

@@ -11,6 +11,7 @@ use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\SamplingFlags;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Zipkin\Instrumentation\Http\Server\Psr15\Propagation\RequestHeaders;
 use Zipkin\Instrumentation\Http\Server\Parser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
@@ -38,7 +39,7 @@ final class Middleware implements MiddlewareInterface
     private $parser;
 
     /**
-     * @var (callable(ServerRequestInterface):?bool)|null
+     * @var (callable(ServerRequest):?bool)|null
      */
     private $requestSampler;
 
@@ -66,14 +67,16 @@ final class Middleware implements MiddlewareInterface
             }
         }
 
+        $parsedRequest = new Request($request);
+
         $span->setKind(Kind\SERVER);
         $spanCustomizer = new SpanCustomizerShield($span);
-        $span->setName($this->parser->spanName($request));
-        $this->parser->request($request, $span->getContext(), $spanCustomizer);
+        $span->setName($this->parser->spanName($parsedRequest));
+        $this->parser->request($parsedRequest, $span->getContext(), $spanCustomizer);
 
         try {
             $response = $handler->handle($request);
-            $this->parser->response($response, $span->getContext(), $spanCustomizer);
+            $this->parser->response(new Response($response, $parsedRequest), $span->getContext(), $spanCustomizer);
             return $response;
         } catch (Throwable $e) {
             $span->setError($e);

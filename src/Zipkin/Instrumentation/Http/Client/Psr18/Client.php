@@ -39,7 +39,7 @@ final class Client implements ClientInterface
     private $parser;
 
     /**
-     * @var (callable(RequestInterface):?bool)|null
+     * @var (callable(Request):?bool)|null
      */
     private $requestSampler;
 
@@ -54,12 +54,13 @@ final class Client implements ClientInterface
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
+        $parsedRequest = new Request($request);
         if ($this->requestSampler === null) {
             $span = $this->tracer->nextSpan();
         } else {
             $span = $this->tracer->nextSpanWithSampler(
                 $this->requestSampler,
-                [$request]
+                [$parsedRequest]
             );
         }
 
@@ -77,13 +78,13 @@ final class Client implements ClientInterface
         // If span is NOOP it does not make sense to add customizations
         // to it like tags or annotations.
         $spanCustomizer = new SpanCustomizerShield($span);
-        $span->setName($this->parser->spanName($request));
-        $this->parser->request($request, $span->getContext(), $spanCustomizer);
+        $span->setName($this->parser->spanName($parsedRequest));
+        $this->parser->request($parsedRequest, $span->getContext(), $spanCustomizer);
 
         try {
             $span->start();
             $response = $this->delegate->sendRequest($request);
-            $this->parser->response($response, $span->getContext(), $spanCustomizer);
+            $this->parser->response(new Response($response, $parsedRequest), $span->getContext(), $spanCustomizer);
             return $response;
         } catch (Throwable $e) {
             $span->setError($e);
