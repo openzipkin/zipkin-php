@@ -15,7 +15,6 @@ composer require psr/http-server-middleware
 In this example we use [fast-route](https://github.com/middlewares/fast-route) and [request-handler](https://github.com/middlewares/request-handler) middlewares but any HTTP server middleware supporting PSR15 middlewares will work.
 
 ```php
-use Zipkin\Instrumentation\Http\Server\Psr15\DefaultParser;
 use Zipkin\Instrumentation\Http\Server\Psr15\Middleware as ZipkinMiddleware;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
 
@@ -29,7 +28,7 @@ $tracing = TracingBuilder::create()
             ->havingLocalServiceName('my_service')
             ->build();
 
-$httpClientTracing = new ServerTracing($tracing, new DefaultParser);
+$httpClientTracing = new HttpServerTracing($tracing);
 
 $dispatcher = new Dispatcher([
     new Middlewares\FastRoute($fastRouteDispatcher),

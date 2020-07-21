@@ -19,13 +19,12 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
 use Zipkin\Instrumentation\Http\Client\Psr\Client as ZipkinClient;
-use Zipkin\Instrumentation\Http\Client\Psr\DefaultParser;
 
 $tracing = TracingBuilder::create()
             ->havingLocalServiceName('my_service')
             ->build();
 
-$httpClientTracing = new HttpClientTracing($tracing, new DefaultParser);
+$httpClientTracing = new HttpClientTracing($tracing);
 ...
 
 $httpClient = new ZipkinClient(new Client, $httpClientTracing);

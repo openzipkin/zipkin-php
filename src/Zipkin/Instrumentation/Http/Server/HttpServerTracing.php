@@ -32,11 +32,11 @@ class HttpServerTracing
 
     public function __construct(
         Tracing $tracing,
-        Parser $parser,
+        Parser $parser = null,
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser;
+        $this->parser = $parser ?? new DefaultParser;
         $this->requestSampler = $requestSampler;
     }
 
