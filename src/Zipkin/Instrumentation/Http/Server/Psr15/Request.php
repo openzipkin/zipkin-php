@@ -7,7 +7,7 @@ namespace Zipkin\Instrumentation\Http\Server\Psr15;
 use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Psr\Http\Message\RequestInterface;
 
-final class Request implements ServerRequest
+final class Request extends ServerRequest
 {
     /**
      * @var RequestInterface
@@ -46,9 +46,9 @@ final class Request implements ServerRequest
     /**
      * {@inheritdoc}
      */
-    public function getHeader(string $name): string
+    public function getHeader(string $name): ?string
     {
-        return $this->delegate->getHeaderLine($name);
+        return $this->delegate->getHeaderLine($name) ?: null;
     }
 
     public function getRoute(): ?string

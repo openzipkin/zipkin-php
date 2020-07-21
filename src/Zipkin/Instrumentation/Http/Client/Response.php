@@ -6,6 +6,6 @@ namespace Zipkin\Instrumentation\Http\Client;
 
 use Zipkin\Instrumentation\Http\Response as HttpResponse;
 
-interface Response extends HttpResponse
+abstract class Response extends HttpResponse
 {
 }

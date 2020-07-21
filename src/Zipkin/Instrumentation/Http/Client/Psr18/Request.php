@@ -7,7 +7,7 @@ namespace Zipkin\Instrumentation\Http\Client\Psr18;
 use Zipkin\Instrumentation\Http\Client\Request as ClientRequest;
 use Psr\Http\Message\RequestInterface;
 
-final class Request implements ClientRequest
+final class Request extends ClientRequest
 {
     /**
      * @var RequestInterface
@@ -46,9 +46,9 @@ final class Request implements ClientRequest
     /**
      * {@inheritdoc}
      */
-    public function getHeader(string $name): string
+    public function getHeader(string $name): ?string
     {
-        return $this->delegate->getHeaderLine($name);
+        return $this->delegate->getHeaderLine($name) ?: null;
     }
 
     /**

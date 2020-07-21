@@ -7,7 +7,7 @@ namespace Zipkin\Instrumentation\Http;
 /**
  * Abstract request type used for parsing and sampling of http clients and servers.
  */
-interface Request
+abstract class Request
 {
     /**
      * The HTTP method, or verb, such as "GET" or "POST".
@@ -21,7 +21,7 @@ interface Request
      *
      * @see Zipkin\Tags\HTTP_METHOD
      */
-    public function getMethod(): string;
+    abstract public function getMethod(): string;
 
     /**
      * The absolute http path, without any query parameters. Ex. "/objects/abcd-ff"
@@ -38,7 +38,7 @@ interface Request
      *
      * @see Tags\HTTP_PATH
      */
-    public function getPath(): ?string;
+    abstract public function getPath(): ?string;
 
     /**
      * The entire URL, including the scheme, host and query parameters if available.
@@ -47,15 +47,15 @@ interface Request
      *
      * @see Tags#HTTP_URL
      */
-    public function getUrl(): string;
+    abstract public function getUrl(): string;
 
     /**
      * Returns one value corresponding to the specified header, or null.
      */
-    public function getHeader(string $name): string;
+    abstract public function getHeader(string $name): ?string;
 
     /**
      * @return mixed the underlying request object or {@code null} if there is none.
      */
-    public function unwrap();
+    abstract public function unwrap();
 }

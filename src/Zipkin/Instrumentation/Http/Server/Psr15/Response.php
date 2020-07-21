@@ -8,7 +8,7 @@ use Zipkin\Instrumentation\Http\Server\Response as ServerResponse;
 use Zipkin\Instrumentation\Http\Request;
 use Psr\Http\Message\ResponseInterface;
 
-final class Response implements ServerResponse
+final class Response extends ServerResponse
 {
     /**
      * @var ResponseInterface

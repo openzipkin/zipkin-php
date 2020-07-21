@@ -6,7 +6,7 @@ namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\Instrumentation\Http\Request as HttpRequest;
 
-interface Request extends HttpRequest
+abstract class Request extends HttpRequest
 {
     /**
      * Returns an expression such as "/items/:itemId" representing an application endpoint,
@@ -20,5 +20,5 @@ interface Request extends HttpRequest
      *
      * @see Tags\HTTP_ROUTE
      */
-    public function getRoute(): ?string;
+    abstract public function getRoute(): ?string;
 }

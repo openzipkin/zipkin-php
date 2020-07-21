@@ -6,6 +6,6 @@ namespace Zipkin\Instrumentation\Http\Client;
 
 use Zipkin\Instrumentation\Http\Request as HttpRequest;
 
-interface Request extends HttpRequest
+abstract class Request extends HttpRequest
 {
 }
