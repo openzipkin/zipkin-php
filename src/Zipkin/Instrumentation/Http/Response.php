@@ -9,7 +9,10 @@ abstract class Response
     /**
      * The request that initiated this response or {@code null} if unknown.
      */
-    abstract public function getRequest(): ?Request;
+    public function getRequest(): ?Request
+    {
+        return null;
+    }
 
     /**
      * The HTTP status code or zero if unreadable.

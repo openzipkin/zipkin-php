@@ -89,7 +89,6 @@ final class ServerTest extends TestCase
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
-            'http.status_code' => '200',
         ], $span['tags']);
     }
 

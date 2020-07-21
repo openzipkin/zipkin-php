@@ -23,9 +23,13 @@ class DefaultParser implements Parser
      */
     protected function spanName(Request $request): string
     {
-        return $request->getMethod();
+        return $request->getMethod()
+            . ($request->getRoute() === null ? '' : ' ' . $request->getRoute());
     }
 
+    /**
+     * {@inhertidoc}
+     */
     public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
     {
         $span->setName($this->spanName($request));
@@ -33,8 +37,15 @@ class DefaultParser implements Parser
         $span->tag(Tags\HTTP_PATH, $request->getPath() ?: '/');
     }
 
+    /**
+     * {@inhertidoc}
+     */
     public function response(Response $response, TraceContext $context, SpanCustomizer $span): void
     {
+        if (null !== ($route = $response->getRoute())) {
+            $span->setName($response->getRequest()->getMethod() . ' ' . $route);
+        }
+
         $statusCode = $response->getStatusCode();
         if ($statusCode < 200 || $statusCode > 299) {
             $span->tag(Tags\HTTP_STATUS_CODE, (string) $statusCode);

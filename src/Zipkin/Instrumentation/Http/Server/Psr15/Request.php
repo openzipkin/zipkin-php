@@ -51,11 +51,6 @@ final class Request extends ServerRequest
         return $this->delegate->getHeaderLine($name) ?: null;
     }
 
-    public function getRoute(): ?string
-    {
-        return null;
-    }
-
     /**
      * {@inheritdoc}
      *

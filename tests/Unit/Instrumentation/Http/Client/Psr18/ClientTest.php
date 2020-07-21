@@ -78,7 +78,6 @@ final class ClientTest extends TestCase
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
-            'http.status_code' => '200',
         ], $span->getTags());
     }
 

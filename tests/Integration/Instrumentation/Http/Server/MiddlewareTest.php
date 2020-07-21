@@ -85,7 +85,6 @@ final class MiddlewareTest extends TestCase
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/users/abc123',
-            'http.status_code' => '201',
             'user_id' => 'abc123',
         ], $span['tags']);
     }

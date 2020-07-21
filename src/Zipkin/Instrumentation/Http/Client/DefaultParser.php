@@ -18,11 +18,18 @@ use Zipkin\Instrumentation\Http\Client\Parser;
  */
 class DefaultParser implements Parser
 {
+    /**
+     * spanName returns an appropiate span name based on the request,
+     * usually the HTTP method is enough (e.g GET or POST).
+     */
     protected function spanName(Request $request): string
     {
         return $request->getMethod();
     }
 
+    /**
+     * {@inhertidoc}
+     */
     public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
     {
         $span->setName($this->spanName($request));
@@ -30,6 +37,9 @@ class DefaultParser implements Parser
         $span->tag(Tags\HTTP_PATH, $request->getPath() ?: "/");
     }
 
+    /**
+     * {@inhertidoc}
+     */
     public function response(Response $response, TraceContext $context, SpanCustomizer $span): void
     {
         $statusCode = $response->getStatusCode();

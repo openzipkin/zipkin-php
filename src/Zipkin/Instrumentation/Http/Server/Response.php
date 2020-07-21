@@ -20,5 +20,8 @@ abstract class Response extends HttpResponse
      *
      * @see Tags\HTTP_ROUTE
      */
-    abstract public function getRoute(): ?string;
+    public function getRoute(): ?string
+    {
+        return null;
+    }
 }

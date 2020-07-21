@@ -46,14 +46,6 @@ final class Response extends ServerResponse
 
     /**
      * {@inheritdoc}
-     */
-    public function getRoute(): ?string
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @return ResponseInterface
      */
