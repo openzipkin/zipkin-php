@@ -35,9 +35,13 @@ class DefaultParser implements Parser
 
     public function response(Response $response, TraceContext $context, SpanCustomizer $span): void
     {
-        $span->tag(Tags\HTTP_STATUS_CODE, (string) $response->getStatusCode());
-        if ($response->getStatusCode() > 399) {
-            $span->tag(Tags\ERROR, (string) $response->getStatusCode());
+        $statusCode = $response->getStatusCode();
+        if ($statusCode < 200 || $statusCode > 299) {
+            $span->tag(Tags\HTTP_STATUS_CODE, (string) $statusCode);
+        }
+
+        if ($statusCode > 399) {
+            $span->tag(Tags\ERROR, (string) $statusCode);
         }
     }
 }
