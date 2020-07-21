@@ -18,13 +18,14 @@ use Zipkin\Instrumentation\Http\Client\Parser;
  */
 class DefaultParser implements Parser
 {
-    public function spanName(Request $request): string
+    protected function spanName(Request $request): string
     {
         return $request->getMethod();
     }
 
     public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
     {
+        $span->setName($this->spanName($request));
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
         $span->tag(Tags\HTTP_PATH, $request->getPath() ?: "/");
     }

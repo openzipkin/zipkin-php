@@ -16,12 +16,6 @@ use Zipkin\Instrumentation\Http\Request;
 interface Parser
 {
     /**
-     * spanName returns an appropiate span name based on the request,
-     * usually the HTTP method is good enough (e.g GET or POST).
-     */
-    public function spanName(Request $request): string;
-
-    /**
      * request parses the incoming data related to a request in order to add
      * relevant information to the span under the SpanCustomizer interface.
      *

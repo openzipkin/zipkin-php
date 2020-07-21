@@ -78,7 +78,6 @@ final class Client implements ClientInterface
         // If span is NOOP it does not make sense to add customizations
         // to it like tags or annotations.
         $spanCustomizer = new SpanCustomizerShield($span);
-        $span->setName($this->parser->spanName($parsedRequest));
         $this->parser->request($parsedRequest, $span->getContext(), $spanCustomizer);
 
         try {

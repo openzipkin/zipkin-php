@@ -16,13 +16,19 @@ use Zipkin\Instrumentation\Http\Server\Parser;
  */
 class DefaultParser implements Parser
 {
-    public function spanName(Request $request): string
+    /**
+     * spanName returns an appropiate span name based on the request,
+     * usually the HTTP method is enough (e.g GET or POST) but ideally
+     * the http.route is desired (e.g. /user/{user_id}).
+     */
+    protected function spanName(Request $request): string
     {
-        return $request->getMethod() . ($request->getRoute() === null ? '' : ' ' . $request->getRoute());
+        return $request->getMethod();
     }
 
     public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
     {
+        $span->setName($this->spanName($request));
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
         $span->tag(Tags\HTTP_PATH, $request->getPath() ?: '/');
     }
@@ -32,10 +38,6 @@ class DefaultParser implements Parser
         $span->tag(Tags\HTTP_STATUS_CODE, (string) $response->getStatusCode());
         if ($response->getStatusCode() > 399) {
             $span->tag(Tags\ERROR, (string) $response->getStatusCode());
-        }
-
-        if ($response->getRoute() !== null && $response->getRequest() !== null) {
-            $span->setName($response->getRequest()->getMethod() . ' ' . $response->getRoute());
         }
     }
 }

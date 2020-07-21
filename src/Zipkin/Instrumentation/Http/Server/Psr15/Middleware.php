@@ -71,7 +71,6 @@ final class Middleware implements MiddlewareInterface
 
         $span->setKind(Kind\SERVER);
         $spanCustomizer = new SpanCustomizerShield($span);
-        $span->setName($this->parser->spanName($parsedRequest));
         $this->parser->request($parsedRequest, $span->getContext(), $spanCustomizer);
 
         try {
