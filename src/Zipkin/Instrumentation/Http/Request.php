@@ -16,8 +16,7 @@ abstract class Request
      *
      * <h3>Note</h3>
      * <p>It is part of the <a href="https://tools.ietf.org/html/rfc7231#section-4.1">HTTP RFC</a>
-     * that an HTTP method is case-sensitive. Do not downcase results. If you do, not only will
-     * integration tests fail, but you will surprise any consumers who expect compliant results.
+     * that an HTTP method is case-sensitive. Do not downcase results.
      *
      * @see Zipkin\Tags\HTTP_METHOD
      */
@@ -36,7 +35,7 @@ abstract class Request
      * normalize "" to "/". This ensures values are consistent with wire-level clients and behaviour
      * consistent with RFC 7230 Section 2.7.3.
      *
-     * @see Tags\HTTP_PATH
+     * @see Zipkin\Tags\HTTP_PATH
      */
     abstract public function getPath(): ?string;
 
@@ -45,7 +44,7 @@ abstract class Request
      *
      * <p>Conventionally associated with the key "http.url"
      *
-     * @see Tags#HTTP_URL
+     * @see Zipkin\Tags\HTTP_URL
      */
     abstract public function getUrl(): string;
 
