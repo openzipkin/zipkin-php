@@ -28,10 +28,6 @@ use Zipkin\Reporters\Http;
 // First we create the endpoint that describes our service
 $endpoint = Endpoint::create('my_service');
 
-// Logger to stdout
-$logger = new \Monolog\Logger('log');
-$logger->pushHandler(new \Monolog\Handler\ErrorLogHandler());
-
 $reporter = new Http(['endpoint_url' => 'http://myzipkin:9411/api/v2/spans']);
 $sampler = BinarySampler::createAsAlwaysSample();
 $tracing = TracingBuilder::create()
