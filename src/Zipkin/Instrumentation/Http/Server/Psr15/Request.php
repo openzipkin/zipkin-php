@@ -7,6 +7,9 @@ namespace Zipkin\Instrumentation\Http\Server\Psr15;
 use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * {@inheritdoc}
+ */
 final class Request extends ServerRequest
 {
     /**
@@ -32,7 +35,7 @@ final class Request extends ServerRequest
      */
     public function getPath(): ?string
     {
-        return $this->delegate->getUri()->getPath();
+        return $this->delegate->getUri()->getPath() ?: '/';
     }
 
     /**

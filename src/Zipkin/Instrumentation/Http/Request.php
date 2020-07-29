@@ -6,6 +6,8 @@ namespace Zipkin\Instrumentation\Http;
 
 /**
  * Abstract request type used for parsing and sampling of http clients and servers.
+ *
+ * @internal
  */
 abstract class Request
 {
