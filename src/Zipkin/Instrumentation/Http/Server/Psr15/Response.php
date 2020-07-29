@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Zipkin\Instrumentation\Http\Server\Psr15;
 
 use Zipkin\Instrumentation\Http\Server\Response as ServerResponse;
-use Zipkin\Instrumentation\Http\Request;
+use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * {@inheritdoc}
+ */
 final class Response extends ServerResponse
 {
     /**
@@ -31,7 +34,7 @@ final class Response extends ServerResponse
     /**
      * {@inheritdoc}
      */
-    public function getRequest(): ?Request
+    public function getRequest(): ?ServerRequest
     {
         return $this->request;
     }

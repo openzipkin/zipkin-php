@@ -32,7 +32,7 @@ final class Request extends ClientRequest
      */
     public function getPath(): ?string
     {
-        return $this->delegate->getUri()->getPath();
+        return $this->delegate->getUri()->getPath() ?: '/';
     }
 
     /**

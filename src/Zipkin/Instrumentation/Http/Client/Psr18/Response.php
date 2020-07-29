@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http\Client\Psr18;
 
-use Zipkin\Instrumentation\Http\Request as HttpRequest;
 use Zipkin\Instrumentation\Http\Client\Response as ClientResponse;
+use Zipkin\Instrumentation\Http\Client\Request as ClientRequest;
 use Psr\Http\Message\ResponseInterface;
 
 final class Response extends ClientResponse
@@ -31,7 +31,7 @@ final class Response extends ClientResponse
     /**
      * {@inheritdoc}
      */
-    public function getRequest(): ?HttpRequest
+    public function getRequest(): ?ClientRequest
     {
         return $this->request;
     }

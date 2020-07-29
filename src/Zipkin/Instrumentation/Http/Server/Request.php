@@ -6,6 +6,9 @@ namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\Instrumentation\Http\Request as HttpRequest;
 
+/**
+ * {@inheritdoc}
+ */
 abstract class Request extends HttpRequest
 {
     /**

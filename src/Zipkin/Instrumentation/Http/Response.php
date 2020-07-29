@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http;
 
+/**
+ * Abstract response type used for parsing and sampling of http clients and servers.
+ *
+ * @internal
+ */
 abstract class Response
 {
     /**
      * The request that initiated this response or {@code null} if unknown.
+     *
+     * @return Request|null not declared on purpose so client/server responses can
+     * declare its own type.
      */
-    public function getRequest(): ?Request
-    {
-        return null;
-    }
+    abstract public function getRequest();
 
     /**
      * The HTTP status code or zero if unreadable.
