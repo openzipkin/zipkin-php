@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Client;
+namespace Zipkin\Instrumentation\Http\Client\Psr18;
 
 use Zipkin\Tracer;
 use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
+use Zipkin\Instrumentation\Http\Client\Psr18\Propagation\RequestHeaders;
+use Zipkin\Instrumentation\Http\Client\Parser;
+use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
 use Throwable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -36,15 +39,13 @@ final class Client implements ClientInterface
     private $parser;
 
     /**
-     * @var (callable(RequestInterface):?bool)|null
+     * @var (callable(Request):?bool)|null
      */
     private $requestSampler;
 
-    public function __construct(
-        ClientInterface $delegate,
-        ClientTracing $tracing
-    ) {
-        $this->delegate = $delegate;
+    public function __construct(ClientInterface $client, HttpClientTracing $tracing)
+    {
+        $this->delegate = $client;
         $this->injector = $tracing->getTracing()->getPropagation()->getInjector(new RequestHeaders());
         $this->tracer = $tracing->getTracing()->getTracer();
         $this->parser = $tracing->getParser();
@@ -53,12 +54,13 @@ final class Client implements ClientInterface
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
+        $parsedRequest = new Request($request);
         if ($this->requestSampler === null) {
             $span = $this->tracer->nextSpan();
         } else {
             $span = $this->tracer->nextSpanWithSampler(
                 $this->requestSampler,
-                [$request]
+                [$parsedRequest]
             );
         }
 
@@ -76,13 +78,12 @@ final class Client implements ClientInterface
         // If span is NOOP it does not make sense to add customizations
         // to it like tags or annotations.
         $spanCustomizer = new SpanCustomizerShield($span);
-        $span->setName($this->parser->spanName($request));
-        $this->parser->request($request, $span->getContext(), $spanCustomizer);
+        $this->parser->request($parsedRequest, $span->getContext(), $spanCustomizer);
 
         try {
             $span->start();
             $response = $this->delegate->sendRequest($request);
-            $this->parser->response($response, $span->getContext(), $spanCustomizer);
+            $this->parser->response(new Response($response, $parsedRequest), $span->getContext(), $spanCustomizer);
             return $response;
         } catch (Throwable $e) {
             $span->setError($e);

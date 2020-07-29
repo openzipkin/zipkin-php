@@ -4,16 +4,21 @@
     "description": "A Zipkin instrumentation for PHP",
     "keywords": [
         "zipkin",
+        "distributed-tracing",
         "tracing",
         "openzipkin"
     ],
-    "license": "MIT",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "José Carlos Chávez",
             "email": "jcchavezs@gmail.com"
         }
     ],
+    "homepage": "https://github.com/openzipkin/zipkin-php",
+    "support": {
+        "issues": "https://github.com/openzipkin/zipkin-php/issues"
+    },
     "require": {
         "php": "^7.1",
         "ext-curl": "*",
@@ -21,11 +26,14 @@
         "psr/log": "^1.0"
     },
     "require-dev": {
-        "guzzlehttp/psr7": "^1.4",
+        "guzzlehttp/psr7": "^1.6",
         "jcchavezs/httptest": "~0.2",
         "phpstan/phpstan": "~0.12.28",
         "phpunit/phpunit": "~7.5.20",
         "psr/http-client": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "middlewares/fast-route": "^1.2.1",
+        "middlewares/request-handler": "^1.4.0",
         "squizlabs/php_codesniffer": "3.*"
     },
     "config": {
@@ -60,7 +68,8 @@
         "static-check": "phpstan analyse src --level 8"
     },
     "suggest": {
-        "psr/http-client": "Allows to instrument HTTP clients following PSR18."
+        "psr/http-client": "Allows to instrument HTTP clients following PSR18.",
+        "psr/http-server-middleware": "Allows to instrument HTTP servers via middlewares following PSR15."
     },
     "extra": {
         "branch-alias": {

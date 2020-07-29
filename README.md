@@ -294,7 +294,8 @@ request. To do this, simply pass null to `openScope`.
 
 ## Instrumentation
 
-- [PSR18 HTTP Client](src/Zipkin/Instrumentation/Http/Client)
+- [PSR18 HTTP Client](src/Zipkin/Instrumentation/Http/Client/Psr18)
+- [PSR15 HTTP Server](src/Zipkin/Instrumentation/Http/Server/Psr15)
 
 ## Tests
 

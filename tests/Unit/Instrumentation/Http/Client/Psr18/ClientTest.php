@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ZipkinTests\Instrumentation\Http\Client;
+namespace ZipkinTests\Unit\Instrumentation\Http\Client\Psr18;
 
 use Zipkin\TracingBuilder;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
-use Zipkin\Instrumentation\Http\Client\ClientTracing;
-use Zipkin\Instrumentation\Http\Client\Client;
+use Zipkin\Instrumentation\Http\Client\Psr18\Client;
+use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
+use Zipkin\Instrumentation\Http\Client\DefaultParser;
 use RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -30,7 +31,7 @@ final class ClientTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new ClientTracing($tracing),
+            new HttpClientTracing($tracing, new DefaultParser),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();
@@ -77,7 +78,6 @@ final class ClientTest extends TestCase
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
-            'http.status_code' => '200',
         ], $span->getTags());
     }
 

@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Client;
+namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\Tags;
 use Zipkin\SpanCustomizer;
 use Zipkin\Propagation\TraceContext;
-use Zipkin\Instrumentation\Http\Response;
-use Zipkin\Instrumentation\Http\Request;
-use Zipkin\Instrumentation\Http\Client\Parser;
+use Zipkin\Instrumentation\Http\Server\Parser;
 
 /**
  * DefaultParser contains the basic logic for turning request/response information
@@ -20,11 +18,13 @@ class DefaultParser implements Parser
 {
     /**
      * spanName returns an appropiate span name based on the request,
-     * usually the HTTP method is enough (e.g GET or POST).
+     * usually the HTTP method is enough (e.g GET or POST) but ideally
+     * the http.route is desired (e.g. /user/{user_id}).
      */
     protected function spanName(Request $request): string
     {
-        return $request->getMethod();
+        return $request->getMethod()
+            . ($request->getRoute() === null ? '' : ' ' . $request->getRoute());
     }
 
     /**
@@ -34,7 +34,7 @@ class DefaultParser implements Parser
     {
         $span->setName($this->spanName($request));
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
-        $span->tag(Tags\HTTP_PATH, $request->getPath() ?: "/");
+        $span->tag(Tags\HTTP_PATH, $request->getPath() ?: '/');
     }
 
     /**

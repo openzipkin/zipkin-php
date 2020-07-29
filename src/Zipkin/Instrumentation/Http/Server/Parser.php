@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Zipkin\Instrumentation\Http\Client;
+namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\SpanCustomizer;
 use Zipkin\Propagation\TraceContext;
-use Zipkin\Instrumentation\Http\Response;
-use Zipkin\Instrumentation\Http\Request;
 
 /**
  * Parser includes the methods to obtain meaningful span information
