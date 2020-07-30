@@ -25,28 +25,23 @@ abstract class BaseResponseTest extends TestCase
     ): array;
 
     /**
-     * @return array|(Request|null)[][] the
+     * @return (Request|null)[][] the
      */
-    abstract public static function delegateRequestsProvider(): array;
+    abstract public static function requestsProvider(): array;
 
     /**
-     * @dataProvider delegateRequestsProvider
+     * @dataProvider requestsProvider
      */
-    public function testResponseIsCreatedSuccessfully($request)
+    public function testResponseIsCreatedSuccessfully(?Request $request): void
     {
+        /**
+         * @var Response $response
+         */
         list($response, $delegateResponse) = static::createResponse(202, [], null, $request);
         $this->assertInstanceOf(Response::class, $response);
+
         $this->assertEquals(202, $response->getStatusCode());
-        $this->assertNullOrInstanceOf(Request::class, $request);
         $this->assertSame($request, $response->getRequest());
         $this->assertSame($delegateResponse, $response->unwrap());
-    }
-
-    private function assertNullOrInstanceOf(string $expected, $actual, string $message = '')
-    {
-        if ($actual === null) {
-            return;
-        }
-        $this->assertInstanceOf($expected, $actual, $message);
     }
 }

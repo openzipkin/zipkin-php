@@ -20,7 +20,7 @@ final class ResponseTest extends BaseResponseTest
         int $statusCode,
         $headers = [],
         $body = null,
-        Request $request = null
+        ?Request $request = null
     ): array {
         $delegateResponse = new Response($statusCode);
         $response = new Psr18Response($delegateResponse, $request);
@@ -30,7 +30,7 @@ final class ResponseTest extends BaseResponseTest
     /**
      * {@inheritdoc}
      */
-    public static function delegateRequestsProvider(): array
+    public static function requestsProvider(): array
     {
         return [
             [null],

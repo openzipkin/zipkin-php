@@ -9,6 +9,11 @@ use PHPUnit\Framework\TestCase;
 
 abstract class BaseRequestTest extends TestCase
 {
+    /**
+     * @return mixed[] including
+     * - Request the request
+     * - mixed the delegate request
+     */
     abstract public static function createRequest(
         string $method,
         string $uri,
@@ -16,7 +21,7 @@ abstract class BaseRequestTest extends TestCase
         $body = null
     ): array;
 
-    public function testRequestIsCreatedSuccessfully()
+    public function testRequestIsCreatedSuccessfully(): void
     {
         list($request, $delegateRequest) = static::createRequest(
             'GET',
@@ -34,7 +39,7 @@ abstract class BaseRequestTest extends TestCase
     /**
      * @dataProvider rootPathsProvider
      */
-    public function testRequestIsNormalizesRootPath(string $path)
+    public function testRequestIsNormalizesRootPath(string $path): void
     {
         list($request) = static::createRequest('GET', $path, ['test_key' => 'test_value']);
         $this->assertInstanceOf(Request::class, $request);
