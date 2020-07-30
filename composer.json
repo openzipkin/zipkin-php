@@ -34,7 +34,9 @@
         "psr/http-server-middleware": "^1.0",
         "middlewares/fast-route": "^1.2.1",
         "middlewares/request-handler": "^1.4.0",
-        "squizlabs/php_codesniffer": "3.*"
+        "squizlabs/php_codesniffer": "3.*",
+        "illuminate/http": "^7.20",
+        "illuminate/routing": "^7.20"
     },
     "config": {
         "sort-packages": true
