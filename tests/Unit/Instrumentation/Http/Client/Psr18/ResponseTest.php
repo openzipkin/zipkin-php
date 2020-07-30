@@ -6,25 +6,20 @@ namespace ZipkinTests\Unit\Instrumentation\Http\Client\Psr18;
 
 use Zipkin\Instrumentation\Http\Client\Psr18\Response as Psr18Response;
 use Zipkin\Instrumentation\Http\Client\Psr18\Request;
-use PHPUnit\Framework\TestCase;
+use ZipkinTests\Unit\Instrumentation\Http\Client\BaseResponseTest;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 
-final class ResponseTest extends TestCase
+final class ResponseTest extends BaseResponseTest
 {
-    /**
-     * @dataProvider delegateRequests
-     */
-    public function testResponseIsCreatedSuccessfully($request)
+    public static function createResponse(int $statusCode, $headers = [], $body = null, $request = null): array
     {
-        $delegateResponse = new Response(202);
+        $delegateResponse = new Response($statusCode);
         $response = new Psr18Response($delegateResponse, $request);
-        $this->assertEquals(202, $response->getStatusCode());
-        $this->assertSame($request, $response->getRequest());
-        $this->assertSame($delegateResponse, $response->unwrap());
+        return [$response, $delegateResponse, $request];
     }
 
-    public function delegateRequests(): array
+    public static function delegateRequestsProvider(): array
     {
         return [
             [null],
