@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZipkinTests\Unit\Instrumentation\Http\Client;
 
+use Zipkin\Instrumentation\Http\Client\Request;
 use PHPUnit\Framework\TestCase;
 
 abstract class BaseRequestTest extends TestCase
@@ -22,6 +23,7 @@ abstract class BaseRequestTest extends TestCase
             'http://test.com/path',
             ['test_key' => 'test_value']
         );
+        $this->assertInstanceOf(Request::class, $request);
         $this->assertEquals('GET', $request->getMethod());
         $this->assertEquals('/path', $request->getPath());
         $this->assertNull($request->getHeader('test_missing_key'));
@@ -35,6 +37,7 @@ abstract class BaseRequestTest extends TestCase
     public function testRequestIsNormalizesRootPath(string $path)
     {
         list($request) = static::createRequest('GET', $path, ['test_key' => 'test_value']);
+        $this->assertInstanceOf(Request::class, $request);
         $this->assertEquals('/', $request->getPath());
     }
 
