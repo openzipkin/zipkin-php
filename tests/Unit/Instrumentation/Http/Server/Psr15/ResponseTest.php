@@ -4,31 +4,37 @@ declare(strict_types=1);
 
 namespace ZipkinTests\Unit\Instrumentation\Http\Server\Psr15;
 
-use Zipkin\Instrumentation\Http\Server\Psr15\Response as Psr15Response;
-use Zipkin\Instrumentation\Http\Server\Psr15\Request;
-use PHPUnit\Framework\TestCase;
+use Zipkin\Instrumentation\Http\Client\Request;
+use Zipkin\Instrumentation\Http\Client\Psr18\Response as Psr18Response;
+use Zipkin\Instrumentation\Http\Client\Psr18\Request as Psr18Request;
+use ZipkinTests\Unit\Instrumentation\Http\Client\BaseResponseTest;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 
-final class ResponseTest extends TestCase
+final class ResponseTest extends BaseResponseTest
 {
     /**
-     * @dataProvider delegateRequests
+     * {@inheritdoc}
      */
-    public function testResponseIsCreatedSuccessfully($request)
-    {
-        $delegateResponse = new Response(202);
-        $response = new Psr15Response($delegateResponse, $request);
-        $this->assertEquals(202, $response->getStatusCode());
-        $this->assertSame($request, $response->getRequest());
-        $this->assertSame($delegateResponse, $response->unwrap());
+    public static function createResponse(
+        int $statusCode,
+        $headers = [],
+        $body = null,
+        ?Request $request = null
+    ): array {
+        $delegateResponse = new Response($statusCode);
+        $response = new Psr18Response($delegateResponse, $request);
+        return [$response, $delegateResponse, $request];
     }
 
-    public function delegateRequests(): array
+    /**
+     * {@inheritdoc}
+     */
+    public static function requestsProvider(): array
     {
         return [
             [null],
-            [new Request(new Psr7Request('GET', 'http://test.com/path'))],
+            [new Psr18Request(new Psr7Request('GET', 'http://test.com/path'))],
         ];
     }
 }
