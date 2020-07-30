@@ -11,7 +11,12 @@ abstract class BaseResponseTest extends TestCase
     /**
      * @return array including the response, delegated response and request.
      */
-    abstract public static function createResponse(int $statusCode, $headers = [], $body = null, $request = null): array;
+    abstract public static function createResponse(
+        int $statusCode,
+        $headers = [],
+        $body = null,
+        $request = null
+    ): array;
 
     abstract public static function delegateRequestsProvider(): array;
 

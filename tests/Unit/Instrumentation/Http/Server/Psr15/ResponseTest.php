@@ -12,8 +12,12 @@ use GuzzleHttp\Psr7\Request as Psr7Request;
 
 final class ResponseTest extends BaseResponseTest
 {
-    public static function createResponse(int $statusCode, $headers = [], $body = null, $request = null): array
-    {
+    public static function createResponse(
+        int $statusCode,
+        $headers = [],
+        $body = null,
+        $request = null
+    ): array {
         $delegateResponse = new Response($statusCode);
         $response = new Psr18Response($delegateResponse, $request);
         return [$response, $delegateResponse, $request];
