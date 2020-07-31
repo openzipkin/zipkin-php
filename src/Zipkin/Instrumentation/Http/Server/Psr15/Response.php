@@ -49,10 +49,8 @@ final class Response extends ServerResponse
 
     /**
      * {@inheritdoc}
-     *
-     * @return ResponseInterface
      */
-    public function unwrap()
+    public function unwrap(): ResponseInterface
     {
         return $this->delegate;
     }

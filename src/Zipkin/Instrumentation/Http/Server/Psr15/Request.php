@@ -56,10 +56,8 @@ final class Request extends ServerRequest
 
     /**
      * {@inheritdoc}
-     *
-     * @return RequestInterface
      */
-    public function unwrap()
+    public function unwrap(): RequestInterface
     {
         return $this->delegate;
     }
