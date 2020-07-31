@@ -11,7 +11,7 @@ use Zipkin\Propagation\TraceContext;
  * Parser includes the methods to obtain meaningful span information
  * out of HTTP request/response elements.
  */
-interface Parser
+interface HttpServerParser
 {
     /**
      * request parses the incoming data related to a request in order to add

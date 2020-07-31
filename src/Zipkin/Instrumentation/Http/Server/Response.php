@@ -6,9 +6,6 @@ namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\Instrumentation\Http\Response as HttpResponse;
 
-/**
- * {@inheritdoc}
- */
 abstract class Response extends HttpResponse
 {
     /**

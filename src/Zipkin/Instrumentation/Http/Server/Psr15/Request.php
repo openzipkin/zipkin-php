@@ -7,9 +7,6 @@ namespace Zipkin\Instrumentation\Http\Server\Psr15;
 use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Psr\Http\Message\RequestInterface;
 
-/**
- * {@inheritdoc}
- */
 final class Request extends ServerRequest
 {
     /**

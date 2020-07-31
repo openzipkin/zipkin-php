@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Zipkin\Instrumentation\Http\Server;
 
 use Zipkin\Instrumentation\Http\Request as HttpRequest;
+use const Zipkin\Tags\HTTP_ROUTE;
 
-/**
- * {@inheritdoc}
- */
 abstract class Request extends HttpRequest
 {
     /**
@@ -21,7 +19,7 @@ abstract class Request extends HttpRequest
      * identify the route. Parsing should expect this and look at {@link HttpResponse#route()} as
      * needed.
      *
-     * @see Zipkin\Tags\HTTP_ROUTE
+     * @see HTTP_ROUTE
      */
     public function getRoute(): ?string
     {

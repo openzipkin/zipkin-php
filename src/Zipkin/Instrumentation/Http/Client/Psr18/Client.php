@@ -9,7 +9,7 @@ use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
 use Zipkin\Instrumentation\Http\Client\Psr18\Propagation\RequestHeaders;
-use Zipkin\Instrumentation\Http\Client\Parser;
+use Zipkin\Instrumentation\Http\Client\HttpClientParser;
 use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
 use Throwable;
 use Psr\Http\Message\ResponseInterface;
@@ -34,7 +34,7 @@ final class Client implements ClientInterface
     private $tracer;
 
     /**
-     * @var Parser
+     * @var HttpClientParser
      */
     private $parser;
 

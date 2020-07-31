@@ -13,7 +13,7 @@ use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Kind;
 use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Zipkin\Instrumentation\Http\Server\Psr15\Propagation\RequestHeaders;
-use Zipkin\Instrumentation\Http\Server\Parser;
+use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
 use Throwable;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -34,7 +34,7 @@ final class Middleware implements MiddlewareInterface
     private $extractor;
 
     /**
-     * @var Parser
+     * @var HttpServerParser
      */
     private $parser;
 

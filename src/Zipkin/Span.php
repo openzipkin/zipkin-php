@@ -6,6 +6,7 @@ namespace Zipkin;
 
 use Zipkin\Propagation\TraceContext;
 use Throwable;
+use const Zipkin\Kind\SERVER;
 
 interface Span
 {
@@ -44,7 +45,7 @@ interface Span
 
     /**
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
-     * kind is {@link Zipkin\Kind\SERVER}, the span's start timestamp is implicitly annotated as "sr"
+     * kind is {@link SERVER}, the span's start timestamp is implicitly annotated as "sr"
      * and that plus its duration as "ss".
      *
      * The value must be strictly one of the ones listed in {@link Kind}.
@@ -68,6 +69,7 @@ interface Span
 
     /**
      * Adds tags depending on the configured {@link Tracing::errorParser() error parser}
+     * @param Throwable $e
      */
     public function setError(Throwable $e): void;
 
@@ -75,7 +77,7 @@ interface Span
      * Associates an event that explains latency with the current system time.
      *
      * @param string $value A short tag indicating the event, like "finagle.retry"
-     * @param int $timestamp
+     * @param int|null $timestamp
      * @return void
      * @see Annotations
      */

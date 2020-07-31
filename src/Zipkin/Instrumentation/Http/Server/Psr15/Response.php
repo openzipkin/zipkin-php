@@ -8,9 +8,6 @@ use Zipkin\Instrumentation\Http\Server\Response as ServerResponse;
 use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * {@inheritdoc}
- */
 final class Response extends ServerResponse
 {
     /**

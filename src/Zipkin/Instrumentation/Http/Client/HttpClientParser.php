@@ -13,7 +13,7 @@ use Zipkin\Instrumentation\Http\Request;
  * Parser includes the methods to obtain meaningful span information
  * out of HTTP request/response elements.
  */
-interface Parser
+interface HttpClientParser
 {
     /**
      * request parses the incoming data related to a request in order to add

@@ -7,14 +7,14 @@ namespace Zipkin\Instrumentation\Http\Server;
 use Zipkin\Tags;
 use Zipkin\SpanCustomizer;
 use Zipkin\Propagation\TraceContext;
-use Zipkin\Instrumentation\Http\Server\Parser;
+use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 
 /**
  * DefaultParser contains the basic logic for turning request/response information
  * into span name and tags. Implementors can use this as a base parser to reduce
  * boilerplate.
  */
-class DefaultParser implements Parser
+class DefaultHttpServerParser implements HttpServerParser
 {
     /**
      * spanName returns an appropiate span name based on the request,
