@@ -53,10 +53,8 @@ final class Request extends ClientRequest
 
     /**
      * {@inheritdoc}
-     *
-     * @return RequestInterface
      */
-    public function unwrap()
+    public function unwrap(): RequestInterface
     {
         return $this->delegate;
     }
