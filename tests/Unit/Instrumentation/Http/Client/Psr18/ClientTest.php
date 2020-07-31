@@ -9,7 +9,7 @@ use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
 use Zipkin\Instrumentation\Http\Client\Psr18\Client;
 use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
-use Zipkin\Instrumentation\Http\Client\DefaultParser;
+use Zipkin\Instrumentation\Http\Client\DefaultHttpClientParser;
 use RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -31,7 +31,7 @@ final class ClientTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new HttpClientTracing($tracing, new DefaultParser),
+            new HttpClientTracing($tracing, new DefaultHttpClientParser),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();

@@ -13,9 +13,9 @@ use Zipkin\Propagation\TraceContext;
 
 use Zipkin\Instrumentation\Http\Server\Request;
 use Zipkin\Instrumentation\Http\Server\Psr15\Middleware;
-use Zipkin\Instrumentation\Http\Server\Parser;
+use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
-use Zipkin\Instrumentation\Http\Server\DefaultParser;
+use Zipkin\Instrumentation\Http\Server\DefaultHttpServerParser;
 use RingCentral\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Middlewares\Utils\Factory;
@@ -25,7 +25,7 @@ use FastRoute\RouteCollector;
 
 final class MiddlewareTest extends TestCase
 {
-    private static function createTracing(Parser $parser): array
+    private static function createTracing(HttpServerParser $parser): array
     {
         $reporter = new InMemory();
         $tracing =
@@ -46,7 +46,7 @@ final class MiddlewareTest extends TestCase
 
     public function testMiddlewareRecordsRequestSuccessfully()
     {
-        $parser = new class() extends DefaultParser {
+        $parser = new class() extends DefaultHttpServerParser {
             public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
             {
                 // This parser retrieves the user_id from the request and add

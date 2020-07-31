@@ -12,7 +12,7 @@ use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Instrumentation\Http\Server\Psr15\Middleware;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
-use Zipkin\Instrumentation\Http\Server\DefaultParser;
+use Zipkin\Instrumentation\Http\Server\DefaultHttpServerParser;
 use RingCentral\Psr7\Response as Psr7Response;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -34,7 +34,7 @@ final class ServerTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new HttpServerTracing($tracing, new DefaultParser, $requestSampler),
+            new HttpServerTracing($tracing, new DefaultHttpServerParser, $requestSampler),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();

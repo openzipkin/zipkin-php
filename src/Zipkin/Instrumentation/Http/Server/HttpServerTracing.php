@@ -18,7 +18,7 @@ class HttpServerTracing
     private $tracing;
 
     /**
-     * @var Parser
+     * @var HttpServerParser
      */
     private $parser;
 
@@ -32,11 +32,11 @@ class HttpServerTracing
 
     public function __construct(
         Tracing $tracing,
-        Parser $parser = null,
+        HttpServerParser $parser = null,
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser ?? new DefaultParser;
+        $this->parser = $parser ?? new DefaultHttpServerParser;
         $this->requestSampler = $requestSampler;
     }
 
@@ -53,7 +53,7 @@ class HttpServerTracing
         return $this->requestSampler;
     }
 
-    public function getParser(): Parser
+    public function getParser(): HttpServerParser
     {
         return $this->parser;
     }

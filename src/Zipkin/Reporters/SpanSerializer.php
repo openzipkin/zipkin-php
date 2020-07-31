@@ -14,6 +14,7 @@ interface SpanSerializer
 {
     /**
      * @param ReadbackSpan[]|array $spans
+     * @return string with spans serialized
      */
     public function serialize(array $spans): string;
 }

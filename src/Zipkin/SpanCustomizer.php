@@ -37,7 +37,7 @@ interface SpanCustomizer
      * Associates an event that explains latency with the current system time.
      *
      * @param string $value A short tag indicating the event, like "finagle.retry"
-     * @param int $timestamp
+     * @param int|null $timestamp
      * @return void
      * @see Annotations
      */

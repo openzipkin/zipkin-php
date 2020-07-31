@@ -9,17 +9,17 @@ use Zipkin\SpanCustomizer;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Instrumentation\Http\Response;
 use Zipkin\Instrumentation\Http\Request;
-use Zipkin\Instrumentation\Http\Client\Parser;
+use Zipkin\Instrumentation\Http\Client\HttpClientParser;
 
 /**
  * DefaultParser contains the basic logic for turning request/response information
  * into span name and tags. Implementors can use this as a base parser to reduce
  * boilerplate.
  */
-class DefaultParser implements Parser
+class DefaultHttpClientParser implements HttpClientParser
 {
     /**
-     * spanName returns an appropiate span name based on the request,
+     * spanName returns an appropriate span name based on the request,
      * usually the HTTP method is enough (e.g GET or POST).
      */
     protected function spanName(Request $request): string

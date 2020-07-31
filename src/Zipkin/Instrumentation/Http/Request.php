@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http;
 
+use const Zipkin\Tags\HTTP_METHOD;
+use const Zipkin\Tags\HTTP_PATH;
+use const Zipkin\Tags\HTTP_URL;
+
 /**
  * Abstract request type used for parsing and sampling of http clients and servers.
  *
@@ -20,7 +24,7 @@ abstract class Request
      * <p>It is part of the <a href="https://tools.ietf.org/html/rfc7231#section-4.1">HTTP RFC</a>
      * that an HTTP method is case-sensitive. Do not downcase results.
      *
-     * @see Zipkin\Tags\HTTP_METHOD
+     * @see HTTP_METHOD
      */
     abstract public function getMethod(): string;
 
@@ -37,7 +41,7 @@ abstract class Request
      * normalize "" to "/". This ensures values are consistent with wire-level clients and behaviour
      * consistent with RFC 7230 Section 2.7.3.
      *
-     * @see Zipkin\Tags\HTTP_PATH
+     * @see HTTP_PATH
      */
     abstract public function getPath(): ?string;
 
@@ -46,7 +50,7 @@ abstract class Request
      *
      * <p>Conventionally associated with the key "http.url"
      *
-     * @see Zipkin\Tags\HTTP_URL
+     * @see HTTP_URL
      */
     abstract public function getUrl(): string;
 
