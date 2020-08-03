@@ -25,12 +25,12 @@ abstract class BaseRequestTest extends TestCase
     {
         list($request, $delegateRequest) = static::createRequest(
             'GET',
-            'http://test.com/path',
+            'http://test.com/path/to',
             ['test_key' => 'test_value']
         );
         $this->assertInstanceOf(Request::class, $request);
         $this->assertEquals('GET', $request->getMethod());
-        $this->assertEquals('/path', $request->getPath());
+        $this->assertEquals('/path/to', $request->getPath());
         $this->assertNull($request->getHeader('test_missing_key'));
         $this->assertEquals('test_value', $request->getHeader('test_key'));
         $this->assertSame($delegateRequest, $request->unwrap());
