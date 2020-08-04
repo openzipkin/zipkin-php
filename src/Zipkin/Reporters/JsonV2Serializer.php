@@ -31,9 +31,9 @@ class JsonV2Serializer implements SpanSerializer
         return '[' . implode(',', $spansAsArray) . ']';
     }
 
-    private function serializeEndpoint(Endpoint $endpoint): string
+    private static function serializeEndpoint(Endpoint $endpoint): string
     {
-        $endpointStr =  '{"serviceName":"' . $endpoint->getServiceName() . '"';
+        $endpointStr =  '{"serviceName":"' . \strtolower($endpoint->getServiceName()) . '"';
 
         if ($endpoint->getIpv4() !== null) {
             $endpointStr .= ',"ipv4":"' . $endpoint->getIpv4() . '"';
@@ -54,9 +54,12 @@ class JsonV2Serializer implements SpanSerializer
     {
         $spanStr =
             '{"id":"' . $span->getSpanId() . '"'
-            . ',"name":"' . $span->getName() . '"'
             . ',"traceId":"' . $span->getTraceId() . '"'
             . ',"timestamp":' . $span->getTimestamp();
+
+        if ($span->getName() !== null) {
+            $spanStr .= ',"name":"' . \strtolower($span->getName()) . '"';
+        }
 
         if ($span->getDuration() !== null) {
             $spanStr .= ',"duration":' . $span->getDuration();
