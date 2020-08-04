@@ -1,6 +1,6 @@
 <?php
 
-namespace ZipkinTests\Unit\Propagation;
+namespace ZipkinTests\Unit\Reporters;
 
 use Zipkin\Reporters\JsonV2Serializer;
 use Zipkin\Recording\Span;
@@ -17,9 +17,9 @@ final class JsonV2SerializerTest extends TestCase
         $span = Span::createFromContext($context, $localEndpoint);
         $startTime = 1594044779509687;
         $span->start($startTime);
-        $span->setName('test');
+        $span->setName('Test');
         $span->setKind('CLIENT');
-        $remoteEndpoint = Endpoint::create('service2', null, '2001:0db8:85a3:0000:0000:8a2e:0370:7334', 3302);
+        $remoteEndpoint = Endpoint::create('SERVICE2', null, '2001:0db8:85a3:0000:0000:8a2e:0370:7334', 3302);
         $span->setRemoteEndpoint($remoteEndpoint);
         $span->tag('test_key', 'test_value');
         $span->annotate($startTime + 100, 'test_annotarion');
@@ -29,7 +29,7 @@ final class JsonV2SerializerTest extends TestCase
         $serializedSpans = $serializer->serialize([$span]);
 
         $expectedSerialization = '[{'
-            . '"id":"186f11b67460db4d","name":"test","traceId":"186f11b67460db4d","timestamp":1594044779509687,'
+            . '"id":"186f11b67460db4d","traceId":"186f11b67460db4d","timestamp":1594044779509687,"name":"test",'
             . '"duration":1000,"localEndpoint":{"serviceName":"service1","ipv4":"192.168.0.11","port":3301},'
             . '"kind":"CLIENT",'
             . '"remoteEndpoint":{"serviceName":"service2","ipv6":"2001:0db8:85a3:0000:0000:8a2e:0370:7334","port":3302}'
@@ -55,7 +55,7 @@ final class JsonV2SerializerTest extends TestCase
         $serializedSpans = $serializer->serialize([$span]);
 
         $expectedSerialization = '[{'
-            . '"id":"186f11b67460db4d","name":"test","traceId":"186f11b67460db4d","timestamp":1594044779509688,'
+            . '"id":"186f11b67460db4d","traceId":"186f11b67460db4d","timestamp":1594044779509688,"name":"test",'
             . '"duration":1000,"localEndpoint":{"serviceName":"service1","ipv4":"192.168.0.11","port":3301},'
             . '"tags":{"test_key":"test_value","error":"priority_error"}'
             . '}]';

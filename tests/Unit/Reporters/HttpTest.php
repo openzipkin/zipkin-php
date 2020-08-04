@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 
 final class HttpTest extends TestCase
 {
-    const PAYLOAD = '[{"id":"%s","name":"test","traceId":"%s",'
-        . '"timestamp":%d,"localEndpoint":{"serviceName":""}}]';
+    const PAYLOAD = '[{"id":"%s","traceId":"%s",'
+        . '"timestamp":%d,"name":"test","localEndpoint":{"serviceName":""}}]';
 
     public function testConstructorIsRetrocompatible()
     {
