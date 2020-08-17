@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2020 OpenZipkin Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace ZipkinTests\Unit\Propagation;
 
 use Zipkin\Propagation\TraceContext;
@@ -151,7 +167,8 @@ final class B3Test extends TestCase
     {
         return [
             'client' => [
-                new class() extends Map implements RemoteSetter {
+                new class () extends Map implements RemoteSetter
+                {
                     public function getKind(): string
                     {
                         return 'CLIENT';
@@ -164,7 +181,8 @@ final class B3Test extends TestCase
                 ]
             ],
             'producer' => [
-                new class() extends Map implements RemoteSetter {
+                new class () extends Map implements RemoteSetter
+                {
                     public function getKind(): string
                     {
                         return 'PRODUCER';
@@ -327,7 +345,8 @@ final class B3Test extends TestCase
         $carrier[strtolower(self::SPAN_ID_NAME)] = 'mno';
         $test = $this;
 
-        $logger = new class($test) implements LoggerInterface {
+        $logger = new class ($test) implements LoggerInterface
+        {
             use LoggerTrait;
 
             private $test;
@@ -336,7 +355,7 @@ final class B3Test extends TestCase
             {
                 $this->test = $test;
             }
-            
+
             public function log($level, $message, array $context = array())
             {
                 $this->test->assertEquals('debug', $level);

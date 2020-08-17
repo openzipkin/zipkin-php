@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * Copyright 2020 OpenZipkin Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace ZipkinTests\Unit;
 
 use Zipkin\Tracer;
@@ -371,7 +387,8 @@ final class TracerTest extends TestCase
 
     public function sumCallables(): array
     {
-        $anonymousSumer = new class() {
+        $anonymousSumer = new class ()
+        {
             public function sum(int $a, int $b)
             {
                 return $a + $b;
@@ -404,7 +421,8 @@ final class TracerTest extends TestCase
     {
         list($tracer, $flusher) = self::createDefaultTestTracer();
 
-        $sum = new class() {
+        $sum = new class ()
+        {
             public function __invoke(int $a, int $b)
             {
                 throw new OutOfBoundsException('too small values');
