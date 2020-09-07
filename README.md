@@ -64,7 +64,7 @@ When tracing local code, just run it inside a span
 
 ```php
 $span = $tracer->newTrace();
-$span->setName('encode')
+$span->setName('encode');
 $span->start();
 
 try {
@@ -210,9 +210,9 @@ Here's what server-side propagation might look like
 ```php
 // configure a function that extracts the trace context from a request
 $extractor = $tracing->getPropagation()->getExtractor(new RequestHeaders);
-$extracted = $extractor($request)
+$extracted = $extractor($request);
 
-$span = $tracer->newChild($extracted)
+$span = $tracer->newChild($extracted);
 $span->setKind(Kind\SERVER);
 ```
 
@@ -221,7 +221,7 @@ can extract the context from the $_SERVER variable
 
 ```php
 $extractor = $tracing->getPropagation()->getExtractor(new ServerHeaders);
-$extracted = $extractor($_SERVER)
+$extracted = $extractor($_SERVER);
 ```
 
 ### Extracting a propagated context
