@@ -2,12 +2,12 @@
 
 namespace ZipkinTests\Integration\Reporters\Http;
 
-use HttpTest\HttpTestServer;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use RuntimeException;
 use Zipkin\Reporters\Http\CurlFactory;
+use RuntimeException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
 use PHPUnit\Framework\TestCase;
+use HttpTest\HttpTestServer;
 
 /**
  * @group ignore-windows
@@ -22,6 +22,7 @@ final class CurlFactoryTest extends TestCase
             function (RequestInterface $request, ResponseInterface &$response) use ($t) {
                 $t->assertEquals('POST', $request->getMethod());
                 $t->assertEquals('application/json', $request->getHeader('Content-Type')[0]);
+                $t->assertEquals('0', $request->getHeader('b3')[0]);
                 $response = $response->withStatus(202);
             }
         );
