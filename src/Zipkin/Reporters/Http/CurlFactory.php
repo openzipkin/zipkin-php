@@ -29,7 +29,7 @@ final class CurlFactory implements ClientFactory
     /**
      * {@inheritdoc}
      */
-    public function build(array $options = []): callable
+    public function build(array $options): callable
     {
         /**
          * @param string $payload
@@ -50,6 +50,7 @@ final class CurlFactory implements ClientFactory
             $requiredHeaders = [
                 'Content-Type' => 'application/json',
                 'Content-Length' => \strlen($payload),
+                'b3' => '0',
             ];
             $additionalHeaders = $options['headers'] ?? [];
             $headers = \array_merge($additionalHeaders, $requiredHeaders);
