@@ -20,12 +20,19 @@ final class Response extends ServerResponse
      */
     private $request;
 
+    /**
+     * @var string|null
+     */
+    private $route;
+
     public function __construct(
         ResponseInterface $delegate,
-        ?Request $request = null
+        ?Request $request = null,
+        ?string $route = null
     ) {
         $this->delegate = $delegate;
         $this->request = $request;
+        $this->route = $route;
     }
 
     /**
@@ -42,6 +49,14 @@ final class Response extends ServerResponse
     public function getStatusCode(): int
     {
         return $this->delegate->getStatusCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoute(): ?string
+    {
+        return $this->route;
     }
 
     /**

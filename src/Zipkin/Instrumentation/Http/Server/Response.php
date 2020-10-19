@@ -15,4 +15,13 @@ abstract class Response extends HttpResponse
     {
         return null;
     }
+
+    /**
+     * getRoute returns the route path, sometimes known by the response time
+     * e.g. /user/{user_id}
+     */
+    public function getRoute(): ?string
+    {
+        return null;
+    }
 }

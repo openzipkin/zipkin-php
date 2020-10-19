@@ -17,11 +17,11 @@ use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 class DefaultHttpServerParser implements HttpServerParser
 {
     /**
-     * spanName returns an appropiate span name based on the request,
+     * spanNameFromRequest returns an appropiate span name based on the request,
      * usually the HTTP method is enough (e.g GET or POST) but ideally
-     * the http.route is desired (e.g. /user/{user_id}).
+     * the verb+route is desired (e.g. GET /user/{user_id}).
      */
-    protected function spanName(Request $request): string
+    protected function spanNameFromRequest(Request $request): string
     {
         return $request->getMethod()
             . ($request->getRoute() === null ? '' : ' ' . $request->getRoute());
@@ -32,16 +32,41 @@ class DefaultHttpServerParser implements HttpServerParser
      */
     public function request(Request $request, TraceContext $context, SpanCustomizer $span): void
     {
-        $span->setName($this->spanName($request));
+        $span->setName($this->spanNameFromRequest($request));
         $span->tag(Tags\HTTP_METHOD, $request->getMethod());
         $span->tag(Tags\HTTP_PATH, $request->getPath() ?: '/');
     }
+
+    protected function spanName(Request $request): string
+    {
+        return $request->getMethod()
+            . ($request->getRoute() === null ? '' : ' ' . $request->getRoute());
+    }
+
+    /**
+     * spanNameFromResponse returns an appropiate span name based on the response's request,
+     * usually seeking for a better name than the HTTP method (e.g. GET /user/{user_id}).
+     */
+    protected function spanNameFromResponse(Response $response): ?string
+    {
+        if ($response->getRoute() === null || $response->getRequest() === null) {
+            return null;
+        }
+
+        return $response->getRequest()->getMethod() . ' ' . $response->getRoute();
+    }
+
 
     /**
      * {@inhertidoc}
      */
     public function response(Response $response, TraceContext $context, SpanCustomizer $span): void
     {
+        $spanName = $this->spanNameFromResponse($response);
+        if ($spanName !== null) {
+            $span->setName($spanName);
+        }
+
         $statusCode = $response->getStatusCode();
         if ($statusCode < 200 || $statusCode > 299) {
             $span->tag(Tags\HTTP_STATUS_CODE, (string) $statusCode);
