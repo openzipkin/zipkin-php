@@ -65,10 +65,10 @@ final class JsonV2SerializerTest extends TestCase
     public function testJSONTagsAreSerializedCorrectly()
     {
         $jsonValue = '{"name":"Kurt"}';
-        $mutilineValue = <<<EOT
+        $mutilineValue = <<<EOD
         foo
         bar
-        EOT;
+        EOD;
 
         $context = TraceContext::create('186f11b67460db4e', '186f11b67460db4e');
         $localEndpoint = Endpoint::create('service1');

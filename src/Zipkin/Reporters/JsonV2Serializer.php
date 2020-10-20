@@ -52,7 +52,8 @@ class JsonV2Serializer implements SpanSerializer
 
     private static function escapeQuotes(string $s): string
     {
-        return substr(json_encode($s), 1, -1);
+        $encodedString = json_encode($s);
+        return $encodedString ? trim($encodedString, '"') : $s;
     }
 
     private function serializeSpan(ReadbackSpan $span): string
