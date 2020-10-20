@@ -50,6 +50,11 @@ class JsonV2Serializer implements SpanSerializer
         return $endpointStr . '}';
     }
 
+    private static function escapeQuotes(string $s): string
+    {
+        return substr(json_encode($s), 1, -1);
+    }
+
     private function serializeSpan(ReadbackSpan $span): string
     {
         $spanStr =
@@ -98,7 +103,8 @@ class JsonV2Serializer implements SpanSerializer
                 } else {
                     $spanStr .= ',';
                 }
-                $spanStr .= '{"value":"' . $annotation['value'] . '","timestamp":' . $annotation['timestamp'] . '}';
+                $spanStr .= '{"value":"' . self::escapeQuotes($annotation['value'])
+                    . '","timestamp":' . $annotation['timestamp'] . '}';
             }
             $spanStr .= ']';
         }
@@ -118,7 +124,7 @@ class JsonV2Serializer implements SpanSerializer
                 } else {
                     $spanStr .= ',';
                 }
-                $spanStr .= '"' . $key . '":"' . $value . '"';
+                $spanStr .= '"' . $key . '":"' . self::escapeQuotes($value) . '"';
             }
             $spanStr .= '}';
         }
