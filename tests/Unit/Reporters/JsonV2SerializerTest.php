@@ -66,9 +66,9 @@ final class JsonV2SerializerTest extends TestCase
     {
         $jsonValue = '{"name":"Kurt"}';
         $mutilineValue = <<<EOD
-        foo
-        bar
-        EOD;
+foo
+bar
+EOD;
 
         $context = TraceContext::create('186f11b67460db4e', '186f11b67460db4e');
         $localEndpoint = Endpoint::create('service1');
