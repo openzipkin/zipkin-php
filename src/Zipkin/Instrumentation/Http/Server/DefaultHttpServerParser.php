@@ -37,12 +37,6 @@ class DefaultHttpServerParser implements HttpServerParser
         $span->tag(Tags\HTTP_PATH, $request->getPath() ?: '/');
     }
 
-    protected function spanName(Request $request): string
-    {
-        return $request->getMethod()
-            . ($request->getRoute() === null ? '' : ' ' . $request->getRoute());
-    }
-
     /**
      * spanNameFromResponse returns an appropiate span name based on the response's request,
      * usually seeking for a better name than the HTTP method (e.g. GET /user/{user_id}).
