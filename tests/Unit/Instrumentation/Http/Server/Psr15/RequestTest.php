@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ZipkinTests\Unit\Instrumentation\Http\Server\Psr15;
 
-use Zipkin\Instrumentation\Http\Client\Psr18\Request;
-use ZipkinTests\Unit\Instrumentation\Http\Client\BaseRequestTest;
+use Zipkin\Instrumentation\Http\Server\Psr15\Request;
+use ZipkinTests\Unit\Instrumentation\Http\Server\BaseRequestTest;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 
 final class RequestTest extends BaseRequestTest
