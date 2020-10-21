@@ -25,7 +25,7 @@ final class ResponseTest extends BaseResponseTest
     ): array {
         $delegateResponse = new Response($statusCode);
         $response = new Psr15Response($delegateResponse, $request);
-        return [$response, $delegateResponse, $request];
+        return [$response, $delegateResponse, $request, null];
     }
 
     /**
