@@ -22,7 +22,7 @@ abstract class BaseResponseTest extends TestCase
         $headers = [],
         $body = null,
         ?Request $request = null,
-        ?string $route = null
+        string $route = null
     ): array;
 
     /**
@@ -38,10 +38,9 @@ abstract class BaseResponseTest extends TestCase
         /**
          * @var Response $response
          */
-        list($response, $delegateResponse, $_, $route) = static::createResponse(202, [], null, $request, "/things");
+        list($response, $delegateResponse) = static::createResponse(202, [], null, $request);
         $this->assertEquals(202, $response->getStatusCode());
         $this->assertSame($request, $response->getRequest());
         $this->assertSame($delegateResponse, $response->unwrap());
-        $this->assertSame($route, $response->getRoute());
     }
 }

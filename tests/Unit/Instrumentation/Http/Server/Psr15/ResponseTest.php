@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace ZipkinTests\Unit\Instrumentation\Http\Server\Psr15;
 
-use Zipkin\Instrumentation\Http\Client\Request;
-use Zipkin\Instrumentation\Http\Client\Psr18\Response as Psr18Response;
-use Zipkin\Instrumentation\Http\Client\Psr18\Request as Psr18Request;
-use ZipkinTests\Unit\Instrumentation\Http\Client\BaseResponseTest;
+use Zipkin\Instrumentation\Http\Server\Request;
+use Zipkin\Instrumentation\Http\Server\Psr15\Response as Psr15Response;
+use Zipkin\Instrumentation\Http\Server\Psr15\Request as Psr15Request;
+use ZipkinTests\Unit\Instrumentation\Http\Server\BaseResponseTest;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Request as Psr7Request;
 
@@ -21,11 +21,11 @@ final class ResponseTest extends BaseResponseTest
         $headers = [],
         $body = null,
         ?Request $request = null,
-        ?string $route = null
+        string $route = null
     ): array {
         $delegateResponse = new Response($statusCode);
-        $response = new Psr18Response($delegateResponse, $request);
-        return [$response, $delegateResponse, $request, $route];
+        $response = new Psr15Response($delegateResponse, $request);
+        return [$response, $delegateResponse, $request];
     }
 
     /**
@@ -35,7 +35,7 @@ final class ResponseTest extends BaseResponseTest
     {
         return [
             [null],
-            [new Psr18Request(new Psr7Request('GET', 'http://test.com/path'))],
+            [new Psr15Request(new Psr7Request('GET', 'http://test.com/path'))],
         ];
     }
 }
