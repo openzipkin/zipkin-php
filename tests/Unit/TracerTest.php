@@ -16,7 +16,6 @@ use Zipkin\Propagation\CurrentTraceContext;
 use Zipkin\NoopSpan;
 use Zipkin\Endpoint;
 use ZipkinTests\Unit\InSpan\Sumer;
-use Throwable;
 use Prophecy\Prophecy\ObjectProphecy;
 use PHPUnit\Framework\TestCase;
 use OutOfBoundsException;
@@ -38,7 +37,7 @@ final class TracerTest extends TestCase
      */
     private $currentTracerContext;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->reporter = $this->prophesize(Reporter::class);
         $this->sampler = $this->prophesize(Sampler::class);
@@ -308,7 +307,7 @@ final class TracerTest extends TestCase
 
         $scopeCloser = $tracer->openScope($spanForScope);
 
-        $this->assertTrue(is_callable($scopeCloser));
+        $this->assertIsCallable($scopeCloser);
     }
 
     public function spanForScopeProvider()
