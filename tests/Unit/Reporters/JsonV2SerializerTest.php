@@ -87,6 +87,9 @@ EOD;
             . '"duration":1000,"localEndpoint":{"serviceName":"service1"},'
             . '"tags":{"test_key_1":"{\"name\":\"Kurt\"}","test_key_2":"foo\nbar"}'
             . '}]';
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $expectedSerialization = str_replace('\\n', '\\r\\n', $expectedSerialization);
+        }
         $this->assertEquals($expectedSerialization, $serializedSpans);
     }
 }
