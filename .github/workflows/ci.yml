@@ -29,12 +29,12 @@ jobs:
       - name: Install Composer dependencies
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
-      - name: Download coveralls.phar
+      - name: Download php-coveralls.phar
         if: matrix.operating-system == 'ubuntu-latest'
         run: |
-          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.2/coveralls.phar
-          chmod +x coveralls.phar
-          php coveralls.phar --version
+          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.2/php-coveralls.phar
+          chmod +x php-coveralls.phar
+          php php-coveralls.phar --version
           mkdir -p build/logs
       - name: Run lint
         if: matrix.operating-system != 'windows-latest'
@@ -46,5 +46,5 @@ jobs:
       - name: Upload coverage report to codecov service
         if: matrix.operating-system == 'ubuntu-latest'
         run: |
-          php coveralls.phar -v
+          php php-coveralls.phar -v
           bash <(curl -s https://codecov.io/bash)
