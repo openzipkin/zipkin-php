@@ -24,7 +24,7 @@ final class TraceContextTest extends TestCase
 
     private $hasAtLeastOneMutation;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         /* Makes sure there is at least one mutation */
         $this->hasAtLeastOneMutation = false;
