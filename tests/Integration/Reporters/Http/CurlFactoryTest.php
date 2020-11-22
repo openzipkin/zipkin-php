@@ -14,6 +14,13 @@ use HttpTest\HttpTestServer;
  */
 final class CurlFactoryTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (extension_loaded('pcntl') === false) {
+            $this->markTestSkipped('The pcntl extension is not available.');
+        }
+    }
+
     public function testHttpReportingSuccess()
     {
         $t = $this;
