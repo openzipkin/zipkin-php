@@ -50,10 +50,10 @@ class JsonV2Serializer implements SpanSerializer
         return $endpointStr . '}';
     }
 
-    public static function escapeString(string $s): string
+    private static function escapeString(string $s): string
     {
         $encodedString = \json_encode($s);
-        return $encodedString === false ? $s : trim($encodedString, '"');
+        return $encodedString === false ? $s : \mb_substr($encodedString, 1, -1);
     }
 
     private function serializeSpan(ReadbackSpan $span): string
