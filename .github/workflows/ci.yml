@@ -1,5 +1,9 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 jobs:
   test:
     name: Zipkin PHP (PHP version ${{ matrix.php-versions }} on ${{ matrix.operating-system }})
