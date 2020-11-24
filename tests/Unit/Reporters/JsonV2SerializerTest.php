@@ -83,8 +83,8 @@ EOD;
         $serializedSpans = $serializer->serialize([$span]);
 
         $expectedSerialization = '[{'
-            . '"id":"186f11b67460db4e","traceId":"186f11b67460db4e","timestamp":1594044779509687,"name":"my\\\\command",'
-            . '"duration":1000,"localEndpoint":{"serviceName":"service1"},'
+            . '"id":"186f11b67460db4e","traceId":"186f11b67460db4e","timestamp":1594044779509687,'
+            . '"name":"my\\\\command","duration":1000,"localEndpoint":{"serviceName":"service1"},'
             . '"tags":{"test_key_1":"{\"name\":\"Kurt\"}","test_key_2":"foo\nbar"}'
             . '}]';
 
