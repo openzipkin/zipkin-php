@@ -62,7 +62,7 @@ final class JsonV2SerializerTest extends TestCase
         $this->assertEquals($expectedSerialization, $serializedSpans);
     }
 
-    public function testJSONTagsAreSerializedCorrectly()
+    public function testStringValuesAreEscapedAndSerializedCorrectly()
     {
         $jsonValue = '{"name":"Kurt"}';
         $mutilineValue = <<<EOD
@@ -75,7 +75,7 @@ EOD;
         $span = Span::createFromContext($context, $localEndpoint);
         $startTime = 1594044779509687;
         $span->start($startTime);
-        $span->setName('Test');
+        $span->setName('My\Command');
         $span->tag('test_key_1', $jsonValue);
         $span->tag('test_key_2', $mutilineValue);
         $span->finish($startTime + 1000);
@@ -83,8 +83,8 @@ EOD;
         $serializedSpans = $serializer->serialize([$span]);
 
         $expectedSerialization = '[{'
-            . '"id":"186f11b67460db4e","traceId":"186f11b67460db4e","timestamp":1594044779509687,"name":"test",'
-            . '"duration":1000,"localEndpoint":{"serviceName":"service1"},'
+            . '"id":"186f11b67460db4e","traceId":"186f11b67460db4e","timestamp":1594044779509687,'
+            . '"name":"my\\\\command","duration":1000,"localEndpoint":{"serviceName":"service1"},'
             . '"tags":{"test_key_1":"{\"name\":\"Kurt\"}","test_key_2":"foo\nbar"}'
             . '}]';
 

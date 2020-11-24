@@ -41,7 +41,7 @@ final class CurlFactoryTest extends TestCase
                 'endpoint_url' => $server->getUrl(),
             ]);
 
-            $curlClient(json_encode([]));
+            $curlClient(\json_encode([]));
             $this->assertTrue(true);
         } finally {
             $server->stop();
@@ -69,7 +69,7 @@ final class CurlFactoryTest extends TestCase
                 'headers' => ['From' => 'user@example.com', 'Content-Type' => 'test'],
             ]);
 
-            $curlClient(json_encode([]));
+            $curlClient(\json_encode([]));
             $this->assertTrue(true);
         } finally {
             $server->stop();
@@ -137,7 +137,7 @@ final class CurlFactoryTest extends TestCase
             ]);
 
             ob_start();
-            $curlClient(json_encode([]));
+            $curlClient(\json_encode([]));
         } finally {
             $server->stop();
             $output = ob_get_clean();

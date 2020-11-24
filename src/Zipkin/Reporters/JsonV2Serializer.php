@@ -33,7 +33,7 @@ class JsonV2Serializer implements SpanSerializer
 
     private static function serializeEndpoint(Endpoint $endpoint): string
     {
-        $endpointStr =  '{"serviceName":"' . \strtolower($endpoint->getServiceName()) . '"';
+        $endpointStr =  '{"serviceName":"' . \strtolower(self::escapeString($endpoint->getServiceName())) . '"';
 
         if ($endpoint->getIpv4() !== null) {
             $endpointStr .= ',"ipv4":"' . $endpoint->getIpv4() . '"';
@@ -50,10 +50,10 @@ class JsonV2Serializer implements SpanSerializer
         return $endpointStr . '}';
     }
 
-    private static function escapeQuotes(string $s): string
+    private static function escapeString(string $s): string
     {
-        $encodedString = json_encode($s);
-        return $encodedString ? trim($encodedString, '"') : $s;
+        $encodedString = \json_encode($s);
+        return $encodedString === false ? $s : \mb_substr($encodedString, 1, -1);
     }
 
     private function serializeSpan(ReadbackSpan $span): string
@@ -64,7 +64,7 @@ class JsonV2Serializer implements SpanSerializer
             . ',"timestamp":' . $span->getTimestamp();
 
         if ($span->getName() !== null) {
-            $spanStr .= ',"name":"' . \strtolower($span->getName()) . '"';
+            $spanStr .= ',"name":"' . \strtolower(self::escapeString($span->getName())) . '"';
         }
 
         if ($span->getDuration() !== null) {
@@ -104,7 +104,7 @@ class JsonV2Serializer implements SpanSerializer
                 } else {
                     $spanStr .= ',';
                 }
-                $spanStr .= '{"value":"' . self::escapeQuotes($annotation['value'])
+                $spanStr .= '{"value":"' . self::escapeString($annotation['value'])
                     . '","timestamp":' . $annotation['timestamp'] . '}';
             }
             $spanStr .= ']';
@@ -125,7 +125,7 @@ class JsonV2Serializer implements SpanSerializer
                 } else {
                     $spanStr .= ',';
                 }
-                $spanStr .= '"' . $key . '":"' . self::escapeQuotes($value) . '"';
+                $spanStr .= '"' . $key . '":"' . self::escapeString($value) . '"';
             }
             $spanStr .= '}';
         }
