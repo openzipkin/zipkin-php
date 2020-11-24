@@ -69,7 +69,7 @@ final class HttpTest extends TestCase
         $httpReporter = new Http([], $mockFactory, $logger->reveal());
         $httpReporter->report([$span]);
 
-        $this->assertEquals($payload, $mockFactory->retrieveContent());
+        $this->assertSame($payload, $mockFactory->retrieveContent());
     }
 
     public function testHttpReporterFails()
