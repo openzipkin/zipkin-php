@@ -6,17 +6,31 @@ namespace Zipkin\Propagation\Id;
 
 /**
  * @return string
+ * @throws \RuntimeException
  */
 function generateTraceIdWith128bits(): string
 {
-    return \bin2hex(\openssl_random_pseudo_bytes(16));
+    $pseudoBytes = \openssl_random_pseudo_bytes(16);
+
+    if ($pseudoBytes === false) {
+        throw new \RuntimeException("Unable to generate a pseudo-random byte string.");
+    }
+
+    return \bin2hex($pseudoBytes);
 }
 
 /**
  * @return string
+ * @throws \RuntimeException
  */
 function generateNextId(): string
 {
+    $pseudoBytes = \openssl_random_pseudo_bytes(16);
+
+    if ($pseudoBytes === false) {
+        throw new \RuntimeException("Unable to generate a pseudo-random byte string.");
+    }
+
     return \bin2hex(\openssl_random_pseudo_bytes(8));
 }
 
