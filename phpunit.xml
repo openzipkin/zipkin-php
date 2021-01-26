@@ -10,7 +10,7 @@
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
         forceCoversAnnotation="false"
-        printerClass="PHPUnit\TextUI\ResultPrinter"
+        printerClass="PHPUnit\TextUI\DefaultResultPrinter"
         processIsolation="false"
         stopOnError="false"
         stopOnFailure="false"
