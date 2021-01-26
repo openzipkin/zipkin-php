@@ -39,7 +39,7 @@ jobs:
       - name: Download php-coveralls.phar
         if: matrix.operating-system == 'ubuntu-latest'
         run: |
-          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.2/php-coveralls.phar
+          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.3/php-coveralls.phar
           chmod +x php-coveralls.phar
           php php-coveralls.phar --version
           mkdir -p build/logs
