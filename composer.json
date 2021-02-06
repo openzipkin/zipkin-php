@@ -32,8 +32,8 @@
         "phpunit/phpunit": "~7.5.20",
         "psr/http-client": "^1.0",
         "psr/http-server-middleware": "^1.0",
-        "middlewares/fast-route": "^1.2.1",
-        "middlewares/request-handler": "^1.4.0",
+        "middlewares/fast-route": "^1.2.1||^2.0.0",
+        "middlewares/request-handler": "^1.4.0||^2.0.0",
         "squizlabs/php_codesniffer": "3.*"
     },
     "config": {
