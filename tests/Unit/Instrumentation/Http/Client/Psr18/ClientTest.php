@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZipkinTests\Unit\Instrumentation\Http\Client\Psr18;
 
+use Nyholm\Psr7\Request;
+use Nyholm\Psr7\Response;
 use Zipkin\TracingBuilder;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
@@ -15,8 +17,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Client\ClientInterface;
 use PHPUnit\Framework\TestCase;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
 
 final class ClientTest extends TestCase
 {

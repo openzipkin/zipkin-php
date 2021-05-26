@@ -19,9 +19,12 @@ use ZipkinTests\Unit\InSpan\Sumer;
 use Prophecy\Prophecy\ObjectProphecy;
 use PHPUnit\Framework\TestCase;
 use OutOfBoundsException;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 final class TracerTest extends TestCase
 {
+    use ProphecyTrait;
+
     /**
      * @var ObjectProphecy|Reporter
      */

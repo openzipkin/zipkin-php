@@ -1,34 +1,32 @@
-<phpunit
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-        backupGlobals="true"
-        backupStaticAttributes="false"
-        bootstrap="./vendor/autoload.php"
-        cacheTokens="false"
-        colors="false"
-        convertErrorsToExceptions="true"
-        convertNoticesToExceptions="true"
-        convertWarningsToExceptions="true"
-        forceCoversAnnotation="false"
-        printerClass="PHPUnit\TextUI\ResultPrinter"
-        processIsolation="false"
-        stopOnError="false"
-        stopOnFailure="false"
-        stopOnIncomplete="false"
-        stopOnSkipped="false"
-        stopOnRisky="false"
-        testSuiteLoaderClass="PHPUnit\Runner\StandardTestSuiteLoader"
-        timeoutForSmallTests="1"
-        timeoutForMediumTests="10"
-        timeoutForLargeTests="60"
-        verbose="false">
-		<filter>
-			<whitelist processUncoveredFilesFromWhitelist="true">
-				<directory suffix=".php">./src</directory>
-				<exclude>
-					<directory>./vendor</directory>
-					<directory>./tests</directory>
-				</exclude>
-			</whitelist>
-		</filter>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    backupGlobals="true"
+    backupStaticAttributes="false"
+    bootstrap="./vendor/autoload.php"
+    colors="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    forceCoversAnnotation="false"
+    printerClass="PHPUnit\TextUI\DefaultResultPrinter"
+    processIsolation="false"
+    stopOnError="false"
+    stopOnFailure="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    stopOnRisky="false"
+    timeoutForSmallTests="1"
+    timeoutForMediumTests="10"
+    timeoutForLargeTests="60"
+    verbose="false"
+>
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./src</directory>
+    </include>
+    <exclude>
+      <directory>./vendor</directory>
+      <directory>./tests</directory>
+    </exclude>
+  </coverage>
 </phpunit>

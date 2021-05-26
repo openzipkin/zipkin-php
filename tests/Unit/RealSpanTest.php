@@ -4,6 +4,7 @@ namespace ZipkinTests\Unit;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Zipkin\Endpoint;
 use Zipkin\RealSpan;
 use Zipkin\Recorder;
@@ -13,6 +14,8 @@ use Zipkin\Propagation\TraceContext;
 
 final class RealSpanTest extends TestCase
 {
+    use ProphecyTrait;
+
     private const TEST_NAME = 'test_span';
     private const TEST_KIND = 'ab';
     private const TEST_START_TIMESTAMP = 1472470996199000;

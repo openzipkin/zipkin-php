@@ -3,6 +3,7 @@
 namespace ZipkinTests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Zipkin\Endpoint;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Recorder;
@@ -12,6 +13,8 @@ use Zipkin\Propagation\TraceContext;
 
 final class RecorderTest extends TestCase
 {
+    use ProphecyTrait;
+
     public function testGetTimestampReturnsNullWhenThereIsNoSuchTraceContext()
     {
         $context = TraceContext::createAsRoot(DefaultSamplingFlags::createAsEmpty());

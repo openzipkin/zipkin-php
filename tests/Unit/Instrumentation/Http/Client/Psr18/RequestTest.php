@@ -6,7 +6,7 @@ namespace ZipkinTests\Unit\Instrumentation\Http\Client\Psr18;
 
 use Zipkin\Instrumentation\Http\Client\Psr18\Request;
 use ZipkinTests\Unit\Instrumentation\Http\Client\BaseRequestTest;
-use GuzzleHttp\Psr7\Request as Psr7Request;
+use Nyholm\Psr7\Request as Psr7Request;
 
 final class RequestTest extends BaseRequestTest
 {

@@ -16,7 +16,7 @@ In this example we use Guzzle 7 but any HTTP client supporting PSR18 clients wil
 
 ```php
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
+use Nyholm\Psr7\Request;
 use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
 use Zipkin\Instrumentation\Http\Client\Psr\Client as ZipkinClient;
 

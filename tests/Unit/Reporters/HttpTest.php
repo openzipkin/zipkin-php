@@ -12,9 +12,12 @@ use TypeError;
 use Psr\Log\LoggerInterface;
 use Prophecy\Argument;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 final class HttpTest extends TestCase
 {
+    use ProphecyTrait;
+
     const PAYLOAD = '[{"id":"%s","traceId":"%s",'
         . '"timestamp":%d,"name":"test","localEndpoint":{"serviceName":""}}]';
 

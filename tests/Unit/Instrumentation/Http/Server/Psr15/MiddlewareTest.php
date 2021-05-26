@@ -19,9 +19,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 use PHPUnit\Framework\TestCase;
-use GuzzleHttp\Psr7\ServerRequest;
+use Nyholm\Psr7\ServerRequest;
 
-final class ServerTest extends TestCase
+final class MiddlewareTest extends TestCase
 {
     private static function createTracing(callable $requestSampler = null): array
     {
