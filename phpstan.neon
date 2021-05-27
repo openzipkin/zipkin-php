@@ -1,6 +1,7 @@
 parameters:
 	checkGenericClassInNonGenericObjectType: false
 	treatPhpDocTypesAsCertain: false
+	reportUnmatchedIgnoredErrors: false
 	bootstrapFiles:
 		- vendor/autoload.php
 	checkMissingIterableValueType: false
@@ -22,10 +23,14 @@ parameters:
 			message: '#Strict comparison using \=\=\=#'
 			path: src/Zipkin/Reporters/Http.php
 		-
+			# This avoids false positive for parameter type mismatch
+			message: '#Parameter \#2 ...\$arrays of function array_merge expects array, array|Zipkin\\Reporters\\Http\\ClientFactory given#'
+			path: src/Zipkin/Reporters/Http.php
+		-
 			# If we specify a type for $fn the it is impossible to justify the casting to string or array
 			message: '#Function Zipkin\\SpanName\\generateSpanName\(\) has parameter \$fn with no typehint specified.#'
 			path: src/Zipkin/SpanName.php
-		-  
+		-
 			# In general types are desired but carrier is an special case
 			message: '#has parameter \$carrier with no typehint specified#'
 			path: src/Zipkin/*

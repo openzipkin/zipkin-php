@@ -2,7 +2,7 @@
 
 namespace ZipkinTests\Unit\Propagation;
 
-use GuzzleHttp\Psr7\Request;
+use Nyholm\Psr7\Request;
 use PHPUnit\Framework\TestCase;
 use Zipkin\Propagation\RequestHeaders;
 

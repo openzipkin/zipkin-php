@@ -8,8 +8,8 @@ use Zipkin\Instrumentation\Http\Client\Request;
 use Zipkin\Instrumentation\Http\Client\Psr18\Response as Psr18Response;
 use Zipkin\Instrumentation\Http\Client\Psr18\Request as Psr18Request;
 use ZipkinTests\Unit\Instrumentation\Http\Client\BaseResponseTest;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request as Psr7Request;
+use Nyholm\Psr7\Response;
+use Nyholm\Psr7\Request as Psr7Request;
 
 final class ResponseTest extends BaseResponseTest
 {
