@@ -49,7 +49,7 @@ jobs:
       - name: Run static check
         run: composer static-check
       - name: Run tests
-        run: composer test -- --coverage-clover=build/logs/clover.xml
+        run: composer test -- 
       - name: Upload coverage report to codecov service
         if: matrix.operating-system == 'ubuntu-latest'
         run: |
