@@ -10,9 +10,9 @@ use Zipkin\Propagation\TraceContext;
 use Zipkin\Endpoint;
 use TypeError;
 use Psr\Log\LoggerInterface;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Argument;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 final class HttpTest extends TestCase
 {
@@ -20,41 +20,6 @@ final class HttpTest extends TestCase
 
     const PAYLOAD = '[{"id":"%s","traceId":"%s",'
         . '"timestamp":%d,"name":"test","localEndpoint":{"serviceName":""}}]';
-
-    public function testConstructorIsRetrocompatible()
-    {
-        $this->assertInstanceOf(Http::class, new Http());
-
-        // old constructor
-        $this->assertInstanceOf(Http::class, new Http(
-            null,
-            ['endpoint_url' => 'http://myzipkin:9411/api/v2/spans']
-        ));
-        $this->assertInstanceOf(Http::class, new Http(CurlFactory::create()));
-        $this->assertInstanceOf(Http::class, new Http(
-            CurlFactory::create(),
-            ['endpoint_url' => 'http://myzipkin:9411/api/v2/spans']
-        ));
-
-        // new constructor
-        $this->assertInstanceOf(Http::class, new Http(
-            ['endpoint_url' => 'http://localhost:9411/api/v2/spans']
-        ));
-        $this->assertInstanceOf(Http::class, new Http(
-            ['endpoint_url' => 'http://localhost:9411/api/v2/spans'],
-            CurlFactory::create()
-        ));
-
-        try {
-            new Http(1);
-            $this->fail('Expected the constructor to fail.');
-        } catch (TypeError $e) {
-            $this->assertEquals(
-                'Argument 1 passed to Zipkin\Reporters\Http::__construct must be of type array, integer given',
-                $e->getMessage()
-            );
-        }
-    }
 
     public function testHttpReporterSuccess()
     {
