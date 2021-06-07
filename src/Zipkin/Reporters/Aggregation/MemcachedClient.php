@@ -24,11 +24,6 @@ class MemcachedClient implements CacheClientInterface
      */
     private $port;
 
-    /**
-     * @param string       $server
-     * @param int          $port
-     * @param bool         $enableCompression
-     */
     public function __construct(
         string $server = '127.0.0.1',
         int $port = 11211,
@@ -45,10 +40,10 @@ class MemcachedClient implements CacheClientInterface
     /**
      * {@inheritdoc}
      */
-    public function ping()
+    public function ping(): bool
     {
         if (false === @fsockopen($this->server, $this->port)) {
-            throw new Exception(
+            throw new \Exception(
                 "Unable to connect to memcached server {$this->server}:{$this->port}"
             );
         }
@@ -59,7 +54,7 @@ class MemcachedClient implements CacheClientInterface
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value, $expiration = 0)
+    public function set($key, $value, $expiration = 0): bool
     {
         return $this->client->set($key, $value, $expiration);
     }
@@ -67,7 +62,7 @@ class MemcachedClient implements CacheClientInterface
     /**
      * {@inheritdoc}
      */
-    public function get($key)
+    public function get($key): ?string
     {
         return $this->client->get($key);
     }
@@ -75,7 +70,7 @@ class MemcachedClient implements CacheClientInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($key)
+    public function delete($key): bool
     {
         return $this->client->delete($key);
     }
@@ -83,7 +78,7 @@ class MemcachedClient implements CacheClientInterface
     /**
      * {@inheritdoc}
      */
-    public function quit()
+    public function quit(): bool
     {
         return $this->client->quit();
     }

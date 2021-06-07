@@ -13,7 +13,7 @@ interface CacheClientInterface
      *
      * @return bool
      */
-    public function ping();
+    public function ping(): bool;
 
     /**
      * Set a value.
@@ -24,7 +24,7 @@ interface CacheClientInterface
      *
      * @return bool
      */
-    public function set($key, $value, $expiration);
+    public function set($key, $value, $expiration): bool;
 
     /**
      * Get a value by key.
@@ -33,7 +33,7 @@ interface CacheClientInterface
      *
      * @return mixed
      */
-    public function get($key);
+    public function get($key): ?string;
 
     /**
      * Delete a value by key.
@@ -42,12 +42,12 @@ interface CacheClientInterface
      *
      * @return bool
      */
-    public function delete($key);
+    public function delete($key): bool;
 
     /**
      * Quit all connections.
      *
      * @return bool
      */
-    public function quit();
+    public function quit(): bool;
 }
