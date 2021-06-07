@@ -26,8 +26,8 @@ class MemcachedClient implements CacheClientInterface
 
     /**
      * @param string       $server
-     * @param int|integer  $port
-     * @param bool|boolean $enableCompression
+     * @param int          $port
+     * @param bool         $enableCompression
      */
     public function __construct(
         string $server = '127.0.0.1',
