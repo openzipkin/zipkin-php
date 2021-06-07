@@ -43,7 +43,7 @@ class MemcachedClient implements CacheClientInterface
     public function ping(): bool
     {
         if (false === @fsockopen($this->server, $this->port)) {
-            throw new \Exception(
+            throw new Exception(
                 "Unable to connect to memcached server {$this->server}:{$this->port}"
             );
         }
