@@ -64,7 +64,7 @@ final class Memcached implements Reporter
         try {
             $this->memcachedClient->ping();
 
-            // Fetch stored traces
+            // Fetch stored spans
             $result = $this->memcachedClient->get(
                 $this->options['cache_key'],
                 null,
@@ -79,7 +79,7 @@ final class Memcached implements Reporter
                 );
             }
 
-            // Store traces if there aren't any previous traces
+            // Store spans if there aren't any previous spans
             if (empty($result)) {
                 $this->memcachedClient->set($this->options['cache_key'], $payload);
                 $this->memcachedClient->quit();
@@ -88,7 +88,7 @@ final class Memcached implements Reporter
 
             $status = false;
 
-            // Merge the new traces with the stored traces only if
+            // Merge the new spans with the stored spans only if
             // the item not updated by a different concurrent proceess
             while (!$status) {
                 $result['value'] = array_merge(
@@ -129,7 +129,7 @@ final class Memcached implements Reporter
         try {
             $this->memcachedClient->ping();
 
-            // Fetch stored traces
+            // Fetch stored spans
             $result = $this->memcachedClient->get(
                 $this->options['cache_key'],
                 null,
@@ -142,7 +142,7 @@ final class Memcached implements Reporter
 
             $status = false;
 
-            // Return stored traces and set the key value as empty only if
+            // Return stored spans and set the key value as empty only if
             // the item not updated by a different concurrent proceess
             while (!$status) {
                 $status = $this->memcachedClient->cas(
