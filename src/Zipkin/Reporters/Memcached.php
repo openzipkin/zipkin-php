@@ -112,6 +112,7 @@ final class Memcached implements Reporter
             }
 
             $this->memcachedClient->quit();
+
             return;
         } catch (Exception $e) {
             $this->logger->error(
