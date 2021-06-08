@@ -7,8 +7,10 @@ namespace Zipkin\Reporters\Aggregation;
 use Memcached;
 use Exception;
 
-class MemcachedClient implements CacheClientInterface
+class MemcachedClient
 {
+    const GET_EXTENDED = Memcached::GET_EXTENDED;
+
     /**
      * @var Memcached
      */
@@ -24,10 +26,15 @@ class MemcachedClient implements CacheClientInterface
      */
     private $port;
 
+    /**
+     * @param string       $server
+     * @param int          $port
+     * @param bool         $enableCompression
+     */
     public function __construct(
         string $server = '127.0.0.1',
         int $port = 11211,
-        bool $enableCompression = false
+        bool $enableCompression = true
     ) {
         $this->server = $server;
         $this->port = $port;
@@ -38,7 +45,9 @@ class MemcachedClient implements CacheClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check connection
+     *
+     * @return bool
      */
     public function ping(): bool
     {
@@ -52,31 +61,48 @@ class MemcachedClient implements CacheClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Set an item
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $expiration
      */
-    public function set($key, $value, $expiration = 0): bool
+    public function set($key, $value, $expiration = 0)
     {
         return $this->client->set($key, $value, $expiration);
     }
 
     /**
-     * {@inheritdoc}
+     * Get item by key.
+     *
+     * @param string $key
+     * @param mixed  $cacheCallback
+     * @param int    $flags
+     *
+     * @return mixed
      */
-    public function get($key): ?string
+    public function get($key, $cacheCallback = null, $flags = null)
     {
-        return $this->client->get($key);
+        return $this->client->get($key, $cacheCallback, $flags);
     }
 
     /**
-     * {@inheritdoc}
+     * Compare and swap an item.
+     *
+     * @param float  $casToken
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $expiration
      */
-    public function delete($key): bool
+    public function cas($casToken, $key, $value, $expiration = 0): bool
     {
-        return $this->client->delete($key);
+        return $this->client->cas($casToken, $key, $value, $expiration);
     }
 
     /**
-     * {@inheritdoc}
+     * Quit all connections.
+     *
+     * @return bool
      */
     public function quit(): bool
     {
