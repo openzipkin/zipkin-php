@@ -67,7 +67,7 @@ class MemcachedClient
      * @param mixed  $value
      * @param int    $expiration
      */
-    public function set($key, $value, $expiration = 0)
+    public function set($key, $value, $expiration = 0): bool
     {
         return $this->client->set($key, $value, $expiration);
     }
