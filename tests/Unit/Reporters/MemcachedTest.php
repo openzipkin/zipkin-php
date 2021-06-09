@@ -142,6 +142,49 @@ final class MemcachedTest extends TestCase
         $this->assertEquals($memcached->flush(), json_decode($payload, true));
     }
 
+    public function testFlushingOfOneSpanWithRetry()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+
+        $memcached = new Memcached([], $memcachedClient);
+
+        $memcachedClient->expects($this->once())
+            ->method('ping')
+            ->willReturn(true);
+
+        $context = TraceContext::createAsRoot();
+        $now = Timestamp\now();
+        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId(), $now);
+
+        $memcachedClient->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(
+                ['zipkin_traces', null, MemcachedClient::GET_EXTENDED],
+                ['zipkin_traces', null, MemcachedClient::GET_EXTENDED]
+            )->willReturnOnConsecutiveCalls(
+                ['cas' => 123, 'value' => $payload],
+                ['cas' => 124, 'value' => $payload]
+            );
+
+        $memcachedClient->expects($this->exactly(2))
+            ->method('cas')
+            ->withConsecutive(
+                ['123', 'zipkin_traces', json_encode([])],
+                ['124', 'zipkin_traces', json_encode([])]
+            )->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+
+        $memcachedClient->expects($this->once())
+            ->method('quit')
+            ->willReturn(true);
+
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->error()->shouldNotBeCalled();
+        $this->assertEquals($memcached->flush(), json_decode($payload, true));
+    }
+
     public function testFlushingError()
     {
         $memcachedClient = $this->createMock(MemcachedClient::class);
