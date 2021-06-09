@@ -112,13 +112,13 @@ final class Memcached implements Reporter
             }
 
             $this->memcachedClient->quit();
-
-            return;
         } catch (Exception $e) {
             $this->logger->error(
                 \sprintf('Error while calling memcached server: %s', $e->getMessage())
             );
         }
+
+        return;
     }
 
     /**
@@ -137,6 +137,8 @@ final class Memcached implements Reporter
             );
 
             if (empty($result)) {
+                $this->memcachedClient->quit();
+
                 return [];
             }
 
@@ -168,5 +170,7 @@ final class Memcached implements Reporter
                 \sprintf('Error while calling memcached server: %s', $e->getMessage())
             );
         }
+
+        return [];
     }
 }
