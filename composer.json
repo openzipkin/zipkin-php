@@ -22,7 +22,6 @@
     "require": {
         "php": "^7.3 || ^8.0",
         "ext-curl": "*",
-        "ext-memcached": "*",
         "psr/http-message": "~1.0",
         "psr/log": "^1.0"
     },
