@@ -11,7 +11,11 @@ class MemcachedClient
 {
     const GET_EXTENDED = Memcached::GET_EXTENDED;
 
-    /**
+    public const DEFAULT_OPTIONS = [
+        Memcached::OPT_COMPRESSION => true,
+    ];
+
+    /**c
      * @var Memcached
      */
     private $client;
@@ -34,14 +38,18 @@ class MemcachedClient
     public function __construct(
         string $server = '127.0.0.1',
         int $port = 11211,
-        bool $enableCompression = true
+        array $options = []
     ) {
         $this->server = $server;
         $this->port = $port;
 
         $this->client = new Memcached();
-        $this->client->setOption(Memcached::OPT_COMPRESSION, $enableCompression);
         $this->client->addServer($this->server, $this->port);
+
+        $options = \array_merge(self::DEFAULT_OPTIONS, $options);
+        foreach($options as $key => $value) {
+            $this->client->setOption($key, $value);
+        }
     }
 
     /**
