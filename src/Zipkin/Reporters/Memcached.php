@@ -99,7 +99,7 @@ final class Memcached implements Reporter
                     $spans
                 );
 
-                // If batch reporting interval passed, send spans to zipkin server and reset the value
+                // If batch reporting interval passed and enabled, send spans to zipkin server and reset the value
                 if ($this->isBatchIntervalPassed()) {
                     $this->httpClient->report($result['value']);
                     $result['value'] = [];
