@@ -15,7 +15,9 @@ use Exception;
 final class Memcached implements Reporter
 {
     public const DEFAULT_OPTIONS = [
-        'cache_key' => 'zipkin_traces',
+        'cache_key_prefix' => 'zipkin_traces',
+        'batch_interval' => 60,
+        'batch_size' => -1
     ];
 
     /**
@@ -39,18 +41,26 @@ final class Memcached implements Reporter
     private $serializer;
 
     /**
+     * @var Http
+     */
+    private $httpClient;
+
+    /**
      * @param array           $options
+     * @param Http $httpClient
      * @param MemcachedClient $memcachedClient
      * @param LoggerInterface $logger
      * @param SpanSerializer  $serializer
      */
     public function __construct(
         array $options = [],
+        Http $httpClient,
         MemcachedClient $memcachedClient = null,
         LoggerInterface $logger = null,
         SpanSerializer $serializer = null
     ) {
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
+        $this->httpClient = $httpClient;
         $this->memcachedClient = $memcachedClient ?? new MemcachedClient();
         $this->logger = $logger ?? new NullLogger();
         $this->serializer = $serializer ?? new JsonV2Serializer();
@@ -64,51 +74,47 @@ final class Memcached implements Reporter
         try {
             $this->memcachedClient->ping();
 
-            // Fetch stored spans
-            $result = $this->memcachedClient->get(
-                $this->options['cache_key'],
-                null,
-                MemcachedClient::GET_EXTENDED
-            );
-
-            $payload = $this->serializer->serialize($spans);
-
-            if ($payload === false) {
-                $this->logger->error(
-                    \sprintf('failed to encode spans with code %d', \json_last_error())
-                );
-            }
-
-            // Store spans if there aren't any previous spans
-            if (empty($result)) {
-                $this->memcachedClient->set($this->options['cache_key'], $payload);
-                $this->memcachedClient->quit();
-                return;
-            }
-
             $status = false;
 
-            // Merge the new spans with the stored spans only if
-            // the item not updated by a different concurrent proceess
             while (!$status) {
-                $result['value'] = array_merge(
-                    json_decode($result['value'], true),
-                    json_decode($payload, true)
+                $result = $this->memcachedClient->get(
+                    sprintf("%s_spans", $this->options['cache_key_prefix']),
+                    null,
+                    MemcachedClient::GET_EXTENDED
                 );
+
+                $payload = serialize($spans);
+
+                if (empty($result)) {
+                    $this->memcachedClient->set(
+                        sprintf("%s_spans", $this->options['cache_key_prefix']),
+                        serialize($spans)
+                    );
+                    $this->memcachedClient->quit();
+                    return;
+                }
+
+                $result['value'] = array_merge(
+                    unserialize($result['value']),
+                    $spans
+                );
+
+                if ($this->isBatchIntervalPassed()) {
+                    $this->httpClient->report($result['value']);
+                    $result['value'] = [];
+                    $this->resetBatchInterval();
+                }
+
+                if (($this->options['batch_size'] > 0) && (count($result['value']) >= $this->options['batch_size'])) {
+                    $this->httpClient->report($result['value']);
+                    $result['value'] = [];
+                }
 
                 $status = $this->memcachedClient->cas(
                     $result['cas'],
-                    $this->options['cache_key'],
-                    json_encode($result['value'])
+                    sprintf("%s_spans", $this->options['cache_key_prefix']),
+                    serialize($result['value'])
                 );
-
-                if (!$status) {
-                    $result = $this->memcachedClient->get(
-                        $this->options['cache_key'],
-                        null,
-                        MemcachedClient::GET_EXTENDED
-                    );
-                }
             }
 
             $this->memcachedClient->quit();
@@ -129,42 +135,30 @@ final class Memcached implements Reporter
         try {
             $this->memcachedClient->ping();
 
-            // Fetch stored spans
-            $result = $this->memcachedClient->get(
-                $this->options['cache_key'],
-                null,
-                MemcachedClient::GET_EXTENDED
-            );
-
-            if (empty($result)) {
-                $this->memcachedClient->quit();
-
-                return [];
-            }
-
             $status = false;
 
-            // Return stored spans and set the key value as empty only if
-            // the item not updated by a different concurrent proceess
             while (!$status) {
-                $status = $this->memcachedClient->cas(
-                    $result['cas'],
-                    $this->options['cache_key'],
-                    json_encode([])
+                $result = $this->memcachedClient->get(
+                    sprintf("%s_spans", $this->options['cache_key_prefix']),
+                    null,
+                    MemcachedClient::GET_EXTENDED
                 );
 
-                if (!$status) {
-                    $result = $this->memcachedClient->get(
-                        $this->options['cache_key'],
-                        null,
-                        MemcachedClient::GET_EXTENDED
-                    );
+                if (empty($result)) {
+                    $this->memcachedClient->quit();
+                    return [];
                 }
+
+                $status = $this->memcachedClient->cas(
+                    $result['cas'],
+                    sprintf("%s_spans", $this->options['cache_key_prefix']),
+                    serialize([])
+                );
             }
 
             $this->memcachedClient->quit();
 
-            return json_decode($result['value'], true);
+            return unserialize($result['value']);
         } catch (Exception $e) {
             $this->logger->error(
                 \sprintf('Error while calling memcached server: %s', $e->getMessage())
@@ -172,5 +166,78 @@ final class Memcached implements Reporter
         }
 
         return [];
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isBatchIntervalPassed(): bool
+    {
+        if ($this->options['batch_interval'] <= 0) {
+            return false;
+        }
+
+        $result = $this->memcachedClient->get(
+            sprintf("%s_batch_ts", $this->options['cache_key_prefix']),
+            null,
+            MemcachedClient::GET_EXTENDED
+        );
+
+        if (empty($result)) {
+            return false;
+        }
+
+        return ($result['value'] + $this->options['batch_interval']) <= time());
+    }
+
+    /**
+     * Reset Batch Interval
+     *
+     * @return bool
+     */
+    private function resetBatchInterval(): bool
+    {
+        if ($this->options['batch_interval'] <= 0) {
+            return false;
+        }
+
+        try {
+            $this->memcachedClient->ping();
+
+            $status = false;
+
+            while (!$status) {
+                $result = $this->memcachedClient->get(
+                    sprintf("%s_batch_ts", $this->options['cache_key_prefix']),
+                    null,
+                    MemcachedClient::GET_EXTENDED
+                );
+
+                if (empty($result)) {
+                    $this->memcachedClient->set(
+                        sprintf("%s_batch_ts", $this->options['cache_key_prefix']),
+                        time()
+                    );
+
+                    $this->memcachedClient->quit();
+
+                    return true;
+                }
+
+                $status = $this->memcachedClient->cas(
+                    $result['cas'],
+                    sprintf("%s_batch_ts", $this->options['cache_key_prefix']),
+                    time()
+                );
+            }
+
+            $this->memcachedClient->quit();
+        } catch (Exception $e) {
+            $this->logger->error(
+                \sprintf('Error while calling memcached server: %s', $e->getMessage())
+            );
+        }
+
+        return true;
     }
 }

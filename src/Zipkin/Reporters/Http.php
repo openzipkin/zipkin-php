@@ -82,7 +82,7 @@ final class Http implements Reporter
             return;
         }
 
-        $payload = (is_object($spans[0])) ? $this->serializer->serialize($spans) : json_encode($spans);
+        $payload = $this->serializer->serialize($spans);
 
         if ($payload === false) {
             $this->logger->error(
