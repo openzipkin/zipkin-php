@@ -16,7 +16,7 @@ final class Memcached implements Reporter
 {
     public const DEFAULT_OPTIONS = [
         'cache_key_prefix' => 'zipkin_traces',
-        'batch_interval' => 60,
+        'batch_interval' => 60, // In seconds
         'batch_size' => -1
     ];
 
@@ -99,12 +99,14 @@ final class Memcached implements Reporter
                     $spans
                 );
 
+                // If batch reporting interval passed, send spans to zipkin server and reset the value
                 if ($this->isBatchIntervalPassed()) {
                     $this->httpClient->report($result['value']);
                     $result['value'] = [];
                     $this->resetBatchInterval();
                 }
 
+                // If batch reporting size reached and enabled, send spans to zipkin server and reset the value
                 if (($this->options['batch_size'] > 0) && (count($result['value']) >= $this->options['batch_size'])) {
                     $this->httpClient->report($result['value']);
                     $result['value'] = [];
@@ -184,7 +186,7 @@ final class Memcached implements Reporter
         );
 
         if (empty($result)) {
-            return false;
+            return true;
         }
 
         return ($result['value'] + $this->options['batch_interval']) <= time());

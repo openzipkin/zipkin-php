@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zipkin\Reporters\Aggregation;
 
-use Memcached;
 use Exception;
 
 class MemcachedClient
@@ -15,7 +14,7 @@ class MemcachedClient
         Memcached::OPT_COMPRESSION => true,
     ];
 
-    /**c
+    /**
      * @var Memcached
      */
     private $client;
@@ -43,7 +42,11 @@ class MemcachedClient
         $this->server = $server;
         $this->port = $port;
 
-        $this->client = new Memcached();
+        if (!class_exists('\Memcached')) {
+            throw new Exception("PHP ext-memcached is required");
+        }
+
+        $this->client = new \Memcached();
         $this->client->addServer($this->server, $this->port);
 
         $options = \array_merge(self::DEFAULT_OPTIONS, $options);
