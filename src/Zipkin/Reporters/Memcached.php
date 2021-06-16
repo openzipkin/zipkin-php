@@ -14,7 +14,7 @@ use Exception;
 
 final class Memcached implements Reporter
 {
-    public const DEFAULT_OPTIONS = [
+    const DEFAULT_OPTIONS = [
         'cache_key_prefix' => 'zipkin_traces',
         'batch_interval' => 60, // In seconds
         'batch_size' => 100
@@ -41,26 +41,26 @@ final class Memcached implements Reporter
     private $serializer;
 
     /**
-     * @var Http
+     * @var Reporter
      */
-    private $httpClient;
+    private $reporter;
 
     /**
      * @param array           $options
-     * @param Http $httpClient
+     * @param Reporter        $reporter
      * @param MemcachedClient $memcachedClient
      * @param LoggerInterface $logger
      * @param SpanSerializer  $serializer
      */
     public function __construct(
         array $options = [],
-        Http $httpClient,
+        Reporter $reporter,
         MemcachedClient $memcachedClient = null,
         LoggerInterface $logger = null,
         SpanSerializer $serializer = null
     ) {
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
-        $this->httpClient = $httpClient;
+        $this->reporter = $reporter;
         $this->memcachedClient = $memcachedClient ?? new MemcachedClient();
         $this->logger = $logger ?? new NullLogger();
         $this->serializer = $serializer ?? new JsonV2Serializer();
@@ -73,6 +73,7 @@ final class Memcached implements Reporter
     {
         try {
             $status = false;
+            $aggregatedSpans = [];
 
             $this->memcachedClient->ping();
 
@@ -101,14 +102,14 @@ final class Memcached implements Reporter
 
                 // If batch reporting interval passed and enabled, send spans to zipkin server and reset the value
                 if ($this->isBatchIntervalPassed()) {
-                    $this->httpClient->report($result['value']);
+                    $aggregatedSpans = $result['value'];
                     $result['value'] = [];
                     $this->resetBatchInterval();
                 }
 
                 // If batch reporting size reached and enabled, send spans to zipkin server and reset the value
                 if (($this->options['batch_size'] > 0) && (count($result['value']) >= $this->options['batch_size'])) {
-                    $this->httpClient->report($result['value']);
+                    $aggregatedSpans = $result['value'];
                     $result['value'] = [];
                 }
 
@@ -118,14 +119,21 @@ final class Memcached implements Reporter
                     serialize($result['value'])
                 );
             }
+            $this->memcachedClient->quit();
         } catch (Exception $e) {
             $this->logger->error(
                 \sprintf('Error while calling memcached server: %s', $e->getMessage())
             );
-            // If memcache is down or there was any failure happened, send spans directly to zipkin
-            $this->httpClient->report($spans);
+
+            // If memcached is down or there was any failure happened, send reported spans directly to zipkin
+            if (empty($aggregatedSpans) && !empty($spans)) {
+                $this->reporter->report($spans);
+            }
         } finally {
-            $this->memcachedClient->quit();
+            // Send all aggregated spans only if reporting time reached and memcached value got cleared.
+            if ($status && !empty($aggregatedSpans)) {
+                $this->reporter->report($aggregatedSpans);
+            }
         }
 
         return;
@@ -191,7 +199,7 @@ final class Memcached implements Reporter
             return true;
         }
 
-        return ($result['value'] + $this->options['batch_interval']) <= time());
+        return (($result['value'] + $this->options['batch_interval']) <= time());
     }
 
     /**
@@ -224,7 +232,6 @@ final class Memcached implements Reporter
                     );
 
                     $this->memcachedClient->quit();
-
                     return true;
                 }
 

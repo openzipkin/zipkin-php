@@ -8,14 +8,14 @@ use Exception;
 
 class MemcachedClient
 {
-    const GET_EXTENDED = Memcached::GET_EXTENDED;
+    const GET_EXTENDED = \Memcached::GET_EXTENDED;
 
-    public const DEFAULT_OPTIONS = [
-        Memcached::OPT_COMPRESSION => true,
+    const DEFAULT_OPTIONS = [
+        \Memcached::OPT_COMPRESSION => true,
     ];
 
     /**
-     * @var Memcached
+     * @var \Memcached
      */
     private $client;
 
@@ -30,17 +30,25 @@ class MemcachedClient
     private $port;
 
     /**
+     * @var int
+     */
+    private $timeout;
+
+    /**
      * @param string       $server
      * @param int          $port
-     * @param bool         $enableCompression
+     * @param int          $timeout
+     * @param array        $options
      */
     public function __construct(
         string $server = '127.0.0.1',
         int $port = 11211,
+        int $timeout = 30,
         array $options = []
     ) {
         $this->server = $server;
         $this->port = $port;
+        $this->timeout = $timeout;
 
         if (!class_exists('\Memcached')) {
             throw new Exception("PHP ext-memcached is required");
@@ -62,10 +70,11 @@ class MemcachedClient
      */
     public function ping(): bool
     {
-        if (false === @fsockopen($this->server, $this->port)) {
-            throw new Exception(
-                "Unable to connect to memcached server {$this->server}:{$this->port}"
-            );
+        if (false === @fsockopen($this->server, $this->port, $errno, $errstr, $this->timeout)) {
+            throw new Exception(sprintf(
+                "Unable to connect to memcached server {$this->server}:{$this->port}: %s",
+                $errstr
+            ));
         }
 
         return true;

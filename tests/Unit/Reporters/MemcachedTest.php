@@ -10,6 +10,7 @@ use Zipkin\Recording\Span;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Endpoint;
 use Psr\Log\LoggerInterface;
+use Zipkin\Reporter;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Exception;
 
@@ -17,160 +18,40 @@ final class MemcachedTest extends TestCase
 {
     use ProphecyTrait;
 
-    const PAYLOAD = '[{"id":"%s","traceId":"%s",'
-        . '"timestamp":%d,"name":"test","localEndpoint":{"serviceName":""}}]';
-
-    public function testReportOfSpans()
+    public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
 
-        $memcachedClient->expects($this->exactly(1))
-            ->method('ping')
-            ->willReturn(true);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('get')
-            ->with('zipkin_traces', null, MemcachedClient::GET_EXTENDED)
-            ->willReturn(false);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('quit')
-            ->willReturn(true);
-
-        $memcached = new Memcached([], $memcachedClient);
-
-        $context = TraceContext::createAsRoot();
-        $localEndpoint = Endpoint::createAsEmpty();
-        $span = Span::createFromContext($context, $localEndpoint);
-        $now = Timestamp\now();
-        $span->start($now);
-        $span->setName('test');
-        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId(), $now);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('set')
-            ->with('zipkin_traces', $payload)
-            ->willReturn(true);
-
-        $logger = $this->prophesize(LoggerInterface::class);
-        $logger->error()->shouldNotBeCalled();
-        $this->assertNull($memcached->report([$span]));
-    }
-
-    public function testReportError()
-    {
-        $memcachedClient = $this->createMock(MemcachedClient::class);
-        $logger = $this->createMock(LoggerInterface::class);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('ping')
-            ->will($this->throwException(new Exception("Unable to connect")));
-
-        $logger->expects($this->exactly(1))
-            ->method('error');
-
-        $memcached = new Memcached([], $memcachedClient, $logger);
-
-        $context = TraceContext::createAsRoot();
-        $localEndpoint = Endpoint::createAsEmpty();
-        $span = Span::createFromContext($context, $localEndpoint);
-        $now = Timestamp\now();
-        $span->start($now);
-        $span->setName('test');
-        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId(), $now);
-
-        $this->assertNull($memcached->report([$span]));
-    }
-
-    public function testFlushingOfZeroSpans()
-    {
-        $memcachedClient = $this->createMock(MemcachedClient::class);
-
-        $memcached = new Memcached([], $memcachedClient);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('ping')
-            ->willReturn(true);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('get')
-            ->with('zipkin_traces', null, MemcachedClient::GET_EXTENDED)
-            ->willReturn(false);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('quit')
-            ->willReturn(true);
-
-        $logger = $this->prophesize(LoggerInterface::class);
-        $logger->error()->shouldNotBeCalled();
-        $this->assertEquals($memcached->flush(), []);
-    }
-
-    public function testFlushingOfOneSpan()
-    {
-        $memcachedClient = $this->createMock(MemcachedClient::class);
-
-        $memcached = new Memcached([], $memcachedClient);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('ping')
-            ->willReturn(true);
-
-        $context = TraceContext::createAsRoot();
-        $now = Timestamp\now();
-        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId(), $now);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('get')
-            ->with('zipkin_traces', null, MemcachedClient::GET_EXTENDED)
-            ->willReturn([
-                'cas' => 123,
-                'value' => $payload
-            ]);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('cas')
-            ->with('123', 'zipkin_traces', json_encode([]))
-            ->willReturn(true);
-
-        $memcachedClient->expects($this->exactly(1))
-            ->method('quit')
-            ->willReturn(true);
-
-        $logger = $this->prophesize(LoggerInterface::class);
-        $logger->error()->shouldNotBeCalled();
-        $this->assertEquals($memcached->flush(), json_decode($payload, true));
+        return $method->invokeArgs($object, $parameters);
     }
 
     public function testFlushingOfOneSpanWithRetry()
     {
         $memcachedClient = $this->createMock(MemcachedClient::class);
-
-        $memcached = new Memcached([], $memcachedClient);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached([], $httpReporter, $memcachedClient);
 
         $memcachedClient->expects($this->once())
             ->method('ping')
             ->willReturn(true);
 
-        $context = TraceContext::createAsRoot();
-        $now = Timestamp\now();
-        $payload = sprintf(self::PAYLOAD, $context->getSpanId(), $context->getTraceId(), $now);
-
         $memcachedClient->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
-                ['zipkin_traces', null, MemcachedClient::GET_EXTENDED],
-                ['zipkin_traces', null, MemcachedClient::GET_EXTENDED]
+                ['zipkin_traces_spans', null, MemcachedClient::GET_EXTENDED],
+                ['zipkin_traces_spans', null, MemcachedClient::GET_EXTENDED]
             )->willReturnOnConsecutiveCalls(
-                ['cas' => 123, 'value' => $payload],
-                ['cas' => 124, 'value' => $payload]
+                ['cas' => 123, 'value' => serialize([new \stdClass()])],
+                ['cas' => 124, 'value' => serialize([new \stdClass()])]
             );
 
         $memcachedClient->expects($this->exactly(2))
-            ->method('cas')
+            ->method('compareAndSwap')
             ->withConsecutive(
-                ['123', 'zipkin_traces', json_encode([])],
-                ['124', 'zipkin_traces', json_encode([])]
+                ['123', 'zipkin_traces_spans', serialize([])],
+                ['124', 'zipkin_traces_spans', serialize([])]
             )->willReturnOnConsecutiveCalls(
                 false,
                 true
@@ -182,15 +63,71 @@ final class MemcachedTest extends TestCase
 
         $logger = $this->prophesize(LoggerInterface::class);
         $logger->error()->shouldNotBeCalled();
-        $this->assertEquals($memcached->flush(), json_decode($payload, true));
+        $this->assertEquals($memcached->flush(), [new \stdClass()]);
+    }
+
+    public function testFlushingOfOneSpan()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached([], $httpReporter, $memcachedClient);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('ping')
+            ->willReturn(true);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('get')
+            ->with('zipkin_traces_spans', null, MemcachedClient::GET_EXTENDED)
+            ->willReturn([
+                'cas' => 123,
+                'value' => serialize([new \stdClass()])
+            ]);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('compareAndSwap')
+            ->with('123', 'zipkin_traces_spans', serialize([]))
+            ->willReturn(true);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('quit')
+            ->willReturn(true);
+
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->error()->shouldNotBeCalled();
+        $this->assertEquals($memcached->flush(), [new \stdClass()]);
+    }
+
+    public function testFlushingOfZeroSpans()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached([], $httpReporter, $memcachedClient);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('ping')
+            ->willReturn(true);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('get')
+            ->with('zipkin_traces_spans', null, MemcachedClient::GET_EXTENDED)
+            ->willReturn(false);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('quit')
+            ->willReturn(true);
+
+        $logger = $this->prophesize(LoggerInterface::class);
+        $logger->error()->shouldNotBeCalled();
+        $this->assertEquals($memcached->flush(), []);
     }
 
     public function testFlushingError()
     {
         $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
-
-        $memcached = new Memcached([], $memcachedClient, $logger);
+        $memcached = new Memcached([], $httpReporter, $memcachedClient, $logger);
 
         $memcachedClient->expects($this->exactly(1))
             ->method('ping')
@@ -200,5 +137,106 @@ final class MemcachedTest extends TestCase
             ->method('error');
 
         $this->assertEquals($memcached->flush(), []);
+    }
+
+    public function testDisabledPatchInterval()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached(['batch_interval' => -1], $httpReporter, $memcachedClient);
+
+        $this->assertEquals(
+            $this->invokeMethod($memcached, 'isBatchIntervalPassed', []),
+            false
+        );
+    }
+
+    public function testEnabledPatchInterval01()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached(['batch_interval' => 60], $httpReporter, $memcachedClient);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('get')
+            ->with('zipkin_traces_batch_ts', null, MemcachedClient::GET_EXTENDED)
+            ->willReturn(null);
+
+        $this->assertEquals(
+            $this->invokeMethod($memcached, 'isBatchIntervalPassed', []),
+            true
+        );
+    }
+
+    public function testEnabledPatchInterval02()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached(['batch_interval' => 60], $httpReporter, $memcachedClient);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('get')
+            ->with('zipkin_traces_batch_ts', null, MemcachedClient::GET_EXTENDED)
+            ->willReturn([
+                'cas' => 123,
+                'value' => time() - 90
+            ]);
+
+        $this->assertEquals(
+            $this->invokeMethod($memcached, 'isBatchIntervalPassed', []),
+            true
+        );
+    }
+
+    public function testEnabledPatchInterval03()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached(['batch_interval' => 60], $httpReporter, $memcachedClient);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('get')
+            ->with('zipkin_traces_batch_ts', null, MemcachedClient::GET_EXTENDED)
+            ->willReturn([
+                'cas' => 123,
+                'value' => time() - 40
+            ]);
+
+        $this->assertEquals(
+            $this->invokeMethod($memcached, 'isBatchIntervalPassed', []),
+            false
+        );
+    }
+
+    public function testResetBatchInterval()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $memcached = new Memcached(['batch_interval' => -1], $httpReporter, $memcachedClient);
+
+        $this->assertEquals(
+            $this->invokeMethod($memcached, 'resetBatchInterval', []),
+            false
+        );
+    }
+
+    public function testResetBatchIntervalError()
+    {
+        $memcachedClient = $this->createMock(MemcachedClient::class);
+        $httpReporter = $this->createMock(Reporter::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $memcached = new Memcached([], $httpReporter, $memcachedClient, $logger);
+
+        $memcachedClient->expects($this->exactly(1))
+            ->method('ping')
+            ->will($this->throwException(new Exception("Unable to connect")));
+
+        $logger->expects($this->exactly(1))
+            ->method('error');
+
+        $this->assertEquals(
+            $this->invokeMethod($memcached, 'resetBatchInterval', []),
+            true
+        );
     }
 }
