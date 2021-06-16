@@ -17,7 +17,7 @@ final class Memcached implements Reporter
     public const DEFAULT_OPTIONS = [
         'cache_key_prefix' => 'zipkin_traces',
         'batch_interval' => 60, // In seconds
-        'batch_size' => -1
+        'batch_size' => 100
     ];
 
     /**
@@ -72,9 +72,9 @@ final class Memcached implements Reporter
     public function report(array $spans): void
     {
         try {
-            $this->memcachedClient->ping();
-
             $status = false;
+
+            $this->memcachedClient->ping();
 
             while (!$status) {
                 $result = $this->memcachedClient->get(
@@ -112,18 +112,20 @@ final class Memcached implements Reporter
                     $result['value'] = [];
                 }
 
-                $status = $this->memcachedClient->cas(
+                $status = $this->memcachedClient->compareAndSwap(
                     $result['cas'],
                     sprintf("%s_spans", $this->options['cache_key_prefix']),
                     serialize($result['value'])
                 );
             }
-
-            $this->memcachedClient->quit();
         } catch (Exception $e) {
             $this->logger->error(
                 \sprintf('Error while calling memcached server: %s', $e->getMessage())
             );
+            // If memcache is down or there was any failure happened, send spans directly to zipkin
+            $this->httpClient->report($spans);
+        } finally {
+            $this->memcachedClient->quit();
         }
 
         return;
@@ -135,9 +137,9 @@ final class Memcached implements Reporter
     public function flush(): array
     {
         try {
-            $this->memcachedClient->ping();
-
             $status = false;
+
+            $this->memcachedClient->ping();
 
             while (!$status) {
                 $result = $this->memcachedClient->get(
@@ -151,7 +153,7 @@ final class Memcached implements Reporter
                     return [];
                 }
 
-                $status = $this->memcachedClient->cas(
+                $status = $this->memcachedClient->compareAndSwap(
                     $result['cas'],
                     sprintf("%s_spans", $this->options['cache_key_prefix']),
                     serialize([])
@@ -204,9 +206,9 @@ final class Memcached implements Reporter
         }
 
         try {
-            $this->memcachedClient->ping();
-
             $status = false;
+
+            $this->memcachedClient->ping();
 
             while (!$status) {
                 $result = $this->memcachedClient->get(
@@ -226,7 +228,7 @@ final class Memcached implements Reporter
                     return true;
                 }
 
-                $status = $this->memcachedClient->cas(
+                $status = $this->memcachedClient->compareAndSwap(
                     $result['cas'],
                     sprintf("%s_batch_ts", $this->options['cache_key_prefix']),
                     time()

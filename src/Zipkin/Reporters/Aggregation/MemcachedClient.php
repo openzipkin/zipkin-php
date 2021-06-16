@@ -105,7 +105,7 @@ class MemcachedClient
      * @param mixed  $value
      * @param int    $expiration
      */
-    public function cas($casToken, $key, $value, $expiration = 0): bool
+    public function compareAndSwap($casToken, $key, $value, $expiration = 0): bool
     {
         return $this->client->cas($casToken, $key, $value, $expiration);
     }
