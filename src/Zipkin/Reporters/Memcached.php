@@ -130,7 +130,6 @@ final class Memcached implements Reporter
         } finally {
             // Send all aggregated spans only if reporting time reached and memcached value got cleared.
             if ($status && !empty($aggregatedSpans)) {
-
                 $this->reporter->report($aggregatedSpans);
             }
         }
