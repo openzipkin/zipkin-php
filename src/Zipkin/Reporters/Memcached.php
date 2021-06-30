@@ -197,7 +197,7 @@ final class Memcached implements Reporter
             return true;
         }
 
-        return (($result['value'] + $this->options['batch_interval']) <= time());
+        return (intval($result['value'] + $this->options['batch_interval']) <= time());
     }
 
     /**

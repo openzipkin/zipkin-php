@@ -95,13 +95,13 @@ class MemcachedClient
     /**
      * Get item by key.
      *
-     * @param string $key
-     * @param mixed  $cacheCallback
-     * @param int    $flags
+     * @param string      $key
+     * @param mixed       $cacheCallback
+     * @param int         $flags
      *
      * @return mixed
      */
-    public function get($key, $cacheCallback = null, $flags = null)
+    public function get($key, $cacheCallback = null, $flags = 0)
     {
         return $this->client->get($key, $cacheCallback, $flags);
     }
