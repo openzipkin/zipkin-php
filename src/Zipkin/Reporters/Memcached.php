@@ -53,7 +53,7 @@ final class Memcached implements Reporter
      * @param SpanSerializer  $serializer
      */
     public function __construct(
-        array $options = [],
+        array $options,
         Reporter $reporter,
         MemcachedClient $memcachedClient = null,
         LoggerInterface $logger = null,

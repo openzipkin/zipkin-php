@@ -58,7 +58,7 @@ class MemcachedClient
         $this->client->addServer($this->server, $this->port);
 
         $options = \array_merge(self::DEFAULT_OPTIONS, $options);
-        foreach($options as $key => $value) {
+        foreach ($options as $key => $value) {
             $this->client->setOption($key, $value);
         }
     }
