@@ -73,7 +73,7 @@ final class Http implements Reporter
     }
 
     /**
-     * @param ReadbackSpan[] $spans
+     * @param ReadbackSpan[]|array $spans
      * @return void
      */
     public function report(array $spans): void
@@ -83,6 +83,7 @@ final class Http implements Reporter
         }
 
         $payload = $this->serializer->serialize($spans);
+
         if ($payload === false) {
             $this->logger->error(
                 \sprintf('failed to encode spans with code %d', \json_last_error())
@@ -91,6 +92,7 @@ final class Http implements Reporter
         }
 
         $client = $this->clientFactory->build($this->options);
+
         try {
             $client($payload);
         } catch (RuntimeException $e) {
