@@ -29,6 +29,11 @@ final class MemcachedTest extends TestCase
 
     public function testReportError()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -50,6 +55,11 @@ final class MemcachedTest extends TestCase
 
     public function testReportSuccessWithoutAggregatedSpans()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -78,6 +88,11 @@ final class MemcachedTest extends TestCase
 
     public function testReportSuccessWithSpans01()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -120,6 +135,11 @@ final class MemcachedTest extends TestCase
 
     public function testReportSuccessWithSpans02()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -159,6 +179,11 @@ final class MemcachedTest extends TestCase
 
     public function testFlushingOfOneSpanWithRetry()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached([], $httpReporter, $memcachedClient);
@@ -198,6 +223,11 @@ final class MemcachedTest extends TestCase
 
     public function testFlushingOfOneSpan()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached([], $httpReporter, $memcachedClient);
@@ -230,6 +260,11 @@ final class MemcachedTest extends TestCase
 
     public function testFlushingOfZeroSpans()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached([], $httpReporter, $memcachedClient);
@@ -254,6 +289,11 @@ final class MemcachedTest extends TestCase
 
     public function testFlushingError()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -271,6 +311,11 @@ final class MemcachedTest extends TestCase
 
     public function testDisabledPatchInterval()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached(['batch_interval' => -1], $httpReporter, $memcachedClient);
@@ -283,6 +328,11 @@ final class MemcachedTest extends TestCase
 
     public function testEnabledPatchInterval01()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached(['batch_interval' => 60], $httpReporter, $memcachedClient);
@@ -300,6 +350,11 @@ final class MemcachedTest extends TestCase
 
     public function testEnabledPatchInterval02()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached(['batch_interval' => 60], $httpReporter, $memcachedClient);
@@ -320,6 +375,11 @@ final class MemcachedTest extends TestCase
 
     public function testEnabledPatchInterval03()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('Memcached extension is missing.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached(['batch_interval' => 60], $httpReporter, $memcachedClient);
@@ -340,6 +400,11 @@ final class MemcachedTest extends TestCase
 
     public function testResetBatchInterval()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $memcached = new Memcached(['batch_interval' => -1], $httpReporter, $memcachedClient);
@@ -352,6 +417,11 @@ final class MemcachedTest extends TestCase
 
     public function testResetBatchIntervalError()
     {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('PHP ext-memcached is required.');
+            return;
+        }
+
         $memcachedClient = $this->createMock(MemcachedClient::class);
         $httpReporter = $this->createMock(Reporter::class);
         $logger = $this->createMock(LoggerInterface::class);
