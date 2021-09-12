@@ -21,7 +21,7 @@ final class DefaultTracing implements Tracing
         Endpoint $localEndpoint,
         Reporter $reporter,
         Sampler $sampler,
-        $usesTraceId128bits,
+        bool $usesTraceId128bits,
         CurrentTraceContext $currentTraceContext,
         bool $isNoop,
         Propagation $propagation,
