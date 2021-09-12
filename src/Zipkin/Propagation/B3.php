@@ -163,8 +163,7 @@ final class B3 implements Propagation
                 ));
             }
 
-            if (
-                array_key_exists(self::INJECT_SINGLE, $injectorsNames) &&
+            if (array_key_exists(self::INJECT_SINGLE, $injectorsNames) &&
                 array_key_exists(self::INJECT_SINGLE_NO_PARENT, $injectorsNames)
             ) {
                 throw new InvalidArgumentException(sprintf(
@@ -189,6 +188,7 @@ final class B3 implements Propagation
         foreach ($kindInjectors + self::DEFAULT_KIND_KEYS as /* string[] */ $injectorsNames) {
             if (!empty($missingInjectors = array_diff($injectorsNames, $keysInjectors))) {
                 $keysInjectors = [...$keysInjectors, ...$missingInjectors];
+
                 $this->keys = array_reduce($missingInjectors, function (array $carry, string $item) {
                     return [...$carry, ...self::KEYS[$item]];
                 }, $this->keys);

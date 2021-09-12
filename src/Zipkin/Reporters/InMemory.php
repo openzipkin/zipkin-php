@@ -12,7 +12,7 @@ final class InMemory implements Reporter
     /**
      * @var array|Span[]
      */
-    private $spans = [];
+    private array $spans = [];
 
     public function report(array $spans): void
     {

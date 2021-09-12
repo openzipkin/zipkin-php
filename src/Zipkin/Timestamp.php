@@ -6,8 +6,6 @@ namespace Zipkin\Timestamp;
 
 /**
  * Returns current timestamp in the zipkin format.
- *
- * @return int
  */
 function now(): int
 {
@@ -16,9 +14,6 @@ function now(): int
 
 /**
  * Checks whether a timestamp is valid or not.
- *
- * @param int $timestamp
- * @return bool
  */
 function isValid(int $timestamp): bool
 {

@@ -10,15 +10,9 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Response extends ClientResponse
 {
-    /**
-     * @var ResponseInterface
-     */
-    private $delegate;
+    private ResponseInterface $delegate;
 
-    /**
-     * @var Request|null
-     */
-    private $request;
+    private ?Request $request;
 
     public function __construct(
         ResponseInterface $delegate,

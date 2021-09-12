@@ -23,20 +23,14 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Middleware implements MiddlewareInterface
 {
-    /**
-     * @var Tracer
-     */
-    private $tracer;
+    private Tracer $tracer;
 
     /**
      * @var callable(ServerRequestInterface):SamplingFlags
      */
     private $extractor;
 
-    /**
-     * @var HttpServerParser
-     */
-    private $parser;
+    private HttpServerParser $parser;
 
     /**
      * @var (callable(ServerRequest):?bool)|null

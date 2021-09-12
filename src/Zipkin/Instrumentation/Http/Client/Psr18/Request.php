@@ -9,10 +9,7 @@ use Psr\Http\Message\RequestInterface;
 
 final class Request extends ClientRequest
 {
-    /**
-     * @var RequestInterface
-     */
-    private $delegate;
+    private RequestInterface $delegate;
 
     public function __construct(RequestInterface $delegate)
     {

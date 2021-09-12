@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http;
 
-use const Zipkin\Tags\HTTP_METHOD;
-use const Zipkin\Tags\HTTP_PATH;
 use const Zipkin\Tags\HTTP_URL;
+use const Zipkin\Tags\HTTP_PATH;
+use const Zipkin\Tags\HTTP_METHOD;
 
 /**
  * Abstract request type used for parsing and sampling of http clients and servers.

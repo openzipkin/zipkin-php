@@ -11,31 +11,14 @@ use Throwable;
 
 class Recorder
 {
-    /**
-     * @var Endpoint
-     */
-    private $endpoint;
+    private Endpoint $endpoint;
 
-    /**
-     * @var SpanMap
-     */
-    private $spanMap;
+    private SpanMap $spanMap;
 
-    /**
-     * @var Reporter
-     */
-    private $reporter;
+    private Reporter $reporter;
 
-    /**
-     * @var bool
-     */
-    private $noop;
+    private bool $noop;
 
-    /**
-     * @param Endpoint $endpoint
-     * @param Reporter $reporter
-     * @param bool $isNoop
-     */
     public function __construct(
         Endpoint $endpoint,
         Reporter $reporter,
@@ -44,7 +27,7 @@ class Recorder
         $this->endpoint = $endpoint;
         $this->reporter = $reporter;
         $this->noop = $isNoop;
-        $this->spanMap = new SpanMap;
+        $this->spanMap = new SpanMap();
     }
 
     public static function createAsNoop(): self
@@ -52,10 +35,6 @@ class Recorder
         return new self(Endpoint::createAsEmpty(), new Noop(), true);
     }
 
-    /**
-     * @param TraceContext $context
-     * @return int|null
-     */
     public function getTimestamp(TraceContext $context): ?int
     {
         $span = $this->spanMap->get($context);
@@ -67,22 +46,12 @@ class Recorder
         return null;
     }
 
-    /**
-     * @param TraceContext $context
-     * @param int $timestamp
-     * @return void
-     */
     public function start(TraceContext $context, int $timestamp): void
     {
         $span = $this->spanMap->getOrCreate($context, $this->endpoint);
         $span->start($timestamp);
     }
 
-    /**
-     * @param TraceContext $context
-     * @param string $name
-     * @return void
-     */
     public function setName(TraceContext $context, string $name): void
     {
         if ($this->noop) {
@@ -93,11 +62,6 @@ class Recorder
         $span->setName($name);
     }
 
-    /**
-     * @param TraceContext $context
-     * @param string $kind
-     * @return void
-     */
     public function setKind(TraceContext $context, string $kind): void
     {
         if ($this->noop) {
@@ -125,12 +89,6 @@ class Recorder
         $span->annotate($timestamp, $value);
     }
 
-    /**
-     * @param TraceContext $context
-     * @param string $key
-     * @param string $value
-     * @return void
-     */
     public function tag(TraceContext $context, string $key, string $value): void
     {
         if ($this->noop) {
@@ -151,11 +109,6 @@ class Recorder
         $span->setError($e);
     }
 
-    /**
-     * @param TraceContext $context
-     * @param Endpoint $remoteEndpoint
-     * @return void
-     */
     public function setRemoteEndpoint(TraceContext $context, Endpoint $remoteEndpoint): void
     {
         if ($this->noop) {
@@ -166,11 +119,6 @@ class Recorder
         $span->setRemoteEndpoint($remoteEndpoint);
     }
 
-    /**
-     * @param TraceContext $context
-     * @param int $finishTimestamp
-     * @return void
-     */
     public function finish(TraceContext $context, int $finishTimestamp): void
     {
         $span = $this->spanMap->get($context);
@@ -180,19 +128,11 @@ class Recorder
         }
     }
 
-    /**
-     * @param TraceContext $context
-     * @return void
-     */
     public function abandon(TraceContext $context): void
     {
         $this->spanMap->remove($context);
     }
 
-    /**
-     * @param TraceContext $context
-     * @return void
-     */
     public function flush(TraceContext $context): void
     {
         $span = $this->spanMap->remove($context);
@@ -203,9 +143,6 @@ class Recorder
         }
     }
 
-    /**
-     * @return void
-     */
     public function flushAll(): void
     {
         $this->reporter->report($this->spanMap->removeAll());

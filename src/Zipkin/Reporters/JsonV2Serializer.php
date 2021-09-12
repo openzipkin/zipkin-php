@@ -11,14 +11,11 @@ use Zipkin\DefaultErrorParser;
 
 class JsonV2Serializer implements SpanSerializer
 {
-    /**
-     * @var ErrorParser
-     */
-    private $errorParser;
+    private ErrorParser $errorParser;
 
     public function __construct(ErrorParser $errorParser = null)
     {
-        $this->errorParser = $errorParser ?? new DefaultErrorParser;
+        $this->errorParser = $errorParser ?? new DefaultErrorParser();
     }
 
     /**

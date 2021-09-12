@@ -13,15 +13,9 @@ use Zipkin\Instrumentation\Http\Request;
  */
 class HttpClientTracing
 {
-    /**
-     * @var Tracing
-     */
-    private $tracing;
+    private Tracing $tracing;
 
-    /**
-     * @var HttpClientParser
-     */
-    private $parser;
+    private HttpClientParser $parser;
 
     /**
      * function that decides to sample or not an unsampled
@@ -37,7 +31,7 @@ class HttpClientTracing
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser ?? new DefaultHttpClientParser;
+        $this->parser = $parser ?? new DefaultHttpClientParser();
         $this->requestSampler = $requestSampler;
     }
 
