@@ -60,7 +60,7 @@ abstract class Request
     abstract public function getHeader(string $name): ?string;
 
     /**
-     * @return mixed the underlying request object or {@code null} if there is none.
+     * @return object|null the underlying request object or {@code null} if there is none.
      */
-    abstract public function unwrap();
+    abstract public function unwrap(): ?object;
 }
