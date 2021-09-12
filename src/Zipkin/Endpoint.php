@@ -8,8 +8,6 @@ use InvalidArgumentException;
 
 final class Endpoint
 {
-    public const DEFAULT_SERVICE_NAME = 'unknown';
-
     /**
      * Service name in lowercase, such as "memcache" or "zipkin-web"
      * Conventionally, when the service name isn't known, service_name = "unknown".
