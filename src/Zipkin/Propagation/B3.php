@@ -163,7 +163,8 @@ final class B3 implements Propagation
                 ));
             }
 
-            if (array_key_exists(self::INJECT_SINGLE, $injectorsNames) &&
+            if (
+                array_key_exists(self::INJECT_SINGLE, $injectorsNames) &&
                 array_key_exists(self::INJECT_SINGLE_NO_PARENT, $injectorsNames)
             ) {
                 throw new InvalidArgumentException(sprintf(
@@ -181,12 +182,15 @@ final class B3 implements Propagation
         // $keysInjectors keeps reference for the already included injectors
         // to avoid duplications in the headers and/or the need to apply
         // array_unique
+        /**
+         * @var string[]
+         */
         $keysInjectors = [];
-        foreach ($kindInjectors + self::DEFAULT_KIND_KEYS as $injectorsNames) {
+        foreach ($kindInjectors + self::DEFAULT_KIND_KEYS as /* string[] */ $injectorsNames) {
             if (!empty($missingInjectors = array_diff($injectorsNames, $keysInjectors))) {
-                $keysInjectors = array_merge($keysInjectors, $missingInjectors);
-                $this->keys = array_reduce($missingInjectors, function ($carry, $item) {
-                    return array_merge($carry, self::KEYS[$item]);
+                $keysInjectors = [...$keysInjectors, ...$missingInjectors];
+                $this->keys = array_reduce($missingInjectors, function (array $carry, string $item) {
+                    return [...$carry, ...self::KEYS[$item]];
                 }, $this->keys);
             }
         }
