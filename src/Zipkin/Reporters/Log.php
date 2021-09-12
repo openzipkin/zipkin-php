@@ -28,7 +28,7 @@ final class Log implements Reporter
     public function report(array $spans): void
     {
         $this->logger->info(
-            $this->serializer->serialize($spans),
+            $this->serializer->serialize($spans)
         );
     }
 }
