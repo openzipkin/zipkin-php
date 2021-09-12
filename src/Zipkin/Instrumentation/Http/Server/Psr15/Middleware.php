@@ -13,8 +13,8 @@ use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Kind;
 use Zipkin\Instrumentation\Http\Server\Request as ServerRequest;
 use Zipkin\Instrumentation\Http\Server\Psr15\Propagation\RequestHeaders;
-use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
+use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 use Throwable;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -92,7 +92,7 @@ final class Middleware implements MiddlewareInterface
             return $this->tracer->joinSpan($extractedContext);
         }
 
-        $extractedContext = $extractedContext ?? DefaultSamplingFlags::createAsEmpty();
+        $extractedContext ??= DefaultSamplingFlags::createAsEmpty();
         if ($this->requestSampler === null) {
             return $this->tracer->nextSpan($extractedContext);
         }
