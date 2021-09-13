@@ -16,7 +16,7 @@ final class Log implements Reporter
 
     public function __construct(
         LoggerInterface $logger,
-        SpanSerializer $serializer = null,
+        SpanSerializer $serializer = null
     ) {
         $this->logger = $logger;
         $this->serializer = $serializer ?? new JsonV2Serializer();
@@ -27,8 +27,6 @@ final class Log implements Reporter
      */
     public function report(array $spans): void
     {
-        $this->logger->info(
-            $this->serializer->serialize($spans)
-        );
+        $this->logger->info($this->serializer->serialize($spans));
     }
 }
