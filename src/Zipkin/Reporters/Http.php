@@ -20,29 +20,18 @@ final class Http implements Reporter
         'endpoint_url' => 'http://localhost:9411/api/v2/spans',
     ];
 
-    /**
-     * @var ClientFactory
-     */
-    private $clientFactory;
+    private ClientFactory $clientFactory;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     /**
      * logger is only meant to be used for development purposes. Enabling
      * an actual logger in production could cause a massive amount of data
      * that will flood the logs on failure.
-     *
-     * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var SpanSerializer
-     */
-    private $serializer;
+    private SpanSerializer $serializer;
 
     /**
      * @param array $options the options for HTTP call:

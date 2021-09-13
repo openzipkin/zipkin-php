@@ -12,15 +12,9 @@ use Zipkin\Tracing;
  */
 class HttpServerTracing
 {
-    /**
-     * @var Tracing
-     */
-    private $tracing;
+    private Tracing $tracing;
 
-    /**
-     * @var HttpServerParser
-     */
-    private $parser;
+    private HttpServerParser $parser;
 
     /**
      * function that decides to sample or not an unsampled
@@ -36,7 +30,7 @@ class HttpServerTracing
         callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
-        $this->parser = $parser ?? new DefaultHttpServerParser;
+        $this->parser = $parser ?? new DefaultHttpServerParser();
         $this->requestSampler = $requestSampler;
     }
 

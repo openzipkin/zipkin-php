@@ -24,7 +24,7 @@ interface ReadbackSpan
     public function getKind(): ?string;
     public function getTimestamp(): int;
     public function getDuration(): ?int;
-    public function getLocalEndpoint(): ?Endpoint;
+    public function getLocalEndpoint(): Endpoint;
     public function getTags(): array;
     public function getAnnotations(): array;
     public function getError(): ?Throwable;

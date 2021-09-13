@@ -6,15 +6,9 @@ namespace Zipkin\Propagation;
 
 final class DefaultSamplingFlags implements SamplingFlags
 {
-    /**
-     * @var bool|null
-     */
-    private $isSampled;
+    private ?bool $isSampled;
 
-    /**
-     * @var bool
-     */
-    private $isDebug;
+    private bool $isDebug;
 
     private function __construct(?bool $isSampled, bool $isDebug)
     {
@@ -60,7 +54,7 @@ final class DefaultSamplingFlags implements SamplingFlags
     public function isEmpty(): bool
     {
         return $this->isSampled === self::EMPTY_SAMPLED &&
-        $this->isDebug === self::EMPTY_DEBUG;
+            $this->isDebug === self::EMPTY_DEBUG;
     }
 
     public function isEqual(SamplingFlags $samplingFlags): bool

@@ -9,10 +9,7 @@ use Throwable;
 
 final class NoopSpan implements Span
 {
-    /**
-     * @var TraceContext
-     */
-    private $context;
+    private TraceContext $context;
 
     public function __construct(TraceContext $context)
     {
@@ -23,17 +20,12 @@ final class NoopSpan implements Span
      * When true, no recording is done and nothing is reported to zipkin. However, this span should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
-     *
-     * @return bool
      */
     public function isNoop(): bool
     {
         return true;
     }
 
-    /**
-     * @return TraceContext
-     */
     public function getContext(): TraceContext
     {
         return $this->context;
@@ -44,9 +36,6 @@ final class NoopSpan implements Span
      *
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
-     *
-     * @param int|null $timestamp
-     * @return void
      */
     public function start(int $timestamp = null): void
     {
@@ -54,9 +43,6 @@ final class NoopSpan implements Span
 
     /**
      * Sets the string name for the logical operation this span represents.
-     *
-     * @param string $name
-     * @return void
      */
     public function setName(string $name): void
     {
@@ -66,9 +52,6 @@ final class NoopSpan implements Span
      * The kind of span is optional. When set, it affects how a span is reported. For example, if the
      * kind is {@link Zipkin\Kind\SERVER}, the span's start timestamp is implicitly annotated as "sr"
      * and that plus its duration as "ss".
-     *
-     * @param string $kind
-     * @return void
      */
     public function setKind(string $kind): void
     {
@@ -112,9 +95,6 @@ final class NoopSpan implements Span
      * For a client span, this would be the server's address.
      *
      * It is often expensive to derive a remote address: always check {@link #isNoop()} first!
-     *
-     * @param Endpoint $remoteEndpoint
-     * @return void
      */
     public function setRemoteEndpoint(Endpoint $remoteEndpoint): void
     {
@@ -122,8 +102,6 @@ final class NoopSpan implements Span
 
     /**
      * Throws away the current span without reporting it.
-     *
-     * @return void
      */
     public function abandon(): void
     {
@@ -134,9 +112,6 @@ final class NoopSpan implements Span
      *
      * {@link zipkin.Span#duration Zipkin's span duration} is derived by subtracting the start
      * timestamp from this, and set when appropriate.
-     *
-     * @param int|null $timestamp
-     * @return void
      */
     public function finish(int $timestamp = null): void
     {
@@ -151,8 +126,6 @@ final class NoopSpan implements Span
      *
      * Another example is where a user didn't call finish within a deadline or before a shutdown
      * occurs. By flushing, you can report what was in progress.
-     *
-     * @return void
      */
     public function flush(): void
     {

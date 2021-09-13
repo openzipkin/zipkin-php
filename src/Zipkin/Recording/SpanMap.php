@@ -12,7 +12,7 @@ final class SpanMap
     /**
      * @var Span[]|array
      */
-    private $map = [];
+    private array $map = [];
 
     public function get(TraceContext $context): ?Span
     {

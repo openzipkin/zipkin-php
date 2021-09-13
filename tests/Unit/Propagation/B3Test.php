@@ -14,20 +14,20 @@ use PHPUnit\Framework\TestCase;
 
 final class B3Test extends TestCase
 {
-    const TRACE_ID_NAME = 'x-b3-traceid';
-    const SPAN_ID_NAME = 'x-b3-spanid';
-    const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
-    const SAMPLED_NAME = 'x-b3-sampled';
-    const FLAGS_NAME = 'x-b3-flags';
-    const SINGLE_VALUE_NAME = 'b3';
+    public const TRACE_ID_NAME = 'x-b3-traceid';
+    public const SPAN_ID_NAME = 'x-b3-spanid';
+    public const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
+    public const SAMPLED_NAME = 'x-b3-sampled';
+    public const FLAGS_NAME = 'x-b3-flags';
+    public const SINGLE_VALUE_NAME = 'b3';
 
-    const TEST_TRACE_ID = 'bd7a977555f6b982';
-    const TEST_PARENT_ID = 'bd7a977555f6b982';
-    const TEST_SPAN_ID = 'be2d01e33cc78d97';
-    const TEST_SAMPLE = true;
-    const TEST_DEBUG = false;
-    const TEST_SINGLE_HEADER = 'bd7a977555f6b982-be2d01e33cc78d97-1-bd7a977555f6b982';
-    const TEST_SINGLE_HEADER_NO_PARENT = 'bd7a977555f6b982-be2d01e33cc78d97-1';
+    public const TEST_TRACE_ID = 'bd7a977555f6b982';
+    public const TEST_PARENT_ID = 'bd7a977555f6b982';
+    public const TEST_SPAN_ID = 'be2d01e33cc78d97';
+    public const TEST_SAMPLE = true;
+    public const TEST_DEBUG = false;
+    public const TEST_SINGLE_HEADER = 'bd7a977555f6b982-be2d01e33cc78d97-1-bd7a977555f6b982';
+    public const TEST_SINGLE_HEADER_NO_PARENT = 'bd7a977555f6b982-be2d01e33cc78d97-1';
 
     public function testKeysIncludesAllByDefault()
     {
@@ -44,7 +44,7 @@ final class B3Test extends TestCase
 
     public function testKeysIncludeMultiOnly()
     {
-        $b3Propagator = new B3(new NullLogger, [
+        $b3Propagator = new B3(new NullLogger(), [
             'PRODUCER' => ['multi'],
             'CLIENT' => ['multi'],
             'default' => ['multi'],
@@ -61,13 +61,31 @@ final class B3Test extends TestCase
 
     public function testKeysIncludeSingleOnly()
     {
-        $b3Propagator = new B3(new NullLogger, [
+        $b3Propagator = new B3(new NullLogger(), [
             'PRODUCER' => ['single'],
             'CLIENT' => ['single'],
             'default' => ['single'],
         ]);
 
         $this->assertEquals(['b3'], $b3Propagator->getKeys());
+    }
+
+    public function testKeysIncludeSingleAndMulti()
+    {
+        $b3Propagator = new B3(new NullLogger(), [
+            'PRODUCER' => ['single'],
+            'CLIENT' => ['multi'],
+            'default' => ['single'],
+        ]);
+
+        $this->assertEquals([
+            'b3',
+            'X-B3-TraceId',
+            'X-B3-SpanId',
+            'X-B3-ParentSpanId',
+            'X-B3-Sampled',
+            'X-B3-Flags',
+        ], $b3Propagator->getKeys());
     }
 
     public function injectorProvider(): array
@@ -119,7 +137,7 @@ final class B3Test extends TestCase
             self::TEST_DEBUG
         );
         $setterNGetter = new Map();
-        $b3Propagator = new B3(new NullLogger, $injectorsFn);
+        $b3Propagator = new B3(new NullLogger(), $injectorsFn);
         $injector = $b3Propagator->getInjector($setterNGetter);
         $injector($context, $carrier);
 
@@ -139,7 +157,7 @@ final class B3Test extends TestCase
             true
         );
         $setterNGetter = new Map();
-        $b3Propagator = new B3(new NullLogger);
+        $b3Propagator = new B3(new NullLogger());
         $injector = $b3Propagator->getInjector($setterNGetter);
         $injector($context, $carrier);
 
@@ -198,7 +216,7 @@ final class B3Test extends TestCase
             self::TEST_SAMPLE,
             self::TEST_DEBUG
         );
-        $b3Propagator = new B3(new NullLogger);
+        $b3Propagator = new B3(new NullLogger());
         $injector = $b3Propagator->getInjector($remoteSetter);
         $injector($context, $carrier);
 
@@ -336,7 +354,7 @@ final class B3Test extends TestCase
             {
                 $this->test = $test;
             }
-            
+
             public function log($level, $message, array $context = array())
             {
                 $this->test->assertEquals('debug', $level);

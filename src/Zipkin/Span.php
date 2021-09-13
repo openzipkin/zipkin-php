@@ -14,14 +14,9 @@ interface Span
      * When true, no recording is done and nothing is reported to zipkin. However, this span should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
-     *
-     * @return bool
      */
     public function isNoop(): bool;
 
-    /**
-     * @return TraceContext
-     */
     public function getContext(): TraceContext;
 
     /**
@@ -29,17 +24,11 @@ interface Span
      *
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
-     *
-     * @param int|null $timestamp
-     * @return void
      */
     public function start(int $timestamp = null): void;
 
     /**
      * Sets the string name for the logical operation this span represents.
-     *
-     * @param string $name
-     * @return void
      */
     public function setName(string $name): void;
 
@@ -49,9 +38,6 @@ interface Span
      * and that plus its duration as "ss".
      *
      * The value must be strictly one of the ones listed in {@link Kind}.
-     *
-     * @param string $kind
-     * @return void
      */
     public function setKind(string $kind): void;
 
