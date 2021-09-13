@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace ZipkinTests\Integration\Instrumentation\Http\Server;
 
-use function FastRoute\simpleDispatcher;
 use Zipkin\TracingBuilder;
 use Zipkin\SpanCustomizer;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
+use Zipkin\Recording\ReadbackSpan;
 use Zipkin\Propagation\TraceContext;
 
 use Zipkin\Instrumentation\Http\Server\Request;
 use Zipkin\Instrumentation\Http\Server\Psr15\Middleware;
-use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 use Zipkin\Instrumentation\Http\Server\HttpServerTracing;
+use Zipkin\Instrumentation\Http\Server\HttpServerParser;
 use Zipkin\Instrumentation\Http\Server\DefaultHttpServerParser;
 use RingCentral\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +22,7 @@ use Middlewares\Utils\Factory;
 use Middlewares\Utils\Dispatcher;
 use Middlewares;
 use FastRoute\RouteCollector;
+use function FastRoute\simpleDispatcher;
 
 final class MiddlewareTest extends TestCase
 {
@@ -79,13 +80,16 @@ final class MiddlewareTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        /**
+         * @var ReadbackSpan $span
+         */
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('GET', $span->getName());
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/users/abc123',
             'user_id' => 'abc123',
-        ], $span['tags']);
+        ], $span->getTags());
     }
 }

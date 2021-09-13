@@ -8,6 +8,7 @@ use Zipkin\TracingBuilder;
 use Zipkin\Span;
 use Zipkin\Samplers\BinarySampler;
 use Zipkin\Reporters\InMemory;
+use Zipkin\Recording\ReadbackSpan;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Propagation\DefaultSamplingFlags;
 use Zipkin\Instrumentation\Http\Server\Psr15\Middleware;
@@ -34,7 +35,7 @@ final class MiddlewareTest extends TestCase
         $tracer = $tracing->getTracer();
 
         return [
-            new HttpServerTracing($tracing, new DefaultHttpServerParser, $requestSampler),
+            new HttpServerTracing($tracing, new DefaultHttpServerParser(), $requestSampler),
             static function () use ($tracer, $reporter): array {
                 $tracer->flush();
                 return $reporter->flush();
@@ -83,13 +84,16 @@ final class MiddlewareTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        /**
+         * @var ReadbackSpan $span
+         */
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('GET', $span->getName());
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
-        ], $span['tags']);
+        ], $span->getTags());
     }
 
     public function testMiddlewareParsesRequestSuccessfullyWithNon2xx()
@@ -108,15 +112,18 @@ final class MiddlewareTest extends TestCase
 
         $this->assertCount(1, $spans);
 
-        $span = $spans[0]->toArray();
+        /**
+         * @var ReadbackSpan $span
+         */
+        $span = $spans[0];
 
-        $this->assertEquals('GET', $span['name']);
+        $this->assertEquals('GET', $span->getName());
         $this->assertEquals([
             'http.method' => 'GET',
             'http.path' => '/',
             'http.status_code' => '404',
             'error' => '404'
-        ], $span['tags']);
+        ], $span->getTags());
     }
 
     public function testMiddlewareKeepsContextForJoinSpan()

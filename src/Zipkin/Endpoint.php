@@ -8,8 +8,6 @@ use InvalidArgumentException;
 
 final class Endpoint
 {
-    public const DEFAULT_SERVICE_NAME = 'unknown';
-
     /**
      * Service name in lowercase, such as "memcache" or "zipkin-web"
      * Conventionally, when the service name isn't known, service_name = "unknown".
@@ -100,29 +98,5 @@ final class Endpoint
     public function withServiceName(string $serviceName): Endpoint
     {
         return new self($serviceName, $this->ipv4, $this->ipv6, $this->port);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function toArray(): array
-    {
-        $endpoint = [
-            'serviceName' => $this->serviceName,
-        ];
-
-        if ($this->ipv4) {
-            $endpoint['ipv4'] = $this->ipv4;
-        }
-
-        if ($this->port) {
-            $endpoint['port'] = $this->port;
-        }
-
-        if ($this->ipv6) {
-            $endpoint['ipv6'] = $this->ipv6;
-        }
-
-        return $endpoint;
     }
 }

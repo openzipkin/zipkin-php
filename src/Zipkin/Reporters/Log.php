@@ -12,9 +12,14 @@ final class Log implements Reporter
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger)
-    {
+    private SpanSerializer $serializer;
+
+    public function __construct(
+        LoggerInterface $logger,
+        SpanSerializer $serializer = null
+    ) {
         $this->logger = $logger;
+        $this->serializer = $serializer ?? new JsonV2Serializer();
     }
 
     /**
@@ -22,8 +27,6 @@ final class Log implements Reporter
      */
     public function report(array $spans): void
     {
-        foreach ($spans as $span) {
-            $this->logger->info($span->__toString());
-        }
+        $this->logger->info($this->serializer->serialize($spans));
     }
 }
