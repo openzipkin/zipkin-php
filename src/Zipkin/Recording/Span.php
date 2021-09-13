@@ -27,69 +27,46 @@ final class Span implements ReadbackSpan
      * precedes a timestamp. This is possible when..
      *  - The span is in-flight (ex not yet received a timestamp)
      *  - The span's start event was lost
-     *
-     * @var int
      */
-    private $timestamp;
+    private int $timestamp = 0;
 
-    /**
-     * @var bool
-     */
-    private $finished = false;
+    private bool $finished = false;
 
     /**
      * Span name in lowercase, rpc method for example. Conventionally, when the
      * span name isn't known, name = "unknown".
-     *
-     * @var string
      */
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @var string
-     */
-    private $kind;
+    private ?string $kind = null;
 
     /**
      * Unique 8-byte identifier for a trace, set on all spans within it.
-     *
-     * @var string
      */
-    private $traceId;
+    private string $traceId;
 
     /**
      * The parent's Span.id; absent if this the root span in a trace.
-     *
-     * @var string|null
      */
-    private $parentId;
+    private ?string $parentId;
 
     /**
      * Unique 8-byte identifier of this span within a trace. A span is uniquely
      * identified in storage by (trace_id, id).
-     *
-     * @var string
      */
-    private $spanId;
+    private string $spanId;
 
-    /**
-     * @var bool|null
-     */
-    private $isSampled;
+    private ?bool $isSampled;
 
     /**
      * True is a request to store this span even if it overrides sampling policy.
-     *
-     * @var bool
      */
-    private $debug;
+    private bool $debug;
 
     /**
      * True if we are contributing to a span started by another tracer (ex on a different host).
-     *
-     * @var bool
      */
-    private $shared;
+    private bool $shared;
 
     /**
      * Associates events that explain latency with a timestamp. Unlike log
@@ -98,17 +75,11 @@ final class Span implements ReadbackSpan
      *
      * @var array<array>
      */
-    private $annotations = [];
+    private array $annotations = [];
 
-    /**
-     * @var array
-     */
-    private $tags = [];
+    private array $tags = [];
 
-    /**
-     * @var Throwable|null
-     */
-    private $error;
+    private ?Throwable $error = null;
 
     /**
      * Measurement in microseconds of the critical path, if known. Durations of
@@ -123,20 +94,12 @@ final class Span implements ReadbackSpan
      * this field non-atomically is implementation-specific.
      *
      * This field is i64 vs i32 to support spans longer than 35 minutes.
-     *
-     * @var int|null
      */
-    private $duration;
+    private ?int $duration = null;
 
-    /**
-     * @var Endpoint
-     */
-    private $remoteEndpoint;
+    private ?Endpoint $remoteEndpoint = null;
 
-    /**
-     * @var Endpoint
-     */
-    private $localEndpoint;
+    private Endpoint $localEndpoint;
 
     private function __construct(
         string $traceId,
@@ -178,7 +141,7 @@ final class Span implements ReadbackSpan
     {
         return $this->spanId;
     }
-    
+
     public function getTraceId(): string
     {
         return $this->traceId;
@@ -208,7 +171,7 @@ final class Span implements ReadbackSpan
     {
         return $this->name;
     }
-    
+
     public function getKind(): ?string
     {
         return $this->kind;
@@ -224,7 +187,7 @@ final class Span implements ReadbackSpan
         return $this->duration;
     }
 
-    public function getLocalEndpoint(): ?Endpoint
+    public function getLocalEndpoint(): Endpoint
     {
         return $this->localEndpoint;
     }
@@ -316,55 +279,5 @@ final class Span implements ReadbackSpan
         }
 
         $this->finished = true;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function toArray(): array
-    {
-        $spanAsArray = [
-            'id' => $this->spanId,
-            'name' => $this->name,
-            'traceId' => $this->traceId,
-            'timestamp' => $this->timestamp,
-            'duration' => $this->duration,
-            'localEndpoint' => $this->localEndpoint->toArray(),
-        ];
-
-        if ($this->parentId !== null) {
-            $spanAsArray['parentId'] = $this->parentId;
-        }
-
-        if ($this->debug === true) {
-            $spanAsArray['debug'] = true;
-        }
-
-        if ($this->shared === true) {
-            $spanAsArray['shared'] = true;
-        }
-
-        if ($this->kind !== null) {
-            $spanAsArray['kind'] = $this->kind;
-        }
-
-        if ($this->remoteEndpoint !== null) {
-            $spanAsArray['remoteEndpoint'] = $this->remoteEndpoint->toArray();
-        }
-
-        if (!empty($this->annotations)) {
-            $spanAsArray['annotations'] = $this->annotations;
-        }
-
-        if (!empty($this->tags)) {
-            $spanAsArray['tags'] = $this->tags;
-        }
-
-        return $spanAsArray;
-    }
-
-    public function __toString(): string
-    {
-        return \json_encode($this->toArray()) ?: '';
     }
 }

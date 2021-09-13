@@ -11,10 +11,7 @@ namespace Zipkin;
  */
 final class SpanCustomizerShield implements SpanCustomizer
 {
-    /**
-     * @var Span
-     */
-    private $delegate;
+    private Span $delegate;
 
     public function __construct(Span $span)
     {

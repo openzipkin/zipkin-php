@@ -4,23 +4,17 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use function Zipkin\Timestamp\now;
-use function Zipkin\Timestamp\isValid;
 use Zipkin\Propagation\TraceContext;
 use Throwable;
 use InvalidArgumentException;
+use function Zipkin\Timestamp\now;
+use function Zipkin\Timestamp\isValid;
 
 final class RealSpan implements Span
 {
-    /**
-     * @var Recorder
-     */
-    private $recorder;
+    private Recorder $recorder;
 
-    /**
-     * @var TraceContext
-     */
-    private $traceContext;
+    private TraceContext $traceContext;
 
     public function __construct(TraceContext $context, Recorder $recorder)
     {

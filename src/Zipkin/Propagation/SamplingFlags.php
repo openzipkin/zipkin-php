@@ -6,8 +6,8 @@ namespace Zipkin\Propagation;
 
 interface SamplingFlags
 {
-    const EMPTY_SAMPLED = null;
-    const EMPTY_DEBUG = false;
+    public const EMPTY_SAMPLED = null;
+    public const EMPTY_DEBUG = false;
 
     public function isSampled(): ?bool;
 

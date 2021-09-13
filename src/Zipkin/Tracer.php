@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use function Zipkin\SpanName\generateSpanName;
 use Zipkin\SpanCustomizerShield;
 use Zipkin\SpanCustomizer;
 use Zipkin\Sampler;
@@ -15,53 +14,24 @@ use Zipkin\Propagation\CurrentTraceContext;
 use Throwable;
 use RuntimeException;
 use BadMethodCallException;
+use function Zipkin\SpanName\generateSpanName;
 
 final class Tracer
 {
-    /**
-     * @var Sampler
-     */
-    private $sampler;
+    private Sampler $sampler;
 
-    /**
-     * @var bool
-     */
-    private $isNoop;
+    private bool $isNoop;
 
-    /**
-     * @var bool
-     */
-    private $usesTraceId128bits;
+    private bool $usesTraceId128bits;
 
-    /**
-     * @var Recorder
-     */
-    private $recorder;
+    private Recorder $recorder;
 
-    /**
-     * @var CurrentTraceContext
-     */
-    private $currentTraceContext;
+    private CurrentTraceContext $currentTraceContext;
 
-    /**
-     * @var bool
-     */
-    private $supportsJoin;
+    private bool $supportsJoin;
 
-    /**
-     * @var bool
-     */
-    private $alwaysReportSpans;
+    private bool $alwaysReportSpans;
 
-    /**
-     * @param Endpoint $localEndpoint
-     * @param Reporter $reporter
-     * @param Sampler $sampler
-     * @param bool $usesTraceId128bits
-     * @param CurrentTraceContext $currentTraceContext
-     * @param bool $isNoop
-     * @param bool $alwaysReportSpans
-     */
     public function __construct(
         Endpoint $localEndpoint,
         Reporter $reporter,

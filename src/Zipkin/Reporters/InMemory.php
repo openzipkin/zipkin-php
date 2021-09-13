@@ -12,11 +12,11 @@ final class InMemory implements Reporter
     /**
      * @var array|Span[]
      */
-    private $spans = [];
+    private array $spans = [];
 
     public function report(array $spans): void
     {
-        $this->spans = \array_merge($this->spans, $spans);
+        $this->spans = [...$this->spans, ...$spans];
     }
 
     /**

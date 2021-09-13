@@ -4,64 +4,34 @@ declare(strict_types=1);
 
 namespace Zipkin;
 
-use Psr\Log\NullLogger;
-use Zipkin\Reporters\Log;
-use Zipkin\Propagation\B3;
 use Zipkin\Samplers\BinarySampler;
+use Zipkin\Reporters\Log;
 use Zipkin\Propagation\Propagation;
 use Zipkin\Propagation\CurrentTraceContext;
+use Zipkin\Propagation\B3;
+use Psr\Log\NullLogger;
 
 class TracingBuilder
 {
-    /**
-     * @var string|null
-     */
-    private $localServiceName;
+    private ?string $localServiceName = null;
 
-    /**
-     * @var Endpoint|null
-     */
-    private $localEndpoint;
+    private ?Endpoint $localEndpoint = null;
 
-    /**
-     * @var Reporter|null
-     */
-    private $reporter;
+    private ?Reporter $reporter = null;
 
-    /**
-     * @var Sampler|null
-     */
-    private $sampler;
+    private ?Sampler $sampler = null;
 
-    /**
-     * @var bool
-     */
-    private $usesTraceId128bits = false;
+    private bool $usesTraceId128bits = false;
 
-    /**
-     * @var CurrentTraceContext|null
-     */
-    private $currentTraceContext;
+    private ?CurrentTraceContext $currentTraceContext = null;
 
-    /**
-     * @var bool
-     */
-    private $isNoop = false;
+    private bool $isNoop = false;
 
-    /**
-     * @var bool
-     */
-    private $supportsJoin = true;
+    private bool $supportsJoin = true;
 
-    /**
-     * @var Propagation
-     */
-    private $propagation = null;
+    private ?Propagation $propagation = null;
 
-    /**
-     * @var bool
-     */
-    private $alwaysReportSpans = false;
+    private bool $alwaysReportSpans = false;
 
     public static function create(): self
     {
@@ -73,7 +43,6 @@ class TracingBuilder
      * This is an alternative to {@link #localEndpoint(Endpoint)}.
      *
      * @param string $localServiceName name of the service being traced. Defaults to "unknown".
-     * @return $this
      */
     public function havingLocalServiceName(string $localServiceName): self
     {
@@ -83,7 +52,6 @@ class TracingBuilder
 
     /**
      * @param Endpoint $endpoint Endpoint of the local service being traced. Defaults to site local.
-     * @return $this
      */
     public function havingLocalEndpoint(Endpoint $endpoint): self
     {
@@ -109,7 +77,6 @@ class TracingBuilder
      * <p>See https://github.com/openzipkin/zipkin-reporter-java
      *
      * @param Reporter $reporter
-     * @return $this
      */
     public function havingReporter(Reporter $reporter): self
     {
@@ -122,7 +89,6 @@ class TracingBuilder
      * the overhead of tracing will occur and/or if a trace will be reported to Zipkin.
      *
      * @param Sampler $sampler
-     * @return $this
      */
     public function havingSampler(Sampler $sampler): self
     {
@@ -134,7 +100,6 @@ class TracingBuilder
      * When true, new root spans will have 128-bit trace IDs. Defaults to false (64-bit)
      *
      * @param bool $usesTraceId128bits
-     * @return $this
      */
     public function havingTraceId128bits(bool $usesTraceId128bits): self
     {
@@ -144,7 +109,6 @@ class TracingBuilder
 
     /**
      * @param CurrentTraceContext $currentTraceContext
-     * @return $this
      */
     public function havingCurrentTraceContext(CurrentTraceContext $currentTraceContext): self
     {
@@ -157,7 +121,6 @@ class TracingBuilder
      * policy. This allows operators to stop tracing in risk scenarios.
      *
      * @param bool $isNoop
-     * @return $this
      */
     public function beingNoop(bool $isNoop = true): self
     {
@@ -218,10 +181,10 @@ class TracingBuilder
             }
         }
 
-        $reporter = $this->reporter ?? new Log(new NullLogger);
+        $reporter = $this->reporter ?? new Log(new NullLogger());
         $sampler = $this->sampler ?? BinarySampler::createAsNeverSample();
-        $propagation = $this->propagation ?? new B3;
-        $currentTraceContext = $this->currentTraceContext ?: new CurrentTraceContext;
+        $propagation = $this->propagation ?? new B3();
+        $currentTraceContext = $this->currentTraceContext ?: new CurrentTraceContext();
 
         return new DefaultTracing(
             $localEndpoint,

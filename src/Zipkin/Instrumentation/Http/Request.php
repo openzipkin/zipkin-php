@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Zipkin\Instrumentation\Http;
 
-use const Zipkin\Tags\HTTP_METHOD;
-use const Zipkin\Tags\HTTP_PATH;
 use const Zipkin\Tags\HTTP_URL;
+use const Zipkin\Tags\HTTP_PATH;
+use const Zipkin\Tags\HTTP_METHOD;
 
 /**
  * Abstract request type used for parsing and sampling of http clients and servers.
@@ -60,7 +60,7 @@ abstract class Request
     abstract public function getHeader(string $name): ?string;
 
     /**
-     * @return mixed the underlying request object or {@code null} if there is none.
+     * @return object|null the underlying request object or {@code null} if there is none.
      */
-    abstract public function unwrap();
+    abstract public function unwrap(): ?object;
 }

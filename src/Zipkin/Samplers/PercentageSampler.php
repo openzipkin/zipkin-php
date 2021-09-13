@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Zipkin\Samplers;
 
-use InvalidArgumentException;
 use Zipkin\Sampler;
+use InvalidArgumentException;
 
 final class PercentageSampler implements Sampler
 {
-    /**
-     * @var float
-     */
-    private $rate;
+    private float $rate;
 
     private function __construct(float $rate)
     {

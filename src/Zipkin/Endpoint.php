@@ -6,32 +6,22 @@ namespace Zipkin;
 
 use InvalidArgumentException;
 
-class Endpoint
+final class Endpoint
 {
-    const DEFAULT_SERVICE_NAME = 'unknown';
-
     /**
      * Service name in lowercase, such as "memcache" or "zipkin-web"
      * Conventionally, when the service name isn't known, service_name = "unknown".
-     *
-     * @var string
      */
-    private $serviceName;
+    private string $serviceName;
 
     /**
-     * @var string|null host address packed into 4 bytes.
+     * Host address packed into 4 bytes.
      */
-    private $ipv4;
+    private ?string $ipv4;
 
-    /**
-     * @var string|null
-     */
-    private $ipv6;
+    private ?string $ipv6;
 
-    /**
-     * @var int|null
-     */
-    private $port;
+    private ?int $port;
 
     private function __construct(string $serviceName, ?string $ipv4, ?string $ipv6, ?int $port)
     {
@@ -41,14 +31,6 @@ class Endpoint
         $this->port = $port;
     }
 
-    /**
-     * @param string $serviceName
-     * @param string|null $ipv4
-     * @param string|null $ipv6
-     * @param int|null $port
-     * @return Endpoint
-     * @throws \InvalidArgumentException
-     */
     public static function create(
         string $serviceName,
         ?string $ipv4 = null,
@@ -78,9 +60,6 @@ class Endpoint
         return new self($serviceName, $ipv4, $ipv6, $port);
     }
 
-    /**
-     * @return Endpoint
-     */
     public static function createFromGlobals(): self
     {
         return new self(
@@ -91,76 +70,33 @@ class Endpoint
         );
     }
 
-    /**
-     * @return Endpoint
-     */
     public static function createAsEmpty(): self
     {
         return new self('', null, null, null);
     }
 
-    /**
-     * @return string
-     */
     public function getServiceName(): string
     {
         return $this->serviceName;
     }
 
-    /**
-     * @return string|null
-     */
     public function getIpv4(): ?string
     {
         return $this->ipv4;
     }
 
-    /**
-     * @return string|null
-     */
     public function getIpv6(): ?string
     {
         return $this->ipv6;
     }
 
-    /**
-     * @return int|null
-     */
     public function getPort(): ?int
     {
         return $this->port;
     }
 
-    /**
-     * @param string $serviceName
-     * @return Endpoint
-     */
     public function withServiceName(string $serviceName): Endpoint
     {
         return new self($serviceName, $this->ipv4, $this->ipv6, $this->port);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function toArray(): array
-    {
-        $endpoint = [
-            'serviceName' => $this->serviceName,
-        ];
-
-        if ($this->ipv4) {
-            $endpoint['ipv4'] = $this->ipv4;
-        }
-
-        if ($this->port) {
-            $endpoint['port'] = $this->port;
-        }
-
-        if ($this->ipv6) {
-            $endpoint['ipv6'] = $this->ipv6;
-        }
-
-        return $endpoint;
     }
 }

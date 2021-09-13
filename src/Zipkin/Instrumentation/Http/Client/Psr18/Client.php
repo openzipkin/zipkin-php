@@ -9,8 +9,8 @@ use Zipkin\SpanCustomizerShield;
 use Zipkin\Propagation\TraceContext;
 use Zipkin\Kind;
 use Zipkin\Instrumentation\Http\Client\Psr18\Propagation\RequestHeaders;
-use Zipkin\Instrumentation\Http\Client\HttpClientParser;
 use Zipkin\Instrumentation\Http\Client\HttpClientTracing;
+use Zipkin\Instrumentation\Http\Client\HttpClientParser;
 use Throwable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -18,25 +18,16 @@ use Psr\Http\Client\ClientInterface;
 
 final class Client implements ClientInterface
 {
-    /**
-     * @var ClientInterface
-     */
-    private $delegate;
+    private ClientInterface $delegate;
 
     /**
      * @var callable(TraceContext,mixed):void
      */
     private $injector;
 
-    /**
-     * @var Tracer
-     */
-    private $tracer;
+    private Tracer $tracer;
 
-    /**
-     * @var HttpClientParser
-     */
-    private $parser;
+    private HttpClientParser $parser;
 
     /**
      * @var (callable(Request):?bool)|null

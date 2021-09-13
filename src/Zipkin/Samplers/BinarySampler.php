@@ -8,10 +8,7 @@ use Zipkin\Sampler;
 
 final class BinarySampler implements Sampler
 {
-    /**
-     * @var bool
-     */
-    private $isSampled;
+    private bool $isSampled;
 
     private function __construct(bool $isSampled)
     {

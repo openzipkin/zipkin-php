@@ -20,18 +20,18 @@
         "issues": "https://github.com/openzipkin/zipkin-php/issues"
     },
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^7.4 || ^8.0",
         "ext-curl": "*",
         "psr/http-message": "~1.0",
         "psr/log": "^1.0"
     },
     "require-dev": {
-        "nyholm/psr7": "^1.4",
         "jcchavezs/httptest": "~0.2",
         "middlewares/fast-route": "^2.0",
         "middlewares/request-handler": "^2.0",
+        "nyholm/psr7": "^1.4",
         "phpspec/prophecy-phpunit": "^2.0",
-        "phpstan/phpstan": "~0.12.88",
+        "phpstan/phpstan": "^0.12.26",
         "phpunit/phpunit": "~9",
         "psr/http-client": "^1.0",
         "psr/http-server-middleware": "^1.0",
@@ -74,7 +74,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0.x-dev"
+            "dev-master": "3.0.x-dev"
         }
     }
 }
