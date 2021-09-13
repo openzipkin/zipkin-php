@@ -46,7 +46,6 @@ Annotations:
     - timestamp: 1594044779509787
       value: test_annotation
 RemoteEndpoint: SERVICE2
-
 TEXT;
         $this->assertEquals($expectedSerialization, $serializedSpans);
     }

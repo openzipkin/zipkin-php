@@ -16,44 +16,45 @@ final class LogSerializer implements SpanSerializer
     {
         $spansAsArray = array_map([self::class, 'serializeSpan'], $spans);
 
-        return implode('\n', $spansAsArray);
+        return implode(PHP_EOL, $spansAsArray);
     }
 
     private function serializeSpan(ReadbackSpan $span): string
     {
-        $serialized = sprintf("Name: %s\n", $span->getName());
-        $serialized .= sprintf("TraceID: %s\n", $span->getTraceId());
-        $serialized .= sprintf("SpanID: %s\n", $span->getSpanId());
+        $serialized = [];
+        $serialized[] = sprintf("Name: %s", $span->getName());
+        $serialized[] = sprintf("TraceID: %s", $span->getTraceId());
+        $serialized[] = sprintf("SpanID: %s", $span->getSpanId());
         if (!is_null($parentID = $span->getParentId())) {
-            $serialized .= sprintf("StartTime: %s\n", $parentID);
+            $serialized[] = sprintf("StartTime: %s", $parentID);
         }
-        $serialized .= sprintf("Timestamp: %s\n", $span->getTimestamp());
-        $serialized .= sprintf("Duration: %s\n", $span->getDuration());
-        $serialized .= sprintf("Kind: %s\n", $span->getKind());
+        $serialized[] = sprintf("Timestamp: %s", $span->getTimestamp());
+        $serialized[] = sprintf("Duration: %s", $span->getDuration());
+        $serialized[] = sprintf("Kind: %s", $span->getKind());
 
-        $serialized .= sprintf("LocalEndpoint: %s\n", $span->getLocalEndpoint()->getServiceName());
+        $serialized[] = sprintf("LocalEndpoint: %s", $span->getLocalEndpoint()->getServiceName());
 
         if (\count($tags = $span->getTags()) > 0) {
-            $serialized .= "Tags:\n";
+            $serialized[] = "Tags:";
 
             foreach ($tags as $key => $value) {
-                $serialized .= sprintf("    %s: %s\n", $key, $value);
+                $serialized[] = sprintf("    %s: %s", $key, $value);
             }
         }
 
         if (\count($annotations = $span->getAnnotations()) > 0) {
-            $serialized .= "Annotations:\n";
+            $serialized[] = "Annotations:";
 
             foreach ($annotations as $annotation) {
-                $serialized .= sprintf("    - timestamp: %s\n", $annotation["timestamp"]);
-                $serialized .= sprintf("      value: %s\n", $annotation["value"]);
+                $serialized[] = sprintf("    - timestamp: %s", $annotation["timestamp"]);
+                $serialized[] = sprintf("      value: %s", $annotation["value"]);
             }
         }
 
         if (!is_null($remoteEndpoint = $span->getRemoteEndpoint())) {
-            $serialized .= sprintf("RemoteEndpoint: %s\n", $remoteEndpoint->getServiceName());
+            $serialized[] = sprintf("RemoteEndpoint: %s", $remoteEndpoint->getServiceName());
         }
 
-        return $serialized;
+        return implode(PHP_EOL, $serialized);
     }
 }
