@@ -18,8 +18,8 @@ final class HttpTest extends TestCase
 {
     use ProphecyTrait;
 
-    const PAYLOAD = '[{"id":"%s","traceId":"%s",'
-        . '"timestamp":%d,"name":"test","localEndpoint":{"serviceName":""}}]';
+    public const PAYLOAD = '[{"id":"%s","traceId":"%s",'
+        . '"timestamp":%d,"name":"test","localEndpoint":{"serviceName":"unknown"}}]';
 
     public function testHttpReporterSuccess()
     {

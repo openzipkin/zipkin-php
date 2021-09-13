@@ -8,11 +8,13 @@ use InvalidArgumentException;
 
 final class Endpoint
 {
+    public const DEFAULT_SERVICE_NAME = 'unknown';
+
     /**
      * Service name in lowercase, such as "memcache" or "zipkin-web"
      * Conventionally, when the service name isn't known, service_name = "unknown".
      */
-    private string $serviceName;
+    private string $serviceName = self::DEFAULT_SERVICE_NAME;
 
     /**
      * Host address packed into 4 bytes.
@@ -72,7 +74,7 @@ final class Endpoint
 
     public static function createAsEmpty(): self
     {
-        return new self('', null, null, null);
+        return new self('unknown', null, null, null);
     }
 
     public function getServiceName(): string
