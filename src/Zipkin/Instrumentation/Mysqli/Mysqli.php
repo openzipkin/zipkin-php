@@ -2,12 +2,12 @@
 
 namespace Zipkin\Instrumentation\Mysqli;
 
-use Zipkin\Span;
 use Zipkin\Tracer;
+use Zipkin\Span;
 use Zipkin\Endpoint;
 
-use const Zipkin\Tags\ERROR;
 use InvalidArgumentException;
+use const Zipkin\Tags\ERROR;
 
 /**
  * Mysqli is an instrumented extension for Mysqli.
@@ -22,19 +22,13 @@ class Mysqli extends \Mysqli
         'default_tags' => [],
     ];
 
-    /**
-     * @var Tracer
-     */
-    private $tracer;
+    private Tracer $tracer;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     public function __construct(
         Tracer $tracer,
-        array $options,
+        array $options = [],
         ?string $host = null,
         ?string $user = null,
         ?string $password = null,
@@ -42,15 +36,16 @@ class Mysqli extends \Mysqli
         ?int $port = null,
         ?string $socket = null
     ) {
+        self::validateOptions($options);
         $this->tracer = $tracer;
-        $this->options = self::validateOptions($options) + self::DEFAULT_OPTIONS;
+        $this->options = $options + self::DEFAULT_OPTIONS;
         parent::__construct(
-            $host ?? ini_get("mysqli.default_host"),
-            $user ?? ini_get("mysqli.default_user"),
-            $password ?? ini_get("mysqli.default_pw"),
-            $database ?? "",
-            $port ?? ini_get("mysqli.default_port"),
-            $socket ?? ini_get("mysqli.default_socket")
+            $host ?? ini_get('mysqli.default_host'),
+            $user ?? ini_get('mysqli.default_user'),
+            $password ?? ini_get('mysqli.default_pw'),
+            $database ?? '',
+            $port ?? ini_get('mysqli.default_port'),
+            $socket ?? ini_get('mysqli.default_socket')
         );
     }
 

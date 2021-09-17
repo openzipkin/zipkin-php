@@ -1,0 +1,4 @@
+
+[mysqld]
+# makes it possible to connect to the server using `mysql` as host
+bind-address = 0.0.0.0
