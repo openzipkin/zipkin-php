@@ -63,7 +63,9 @@ final class MysqliTest extends TestCase
             $mysqli = new Mysqli($tracer, [], ...$params);
 
             if ($mysqli->connect_errno) {
-                $this->fail(sprintf('Failed to connect to MySQL: %s %s', $mysqli->connect_errno, $mysqli->connect_error));
+                $this->fail(
+                    sprintf('Failed to connect to MySQL: %s %s', $mysqli->connect_errno, $mysqli->connect_error)
+                );
             }
 
             $res = $mysqli->query('SELECT 1');
