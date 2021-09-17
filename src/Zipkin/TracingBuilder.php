@@ -13,7 +13,7 @@ use Psr\Log\NullLogger;
 
 class TracingBuilder
 {
-    private ?string $localServiceName = null;
+    private string $localServiceName = 'unknown';
 
     private ?Endpoint $localEndpoint = null;
 
@@ -175,10 +175,7 @@ class TracingBuilder
     {
         $localEndpoint = $this->localEndpoint;
         if ($this->localEndpoint === null) {
-            $localEndpoint = Endpoint::createFromGlobals();
-            if ($this->localServiceName !== null) {
-                $localEndpoint = $localEndpoint->withServiceName($this->localServiceName);
-            }
+            $localEndpoint = Endpoint::createFromGlobals()->withServiceName($this->localServiceName);
         }
 
         $reporter = $this->reporter ?? new Log(new NullLogger());
