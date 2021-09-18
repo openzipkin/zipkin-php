@@ -59,7 +59,9 @@ class Mysqli extends \Mysqli
             throw new InvalidArgumentException(sprintf('Invalid remote_endpoint, %s expected', Endpoint::class));
         }
 
-        if (array_key_exists('default_tags', $options) && ($options['default_tags'] !== (array) $options['default_tags'])) {
+        if (array_key_exists('default_tags', $options)
+            && ($options['default_tags'] !== (array) $options['default_tags'])
+        ) {
             throw new InvalidArgumentException('Invalid default_tags, array expected');
         }
     }
@@ -116,6 +118,7 @@ class Mysqli extends \Mysqli
      * @return bool
      * @alias mysqli_real_query
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName
     public function real_query(string $query)
     {
         $span = $this->tracer->nextSpan();
@@ -138,6 +141,7 @@ class Mysqli extends \Mysqli
      * @return bool
      * @alias mysqli_begin_transaction
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName
     public function begin_transaction(int $flags = 0, ?string $name = null)
     {
         $span = $this->tracer->nextSpan();
