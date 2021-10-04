@@ -2,6 +2,7 @@
 
 namespace Zipkin\Instrumentation\Mysqli;
 
+use mysqli_result;
 use Zipkin\Tracer;
 use Zipkin\Span;
 use Zipkin\Endpoint;
@@ -40,12 +41,12 @@ class Mysqli extends \Mysqli
         $this->tracer = $tracer;
         $this->options = $options + self::DEFAULT_OPTIONS;
         parent::__construct(
-            $host ?? ini_get('mysqli.default_host'),
-            $user ?? ini_get('mysqli.default_user'),
-            $password ?? ini_get('mysqli.default_pw'),
+            $user ?? (ini_get('mysqli.default_user') ?: null),
+            $host ?? (ini_get('mysqli.default_host') ?: null),
+            $password ?? (ini_get('mysqli.default_pw') ?: null),
             $database ?? '',
-            $port ?? ini_get('mysqli.default_port'),
-            $socket ?? ini_get('mysqli.default_socket')
+            $port ?? ((int) ini_get('mysqli.default_port') ?: null),
+            $socket ?? (ini_get('mysqli.default_socket') ?: null)
         );
     }
 

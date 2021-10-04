@@ -24,7 +24,7 @@ final class MysqliTest extends TestCase
         echo "Waiting for mysql container to be up.";
         while (true) {
             $res = shell_exec('docker ps --filter "name=zipkin_php_mysql_test" --format "{{.Status}}"');
-            if (\str_contains($res, "healthy")) {
+            if (strpos($res, "healthy") >= 0) {
                 break;
             }
         }
