@@ -15,7 +15,7 @@ use const Zipkin\Tags\ERROR;
  * Function signatures come are borrowed from
  * https://github.com/php/php-src/blob/master/ext/mysqli/mysqli.stub.php
  */
-class Mysqli extends \Mysqli
+final class Mysqli extends \Mysqli
 {
     private const DEFAULT_OPTIONS = [
         'tag_query' => false,
@@ -41,11 +41,11 @@ class Mysqli extends \Mysqli
         $this->tracer = $tracer;
         $this->options = $options + self::DEFAULT_OPTIONS;
         parent::__construct(
-            $user ?? (ini_get('mysqli.default_user') ?: null),
             $host ?? (ini_get('mysqli.default_host') ?: null),
+            $user ?? (ini_get('mysqli.default_user') ?: null),
             $password ?? (ini_get('mysqli.default_pw') ?: null),
-            $database ?? '',
-            $port ?? ((int) ini_get('mysqli.default_port') ?: null),
+            $database,
+            $port ?? (($defaultPort = ini_get('mysqli.default_port')) ? (int) $defaultPort : null),
             $socket ?? (ini_get('mysqli.default_socket') ?: null)
         );
     }

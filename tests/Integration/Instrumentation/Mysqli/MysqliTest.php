@@ -78,7 +78,7 @@ final class MysqliTest extends TestCase
             $span = $spans[0];
             $this->assertEquals('sql/query', $span->getName());
         } finally {
-            $closer();
+            //$closer();
         }
     }
 }
