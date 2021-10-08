@@ -30,23 +30,23 @@ final class Mysqli extends \Mysqli
     public function __construct(
         Tracer $tracer,
         array $options = [],
-        ?string $host = null,
-        ?string $user = null,
-        ?string $password = null,
-        ?string $database = null,
-        ?int $port = null,
-        ?string $socket = null
+        string $host = null,
+        string $user = null,
+        string $password = null,
+        string $database = '',
+        int $port = null,
+        string $socket = null
     ) {
         self::validateOptions($options);
         $this->tracer = $tracer;
         $this->options = $options + self::DEFAULT_OPTIONS;
         parent::__construct(
-            $host ?? (ini_get('mysqli.default_host') ?: null),
-            $user ?? (ini_get('mysqli.default_user') ?: null),
-            $password ?? (ini_get('mysqli.default_pw') ?: null),
+            $host ?? (ini_get('mysqli.default_host') ?: ''),
+            $user ?? (ini_get('mysqli.default_user') ?: ''),
+            $password ?? (ini_get('mysqli.default_pw') ?: ''),
             $database,
-            $port ?? (($defaultPort = ini_get('mysqli.default_port')) ? (int) $defaultPort : null),
-            $socket ?? (ini_get('mysqli.default_socket') ?: null)
+            $port ?? (($defaultPort = ini_get('mysqli.default_port')) ? (int) $defaultPort : 3306),
+            $socket ?? (ini_get('mysqli.default_socket') ?: '')
         );
     }
 
