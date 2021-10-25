@@ -42,6 +42,10 @@ final class MysqliTest extends TestCase
 
     public function testConnect()
     {
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->markTestSkipped("Running the test on windows might be problematic");
+        }
+
         if (!extension_loaded("mysqli")) {
             $this->markTestSkipped("mysqli isn't loaded");
         }
