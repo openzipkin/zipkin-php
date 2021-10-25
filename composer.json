@@ -70,7 +70,7 @@
         "static-check": "phpstan analyse src --level 8"
     },
     "suggest": {
-        "ext-mysqli": "Allows to use MySQL",
+        "ext-mysqli": "Allows to use mysqli instrumentation.",
         "psr/http-client": "Allows to instrument HTTP clients following PSR18.",
         "psr/http-server-middleware": "Allows to instrument HTTP servers via middlewares following PSR15."
     },
