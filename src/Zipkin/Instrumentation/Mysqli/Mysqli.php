@@ -137,18 +137,18 @@ final class Mysqli extends \Mysqli
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      * @alias mysqli_begin_transaction
      */
     // phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function begin_transaction(int $flags = 0, ?string $name = null)
+    public function begin_transaction($flags = 0, $name = null)
     {
         $span = $this->tracer->nextSpan();
         $span->setName('sql/begin_transaction');
         $this->addsTagsAndRemoteEndpoint($span);
         $span->start();
         if ($name !== null) {
-            $span->tag('mysqli.transaction_name', $name);
+            $span->tag('mysqli.transaction_name', (string) $name);
         }
         try {
             if ($name === null) {
@@ -196,17 +196,17 @@ final class Mysqli extends \Mysqli
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      * @alias mysqli_rollback
      */
-    public function rollback(int $flags = 0, ?string $name = null)
+    public function rollback($flags = 0, $name = null)
     {
         $span = $this->tracer->nextSpan();
         $span->setName('sql/rollback');
         $this->addsTagsAndRemoteEndpoint($span);
         $span->start();
         if ($name !== null) {
-            $span->tag('mysqli.transaction_name', $name);
+            $span->tag('mysqli.transaction_name', (string) $name);
         }
         try {
             if ($name === null) {
