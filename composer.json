@@ -26,7 +26,6 @@
         "psr/log": "^1.0"
     },
     "require-dev": {
-        "ext-mysqli": "*",
         "jcchavezs/httptest": "~0.2",
         "middlewares/fast-route": "^2.0",
         "middlewares/request-handler": "^2.0",
@@ -70,6 +69,7 @@
         "static-check": "phpstan analyse src --level 8"
     },
     "suggest": {
+        "ext-mysqli": "Allows to use MySQL",
         "psr/http-client": "Allows to instrument HTTP clients following PSR18.",
         "psr/http-server-middleware": "Allows to instrument HTTP servers via middlewares following PSR15."
     },
