@@ -50,19 +50,17 @@ final class Mysqli extends \Mysqli
         );
     }
 
-    private static function validateOptions(array $options): void
+    private static function validateOptions(array $opts): void
     {
-        if (array_key_exists('tag_query', $options) && ($options['tag_query'] !== (bool) $options['tag_query'])) {
+        if (array_key_exists('tag_query', $opts) && ($opts['tag_query'] !== (bool) $opts['tag_query'])) {
             throw new InvalidArgumentException('Invalid tag_query, bool expected');
         }
 
-        if (array_key_exists('remote_endpoint', $options) && !($options['remote_endpoint'] instanceof Endpoint)) {
+        if (array_key_exists('remote_endpoint', $opts) && !($opts['remote_endpoint'] instanceof Endpoint)) {
             throw new InvalidArgumentException(sprintf('Invalid remote_endpoint, %s expected', Endpoint::class));
         }
 
-        if (array_key_exists('default_tags', $options)
-            && ($options['default_tags'] !== (array) $options['default_tags'])
-        ) {
+        if (array_key_exists('default_tags', $opts) && ($opts['default_tags'] !== (array) $opts['default_tags'])) {
             throw new InvalidArgumentException('Invalid default_tags, array expected');
         }
     }
@@ -153,7 +151,12 @@ final class Mysqli extends \Mysqli
             $span->tag('mysqli.transaction_name', $name);
         }
         try {
-            $result = parent::begin_transaction($flags, $name);
+            if ($name === null) {
+                $result = parent::begin_transaction($flags);
+            } else {
+                $result = parent::begin_transaction($flags, $name);
+            }
+
             if ($result === false) {
                 $span->tag(ERROR, 'true');
             }
@@ -177,7 +180,12 @@ final class Mysqli extends \Mysqli
             $span->tag('mysqli.transaction_name', $name);
         }
         try {
-            $result = parent::commit($flags, $name);
+            if ($name === null) {
+                $result = parent::commit($flags);
+            } else {
+                $result = parent::commit($flags, $name);
+            }
+
             if ($result === false) {
                 $span->tag(ERROR, 'true');
             }
@@ -201,7 +209,11 @@ final class Mysqli extends \Mysqli
             $span->tag('mysqli.transaction_name', $name);
         }
         try {
-            $result = parent::commit($flags, $name);
+            if ($name === null) {
+                $result = parent::commit($flags);
+            } else {
+                $result = parent::commit($flags, $name);
+            }
             if ($result === false) {
                 $span->tag(ERROR, 'true');
             }
