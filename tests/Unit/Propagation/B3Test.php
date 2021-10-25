@@ -14,20 +14,20 @@ use PHPUnit\Framework\TestCase;
 
 final class B3Test extends TestCase
 {
-    public const TRACE_ID_NAME = 'x-b3-traceid';
-    public const SPAN_ID_NAME = 'x-b3-spanid';
-    public const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
-    public const SAMPLED_NAME = 'x-b3-sampled';
-    public const FLAGS_NAME = 'x-b3-flags';
-    public const SINGLE_VALUE_NAME = 'b3';
+    private const TRACE_ID_NAME = 'x-b3-traceid';
+    private const SPAN_ID_NAME = 'x-b3-spanid';
+    private const PARENT_SPAN_ID_NAME = 'x-b3-parentspanid';
+    private const SAMPLED_NAME = 'x-b3-sampled';
+    private const FLAGS_NAME = 'x-b3-flags';
+    private const SINGLE_VALUE_NAME = 'b3';
 
-    public const TEST_TRACE_ID = 'bd7a977555f6b982';
-    public const TEST_PARENT_ID = 'bd7a977555f6b982';
-    public const TEST_SPAN_ID = 'be2d01e33cc78d97';
-    public const TEST_SAMPLE = true;
-    public const TEST_DEBUG = false;
-    public const TEST_SINGLE_HEADER = 'bd7a977555f6b982-be2d01e33cc78d97-1-bd7a977555f6b982';
-    public const TEST_SINGLE_HEADER_NO_PARENT = 'bd7a977555f6b982-be2d01e33cc78d97-1';
+    private const TEST_TRACE_ID = 'bd7a977555f6b982';
+    private const TEST_PARENT_ID = 'bd7a977555f6b982';
+    private const TEST_SPAN_ID = 'be2d01e33cc78d97';
+    private const TEST_SAMPLE = true;
+    private const TEST_DEBUG = false;
+    private const TEST_SINGLE_HEADER = 'bd7a977555f6b982-be2d01e33cc78d97-1-bd7a977555f6b982';
+    private const TEST_SINGLE_HEADER_NO_PARENT = 'bd7a977555f6b982-be2d01e33cc78d97-1';
 
     public function testKeysIncludesAllByDefault()
     {
