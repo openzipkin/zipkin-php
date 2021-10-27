@@ -343,23 +343,10 @@ final class B3Test extends TestCase
         $carrier = [];
         $carrier[strtolower(self::TRACE_ID_NAME)] = 'xyz';
         $carrier[strtolower(self::SPAN_ID_NAME)] = 'mno';
-        $test = $this;
 
-        $logger = new class($test) implements LoggerInterface {
-            use LoggerTrait;
-
-            private $test;
-
-            public function __construct(TestCase $test)
-            {
-                $this->test = $test;
-            }
-
-            public function log($level, $message, array $context = array())
-            {
-                $this->test->assertEquals('debug', $level);
-            }
-        };
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('debug');
+        
         $getter = new Map();
         $b3Propagator = new B3($logger);
         $extractor = $b3Propagator->getExtractor($getter);
