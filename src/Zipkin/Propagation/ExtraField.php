@@ -11,15 +11,19 @@ final class ExtraField implements Propagation
     private Propagation $delegate;
 
     /**
-     * @var string[string]
+     * @var array<string,string>
      */
     private array $keyToName;
 
     /**
-     * @var string[string]
+     * @var array<string,string>
      */
     private array $nameToKey;
 
+    /**
+     * @param Propagation $delegate
+     * @param array<string,string> $keyToNameMap
+     */
     public function __construct(Propagation $delegate, array $keyToNameMap)
     {
         $this->delegate = $delegate;
