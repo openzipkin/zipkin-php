@@ -8,26 +8,23 @@ use Zipkin\Propagation\TraceContext;
 
 final class ExtraField implements Propagation
 {
-    /**
-     * @var Propagation
-     */
-    private $delegate;
+    private Propagation $delegate;
 
     /**
-     * @var string[]
+     * @var string[string]
      */
-    private $keyToName;
+    private array $keyToName;
 
     /**
-     * @var string[]
+     * @var string[string]
      */
-    private $nameToKey;
+    private array $nameToKey;
 
-    public function __construct(Propagation $delegate, array $keyToName)
+    public function __construct(Propagation $delegate, array $keyToNameMap)
     {
         $this->delegate = $delegate;
-        $this->keyToName = $keyToName;
-        $this->nameToKey = array_flip($keyToName);
+        $this->keyToName = $keyToNameMap;
+        $this->nameToKey = array_flip($keyToNameMap);
     }
 
     /**
@@ -43,7 +40,6 @@ final class ExtraField implements Propagation
      */
     public function getInjector(Setter $setter): callable
     {
-        $nameToKey = $this->nameToKey;
         $delegateInjector = $this->delegate->getInjector($setter);
 
         /**
@@ -51,13 +47,13 @@ final class ExtraField implements Propagation
          * @param $carrier
          * @return void
          */
-        return function (TraceContext $traceContext, $carrier) use ($setter, $delegateInjector, $nameToKey) {
+        return function (TraceContext $traceContext, &$carrier) use ($setter, $delegateInjector): void {
             foreach ($traceContext->getExtra() as $name => $value) {
-                if (!array_key_exists($name, $nameToKey)) {
+                if (!array_key_exists($name, $this->nameToKey)) {
                     continue;
                 }
 
-                $setter->put($carrier, $nameToKey[$name], $value);
+                $setter->put($carrier, $this->nameToKey[$name], $value);
             }
 
             $delegateInjector($traceContext, $carrier);
@@ -69,19 +65,20 @@ final class ExtraField implements Propagation
      */
     public function getExtractor(Getter $getter): callable
     {
-        $keyToName = $this->keyToName;
         $delegateExtractor = $this->delegate->getExtractor($getter);
 
         /**
          * @param $carrier
-         * @return TraceContext
+         * @return SamplingFlags
          */
-        return function ($carrier) use ($getter, $delegateExtractor, $keyToName) {
+        return function ($carrier) use ($getter, $delegateExtractor): SamplingFlags {
             $traceContext = $delegateExtractor($carrier);
+            if (!($traceContext instanceof TraceContext)) {
+                return $traceContext;
+            }
 
             $extra = [];
-
-            foreach ($keyToName as $key => $name) {
+            foreach ($this->keyToName as $key => $name) {
                 $value = $getter->get($carrier, $key);
 
                 if ($value === null) {

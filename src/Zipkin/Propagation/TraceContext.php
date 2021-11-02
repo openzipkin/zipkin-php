@@ -26,7 +26,7 @@ final class TraceContext implements SamplingFlags
     private bool $usesTraceId128bits;
 
     /**
-     * @var string[]
+     * @var string[string]
      */
     private array $extra = [];
 
@@ -233,7 +233,7 @@ final class TraceContext implements SamplingFlags
         );
     }
 
-    public function withExtra(array $extra)
+    public function withExtra(array $extra): TraceContext
     {
         return new TraceContext(
             $this->traceId,
@@ -254,9 +254,9 @@ final class TraceContext implements SamplingFlags
      * example implementation could be storing a class containing a correlation value, which is
      * extracted from incoming requests and injected as-is onto outgoing requests.
      *
-     * @return string[]
+     * @return string[string]
      */
-    public function getExtra()
+    public function getExtra(): array
     {
         return $this->extra;
     }
