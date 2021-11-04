@@ -27,7 +27,7 @@ abstract class Response
     abstract public function getStatusCode(): int;
 
     /**
-     * @return object|null the underlying response object or {@code null} if there is none.
+     * @return mixed the underlying response object or {@code null} if there is none.
      */
-    abstract public function unwrap(): ?object;
+    abstract public function unwrap();
 }
