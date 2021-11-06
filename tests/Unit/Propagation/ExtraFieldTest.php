@@ -24,8 +24,14 @@ final class ExtraFieldTest extends TestCase
         $injector = $propagation->getInjector(new Map());
 
         $carrier = [];
-        $injector(TraceContext::createAsRoot()->withExtra(['request_id' => 'abc123']), $carrier);
+        $injector(TraceContext::createAsRoot()->withExtra(
+            [
+                'request_id' => 'abc123',
+                'other_field' => 'xyz987'
+            ],
+        ), $carrier);
         $this->assertEquals('abc123', $carrier['x-request-id']);
+        $this->assertArrayNotHasKey('other_field', $carrier);
     }
 
     public function testGetExtractor(): void
@@ -40,8 +46,11 @@ final class ExtraFieldTest extends TestCase
             'x-b3-traceid' => '7f46165474d11ee5836777d85df2cdab',
             'x-b3-spanid' => '4654d1e567d8f2ab',
             'x-request-id' => 'xyz987',
+            'x-something-else' => 'pqr456',
         ]);
 
-        $this->assertEquals('xyz987', $context->getExtra()['request_id']);
+        $extra = $context->getExtra();
+        $this->assertCount(1, $extra);
+        $this->assertEquals('xyz987', $extra['request_id']);
     }
 }
