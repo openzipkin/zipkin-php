@@ -25,6 +25,11 @@ final class TraceContext implements SamplingFlags
 
     private bool $usesTraceId128bits;
 
+    /**
+     * @var array<string,string>
+     */
+    private array $extra = [];
+
     private function __construct(
         string $traceId,
         string $spanId,
@@ -32,7 +37,8 @@ final class TraceContext implements SamplingFlags
         ?bool $isSampled,
         bool $isDebug,
         bool $isShared,
-        bool $usesTraceId128bits
+        bool $usesTraceId128bits,
+        array $extra
     ) {
         $this->traceId = $traceId;
         $this->spanId = $spanId;
@@ -41,6 +47,7 @@ final class TraceContext implements SamplingFlags
         $this->isDebug = $isDebug;
         $this->isShared = $isShared;
         $this->usesTraceId128bits = $usesTraceId128bits;
+        $this->extra = $extra;
     }
 
     /**
@@ -58,7 +65,8 @@ final class TraceContext implements SamplingFlags
         ?string $parentId = null,
         ?bool $isSampled = SamplingFlags::EMPTY_SAMPLED,
         bool $isDebug = SamplingFlags::EMPTY_DEBUG,
-        bool $isShared = false
+        bool $isShared = false,
+        array $extra = []
     ): TraceContext {
         if (!Id\isValidTraceId($traceId)) {
             throw InvalidTraceContextArgument::forTraceId($traceId);
@@ -72,7 +80,7 @@ final class TraceContext implements SamplingFlags
             throw InvalidTraceContextArgument::forParentSpanId($parentId);
         }
 
-        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $isShared, strlen($traceId) === 32);
+        return new self($traceId, $spanId, $parentId, $isSampled, $isDebug, $isShared, strlen($traceId) === 32, $extra);
     }
 
     /**
@@ -100,7 +108,8 @@ final class TraceContext implements SamplingFlags
             $samplingFlags->isSampled(),
             $samplingFlags->isDebug(),
             false,
-            $usesTraceId128bits
+            $usesTraceId128bits,
+            []
         );
     }
 
@@ -119,7 +128,8 @@ final class TraceContext implements SamplingFlags
             $parent->isSampled,
             $parent->isDebug,
             false,
-            $parent->usesTraceId128bits
+            $parent->usesTraceId128bits,
+            $parent->extra
         );
     }
 
@@ -196,7 +206,8 @@ final class TraceContext implements SamplingFlags
             $isSampled,
             false,
             $this->usesTraceId128bits,
-            $this->isShared
+            $this->isShared,
+            $this->extra
         );
     }
 
@@ -217,8 +228,37 @@ final class TraceContext implements SamplingFlags
             $this->isSampled,
             $this->isDebug,
             $isShared,
-            $this->usesTraceId128bits
+            $this->usesTraceId128bits,
+            $this->extra,
         );
+    }
+
+    public function withExtra(array $extra): TraceContext
+    {
+        return new TraceContext(
+            $this->traceId,
+            $this->spanId,
+            $this->parentId,
+            $this->isSampled,
+            $this->isDebug,
+            $this->isShared,
+            $this->usesTraceId128bits,
+            $extra
+        );
+    }
+
+    /**
+     * Returns a list of additional data propagated through this trace.
+     *
+     * <p>The contents are intentionally opaque, deferring to {@linkplain Propagation} to define. An
+     * example implementation could be storing a class containing a correlation value, which is
+     * extracted from incoming requests and injected as-is onto outgoing requests.
+     *
+     * @return array<string,string>
+     */
+    public function getExtra(): array
+    {
+        return $this->extra;
     }
 
     public function isEmpty(): bool

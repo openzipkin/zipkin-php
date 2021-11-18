@@ -9,18 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 final class TraceContextTest extends TestCase
 {
-    const EMPTY_SAMPLED = null;
-    const EMPTY_DEBUG = false;
+    private const TEST_TRACE_ID = 'bd7a977555f6b982';
+    private const TEST_PARENT_ID = 'bd7a977555f6b983';
+    private const TEST_SPAN_ID = 'be2d01e33cc78d97';
 
-    const TEST_TRACE_ID = 'bd7a977555f6b982';
-    const TEST_PARENT_ID = 'bd7a977555f6b983';
-    const TEST_SPAN_ID = 'be2d01e33cc78d97';
+    private const TEST_INVALID_TRACE_ID = 'invalid_bd7a977555f6b982';
+    private const TEST_INVALID_PARENT_ID = 'invalid_bd7a977555f6b982';
+    private const TEST_INVALID_SPAN_ID = 'invalid_be2d01e33cc78d97';
+    private const TEST_IS_SHARED = false;
 
-    const TEST_INVALID_TRACE_ID = 'invalid_bd7a977555f6b982';
-    const TEST_INVALID_PARENT_ID = 'invalid_bd7a977555f6b982';
-    const TEST_INVALID_SPAN_ID = 'invalid_be2d01e33cc78d97';
-
-    const IS_FINAL_MUTATION = true;
+    private const IS_FINAL_MUTATION = true;
 
     private $hasAtLeastOneMutation;
 
@@ -43,6 +41,7 @@ final class TraceContextTest extends TestCase
         $this->assertEquals(null, $context->getParentId());
         $this->assertEquals($sampled, $context->isSampled());
         $this->assertEquals($debug, $context->isDebug());
+        $this->assertEquals([], $context->getExtra());
     }
 
     /**
@@ -68,12 +67,17 @@ final class TraceContextTest extends TestCase
     public function testCreateFromParentSuccess($sampled, $debug)
     {
         $samplingFlags = DefaultSamplingFlags::create($sampled, $debug);
+        $extra = [
+            'field_1' => 'value_1'
+        ];
         $parentContext = TraceContext::create(
             self::TEST_TRACE_ID,
             self::TEST_SPAN_ID,
             self::TEST_PARENT_ID,
             $samplingFlags->isSampled(),
-            $samplingFlags->isDebug()
+            $samplingFlags->isDebug(),
+            self::TEST_IS_SHARED,
+            $extra
         );
 
         $childContext = TraceContext::createFromParent($parentContext);
