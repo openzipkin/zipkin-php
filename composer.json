@@ -78,10 +78,5 @@
         "ext-mysqli": "Allows to use mysqli instrumentation.",
         "psr/http-client": "Allows to instrument HTTP clients following PSR18.",
         "psr/http-server-middleware": "Allows to instrument HTTP servers via middlewares following PSR15."
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.0.x-dev"
-        }
     }
 }
