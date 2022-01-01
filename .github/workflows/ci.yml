@@ -37,13 +37,6 @@ jobs:
       - name: Install Composer dependencies
         run: |
           composer install --no-progress --prefer-dist --optimize-autoloader
-      - name: Download php-coveralls.phar
-        if: matrix.operating-system == 'ubuntu-latest'
-        run: |
-          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.3/php-coveralls.phar
-          chmod +x php-coveralls.phar
-          php php-coveralls.phar --version
-          mkdir -p build/logs
       - name: Run lint
         if: matrix.operating-system != 'windows-latest'
         run: composer lint
@@ -57,6 +50,10 @@ jobs:
           matrix.php-versions == '8.0' &&
           env.GITHUB_REPOSITORY == 'openzipkin/zipkin-php'
         run: |
+          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.3/php-coveralls.phar
+          chmod +x php-coveralls.phar
+          php php-coveralls.phar --version
+          mkdir -p build/logs
           php php-coveralls.phar -v
           bash <(curl -s https://codecov.io/bash)
         env:
