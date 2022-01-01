@@ -53,7 +53,8 @@ jobs:
         run: composer test -- --coverage-clover=build/logs/clover.xml
       - name: Upload coverage report to codecov service
         if: |
-          matrix.operating-system == 'ubuntu-latest' ||
+          matrix.operating-system == 'ubuntu-latest' &&
+          matrix.php-versions == '8.0' &&
           env.GITHUB_REPOSITORY == 'openzipkin/zipkin-php'
         run: |
           php php-coveralls.phar -v
