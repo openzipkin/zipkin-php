@@ -46,13 +46,29 @@ jobs:
       - name: Run static check
         run: composer static-check
       - name: Run tests
-        run: composer test -- --coverage-clover=build/logs/clover.xml
-      - if: matrix.operating-system == 'ubuntu-latest' && matrix.php-versions == '8.1'
-        name: Coveralls Action Bug Workaround
-        id: coveralls_bug_workaround
-        run: sudo sed -i 's/github\/workspace/home\/runner\/work\/zipkin-php\/zipkin-php/g' ./coverage/lcov.info
-      - if: matrix.operating-system == 'ubuntu-latest' && matrix.php-versions == '8.1'
+        run: composer test -- --coverage-clover=coverage/clover.xml
+
+      - if: matrix.operating-system == 'ubuntu-latest'
+        name: Convert Coverage (clover2lcov)
+        uses: andstor/clover2lcov-action@v1
+        with:
+          src: ./coverage/clover.xml
+          dst: ./coverage/lcov.info
+
+      - if: matrix.operating-system == 'ubuntu-latest'
         name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GH_TOKEN }}
+          flag-name: run-${{ matrix.php-versions }}
+          parallel: true
+
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true
