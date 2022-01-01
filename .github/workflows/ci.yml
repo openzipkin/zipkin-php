@@ -62,6 +62,8 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           flag-name: run-${{ matrix.php-versions }}
           parallel: true
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
   finish:
     needs: test
