@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
     backupGlobals="true"
     backupStaticAttributes="false"
     bootstrap="./vendor/autoload.php"
@@ -18,15 +20,13 @@
     timeoutForSmallTests="1"
     timeoutForMediumTests="10"
     timeoutForLargeTests="60"
-    verbose="false"
->
-  <coverage processUncoveredFiles="true">
+    verbose="false">
+  <coverage processUncoveredFiles="false">
     <include>
       <directory suffix=".php">./src</directory>
     </include>
     <exclude>
       <directory>./vendor</directory>
-      <directory>./tests</directory>
     </exclude>
   </coverage>
 </phpunit>
