@@ -21,10 +21,12 @@ final class MysqliTest extends TestCase
     {
         shell_exec('docker rm -f zipkin_php_mysql_test');
         shell_exec(sprintf('cd %s; docker-compose up -d', __DIR__));
-        echo "Waiting for mysql container to be up.";
+        echo "Waiting for MySQL container to be up.\n";
         while (true) {
             $res = shell_exec('docker ps --filter "name=zipkin_php_mysql_test" --format "{{.Status}}"');
-            if (strpos($res, "healthy") >= 0) {
+            usleep(500000);
+            if (strpos($res, "healthy") !== false) {
+                echo "MySQL container is up.\n";
                 break;
             }
         }

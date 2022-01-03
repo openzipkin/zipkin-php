@@ -66,10 +66,7 @@
     "scripts": {
         "fix-lint": "phpcbf --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
         "lint": "phpcs --standard=ZEND --standard=PSR2 --ignore=*/vendor/* ./",
-        "test": [
-            "@test-unit",
-            "@test-integration"
-        ],
+        "test": "phpunit tests",
         "test-unit": "phpunit tests/Unit",
         "test-integration": "phpunit tests/Integration",
         "static-check": "phpstan analyse src --level 8"
