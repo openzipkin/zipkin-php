@@ -3,12 +3,12 @@
 namespace Zipkin\Instrumentation\Mysqli;
 
 use mysqli_result;
+use const Zipkin\Tags\ERROR;
 use Zipkin\Tracer;
 use Zipkin\Span;
-use Zipkin\Endpoint;
 
+use Zipkin\Endpoint;
 use InvalidArgumentException;
-use const Zipkin\Tags\ERROR;
 
 /**
  * Mysqli is an instrumented extension for Mysqli.
