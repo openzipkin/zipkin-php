@@ -263,7 +263,7 @@ class TraceClient implements ClientInterface
 
         try {
             $response = $this->client->request($method, $uri, $options);
-            $span->tag(Tags\HTTP_STATUS_CODE, $response->getStatusCode());
+            $span->tag(Tags\HTTP_STATUS_CODE, (string) $response->getStatusCode());
 
             return $response;
         catch (Throwable $e) {
