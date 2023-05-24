@@ -34,11 +34,8 @@ class Map implements Getter, Setter
                 return null;
             }
 
-            /**
-             * @var string $k
-             */
             foreach ($carrier as $k => $value) {
-                if (strtolower($k) === $lKey) {
+                if (strtolower((string) $k) === $lKey) {
                     return $value;
                 }
             }
