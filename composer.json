@@ -28,6 +28,7 @@
     "require-dev": {
         "ext-mysqli": "*",
         "jcchavezs/httptest": "~0.2",
+        "longlang/phpkafka": "^1.2",
         "middlewares/fast-route": "^2.0",
         "middlewares/request-handler": "^2.0",
         "nyholm/psr7": "^1.4",
@@ -73,6 +74,7 @@
     },
     "suggest": {
         "ext-mysqli": "Allows to use mysqli instrumentation.",
+        "longlang/phpkafka": "Allows to use kafka instrumentation.",
         "psr/http-client": "Allows to instrument HTTP clients following PSR18.",
         "psr/http-server-middleware": "Allows to instrument HTTP servers via middlewares following PSR15."
     }
