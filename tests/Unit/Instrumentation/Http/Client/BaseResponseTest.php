@@ -21,7 +21,7 @@ abstract class BaseResponseTest extends TestCase
         int $statusCode,
         $headers = [],
         $body = null,
-        Request $request = null
+        ?Request $request = null
     ): array;
 
     /**

@@ -24,7 +24,7 @@ use Nyholm\Psr7\ServerRequest;
 
 final class MiddlewareTest extends TestCase
 {
-    private static function createTracing(callable $requestSampler = null): array
+    private static function createTracing(?callable $requestSampler = null): array
     {
         $reporter = new InMemory();
         $tracing =

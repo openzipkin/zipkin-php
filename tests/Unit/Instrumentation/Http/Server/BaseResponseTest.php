@@ -23,7 +23,7 @@ abstract class BaseResponseTest extends TestCase
         $headers = [],
         $body = null,
         ?Request $request = null,
-        string $route = null
+        ?string $route = null
     ): array;
 
     /**

@@ -36,7 +36,7 @@ trait SpanCustomizerShieldSpan
         return $this->context;
     }
 
-    public function start(int $timestamp = null): void
+    public function start(?int $timestamp = null): void
     {
         throw new LogicException('should not be called');
     }
@@ -61,7 +61,7 @@ trait SpanCustomizerShieldSpan
         throw new LogicException('should not be called');
     }
 
-    public function finish(int $timestamp = null): void
+    public function finish(?int $timestamp = null): void
     {
         throw new LogicException('should not be called');
     }

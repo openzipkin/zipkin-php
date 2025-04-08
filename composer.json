@@ -27,6 +27,7 @@
     },
     "require-dev": {
         "ext-mysqli": "*",
+        "friendsofphp/php-cs-fixer": "^3.75",
         "jcchavezs/httptest": "~0.2",
         "middlewares/fast-route": "^2.0",
         "middlewares/request-handler": "^2.0",

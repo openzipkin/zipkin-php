@@ -147,7 +147,7 @@ final class B3 implements Propagation
      * same injector list.
      */
     public function __construct(
-        LoggerInterface $logger = null,
+        ?LoggerInterface $logger = null,
         array $kindInjectors = []
     ) {
         $this->logger = $logger ?: new NullLogger();

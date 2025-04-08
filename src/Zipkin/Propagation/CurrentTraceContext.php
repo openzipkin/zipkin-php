@@ -20,7 +20,7 @@ final class CurrentTraceContext
 {
     private ?TraceContext $context;
 
-    public function __construct(TraceContext $currentContext = null)
+    public function __construct(?TraceContext $currentContext = null)
     {
         $this->context = $currentContext;
     }
@@ -40,7 +40,7 @@ final class CurrentTraceContext
      * @param TraceContext|null $currentContext
      * @return callable():void The scope closed
      */
-    public function createScopeAndRetrieveItsCloser(TraceContext $currentContext = null): callable
+    public function createScopeAndRetrieveItsCloser(?TraceContext $currentContext = null): callable
     {
         $previous = $this->context;
         $self = $this;

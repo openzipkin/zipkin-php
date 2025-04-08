@@ -23,7 +23,7 @@ final class NoopSpanCustomizer implements SpanCustomizer
     /**
      * {@inheritdoc}
      */
-    public function annotate(string $value, int $timestamp = null): void
+    public function annotate(string $value, ?int $timestamp = null): void
     {
     }
 }

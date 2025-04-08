@@ -41,5 +41,5 @@ interface SpanCustomizer
      * @return void
      * @see Annotations
      */
-    public function annotate(string $value, int $timestamp = null): void;
+    public function annotate(string $value, ?int $timestamp = null): void;
 }

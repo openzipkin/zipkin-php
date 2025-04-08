@@ -30,12 +30,12 @@ final class Mysqli extends \Mysqli
     public function __construct(
         Tracer $tracer,
         array $options = [],
-        string $host = null,
-        string $user = null,
-        string $password = null,
+        ?string $host = null,
+        ?string $user = null,
+        ?string $password = null,
         string $database = '',
-        int $port = null,
-        string $socket = null
+        ?int $port = null,
+        ?string $socket = null
     ) {
         self::validateOptions($options);
         $this->tracer = $tracer;
@@ -65,7 +65,7 @@ final class Mysqli extends \Mysqli
         }
     }
 
-    private function addsTagsAndRemoteEndpoint(Span $span, string $query = null): void
+    private function addsTagsAndRemoteEndpoint(Span $span, ?string $query = null): void
     {
         if ($query !== null && $this->options['tag_query']) {
             $span->tag('sql.query', $query);
