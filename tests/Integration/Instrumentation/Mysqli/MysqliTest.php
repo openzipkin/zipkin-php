@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ZipkinTests\Integration\Instrumentation\Http\Server;
+namespace ZipkinTests\Integration\Instrumentation\Mysqli;
 
 use Zipkin\Tracer;
 use Zipkin\Samplers\BinarySampler;
