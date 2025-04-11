@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace ZipkinTests\Unit\Instrumentation\Http\Server\Psr15;
 
 use Zipkin\Instrumentation\Http\Server\Psr15\Request;
-use ZipkinTests\Unit\Instrumentation\Http\Server\BaseRequestTest;
+use ZipkinTests\Unit\Instrumentation\Http\Server\BaseRequestTestCase;
 use Nyholm\Psr7\Request as Psr7Request;
 
-final class RequestTest extends BaseRequestTest
+final class RequestTestCase extends BaseRequestTestCase
 {
     public static function createRequest(
         string $method,

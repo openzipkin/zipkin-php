@@ -8,7 +8,7 @@ use Zipkin\Instrumentation\Http\Server\Response;
 use Zipkin\Instrumentation\Http\Server\Request;
 use PHPUnit\Framework\TestCase;
 
-abstract class BaseResponseTest extends TestCase
+abstract class BaseResponseTestCase extends TestCase
 {
     /**
      * @return mixed[] including:
