@@ -45,7 +45,7 @@ jobs:
       - name: Run tests
         run: composer test -- --coverage-clover=build/logs/clover.xml
       - name: Upload coverage report to codecov service
-        if: ${{ matrix.operating-system == 'ubuntu-latest' && matrix.php-versions == '8.0' }}
+        if: ${{ matrix.operating-system == 'ubuntu-latest' && matrix.php-versions == '8.1' }}
         run: |
           wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.3/php-coveralls.phar
           chmod +x php-coveralls.phar
