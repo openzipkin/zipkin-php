@@ -231,7 +231,7 @@ final class Tracer
     public function nextSpanWithSampler(
         callable $sampler,
         array $args = [],
-        SamplingFlags $contextOrFlags = null
+        ?SamplingFlags $contextOrFlags = null
     ): Span {
         if ($contextOrFlags === null) {
             $contextOrFlags = $this->currentTraceContext->getContext();
