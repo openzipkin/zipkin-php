@@ -11,8 +11,8 @@ use Zipkin\Reporters\Http\ClientFactory;
 use Zipkin\Reporter;
 use Zipkin\Recording\ReadbackSpan;
 use RuntimeException;
-use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 final class Http implements Reporter
 {
@@ -51,9 +51,9 @@ final class Http implements Reporter
      */
     public function __construct(
         array $options = [],
-        ClientFactory $requesterFactory = null,
-        LoggerInterface $logger = null,
-        SpanSerializer $serializer = null
+        ?ClientFactory $requesterFactory = null,
+        ?LoggerInterface $logger = null,
+        ?SpanSerializer $serializer = null
     ) {
         $this->options = \array_merge(self::DEFAULT_OPTIONS, $options);
         $this->clientFactory = $requesterFactory ?? CurlFactory::create();
