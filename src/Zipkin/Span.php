@@ -14,9 +14,14 @@ interface Span
      * When true, no recording is done and nothing is reported to zipkin. However, this span should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
+     *
+     * @return bool
      */
     public function isNoop(): bool;
 
+    /**
+     * @return TraceContext
+     */
     public function getContext(): TraceContext;
 
     /**
@@ -24,11 +29,18 @@ interface Span
      *
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
+     *
+     * @param int|null $timestamp
+     * @return void
+     * @throws \InvalidArgumentException
      */
-    public function start(int $timestamp = null): void;
+    public function start(?int $timestamp = null): void;
 
     /**
      * Sets the string name for the logical operation this span represents.
+     *
+     * @param string $name
+     * @return void
      */
     public function setName(string $name): void;
 
@@ -38,16 +50,20 @@ interface Span
      * and that plus its duration as "ss".
      *
      * The value must be strictly one of the ones listed in {@link Kind}.
+     *
+     * @param string $kind one of Kind\CLIENT, Kind\SERVER, Kind\CONSUMER and
+     * Kind\PRODUCER
+     * @return void
      */
     public function setKind(string $kind): void;
 
     /**
      * Tags give your span context for search, viewing and analysis. For example, a key
-     * "your_app.version" would let you lookup spans by version. A tag {@link Zipkin\Tags\SQL_QUERY}
-     * isn't searchable, but it can help in debugging when viewing a trace.
+     * "your_app.version" would let you lookup spans by version. A tag "sql.query" isn't searchable,
+     * but might show in the span view for a database call.
      *
      * @param string $key Name used to lookup spans, such as "your_app.version". See {@link Zipkin\Tags} for
-     * standard ones.
+     * common ones.
      * @param string $value
      * @return void
      */
@@ -65,9 +81,9 @@ interface Span
      * @param string $value A short tag indicating the event, like "finagle.retry"
      * @param int|null $timestamp
      * @return void
-     * @see Annotations
+     * @throws \InvalidArgumentException
      */
-    public function annotate(string $value, int $timestamp = null): void;
+    public function annotate(string $value, ?int $timestamp = null): void;
 
     /**
      * For a client span, this would be the server's address.
@@ -94,17 +110,18 @@ interface Span
      *
      * @param int|null $timestamp
      * @return void
+     * @throws \InvalidArgumentException
      */
-    public function finish(int $timestamp = null): void;
+    public function finish(?int $timestamp = null): void;
 
     /**
      * Reports the span, even if unfinished. Most users will not call this method.
      *
      * This primarily supports two use cases: one-way spans and orphaned spans.
-     * For example, a one-way span can be modeled as a span where one tracer calls start and another
+     * For example, a one-way span can be modeled as a span where one flusher calls start and another
      * calls finish. In order to report that span from its origin, flush must be called.
      *
-     * Another example is where a user did not call finish within a deadline or before a shutdown
+     * Another example is where a user didn't call finish within a deadline or before a shutdown
      * occurs. By flushing, you can report what was in progress.
      *
      * @return void

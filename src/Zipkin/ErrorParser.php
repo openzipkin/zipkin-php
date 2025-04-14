@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zipkin;
 
 use Zipkin\Recording\Span;
@@ -12,5 +14,11 @@ use Throwable;
  */
 interface ErrorParser
 {
+    /**
+     * Parses the error into a set of tags.
+     *
+     * @param Throwable $e
+     * @return array<string,string>
+     */
     public function parseTags(Throwable $e): array;
 }
