@@ -37,7 +37,7 @@ final class SpanCustomizerShield implements SpanCustomizer
     /**
      * {@inheritdoc}
      */
-    public function annotate(string $value, int $timestamp = null): void
+    public function annotate(string $value, ?int $timestamp = null): void
     {
         $this->delegate->annotate($value, $timestamp);
     }

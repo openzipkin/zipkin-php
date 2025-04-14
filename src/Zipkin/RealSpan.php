@@ -48,11 +48,11 @@ final class RealSpan implements Span
      * Spans can be modified before calling start. For example, you can add tags to the span and
      * set its name without lock contention.
      *
-     * @param int $timestamp
+     * @param int|null $timestamp
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function start(int $timestamp = null): void
+    public function start(?int $timestamp = null): void
     {
         if ($timestamp !== null && !isValid($timestamp)) {
             throw new InvalidArgumentException(
@@ -117,7 +117,7 @@ final class RealSpan implements Span
      * @throws \InvalidArgumentException
      * @see Zipkin\Annotations
      */
-    public function annotate(string $value, int $timestamp = null): void
+    public function annotate(string $value, ?int $timestamp = null): void
     {
         if ($timestamp !== null && !isValid($timestamp)) {
             throw new InvalidArgumentException(
@@ -161,7 +161,7 @@ final class RealSpan implements Span
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function finish(int $timestamp = null): void
+    public function finish(?int $timestamp = null): void
     {
         if ($timestamp !== null && !isValid($timestamp)) {
             throw new InvalidArgumentException('Invalid timestamp');
