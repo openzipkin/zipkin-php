@@ -20,7 +20,7 @@ final class MysqliTest extends TestCase
     private static function launchMySQL(): array
     {
         shell_exec('docker rm -f zipkin_php_mysql_test');
-        shell_exec(sprintf('cd %s; docker-compose up -d', __DIR__));
+        shell_exec(sprintf('cd %s; docker compose up -d', __DIR__));
         echo "Waiting for MySQL container to be up.\n";
         while (true) {
             $res = shell_exec('docker ps --filter "name=zipkin_php_mysql_test" --format "{{.Status}}"');
@@ -38,7 +38,7 @@ final class MysqliTest extends TestCase
         $port = 3306;
 
         return [[$host, $user, $pass, $db, $port], function () {
-            shell_exec(sprintf('cd %s; docker-compose stop', __DIR__));
+            shell_exec(sprintf('cd %s; docker compose stop', __DIR__));
         }];
     }
 
