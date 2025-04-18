@@ -262,13 +262,13 @@ final class Span implements ReadbackSpan
     }
 
     /**
-     * Completes and reports the span. If no finish timestamp is specified
-     * we don't compute the duration but the span is still reporterd. This
-     * usually happens when a span is flushed manually.
+     * Records the final timestamp, calculates duration and puts the span
+     * in the recorder.
      *
-     * @param int|null $finishTimestamp
+     * @param int|null $finishTimestamp When null, the value of {@link Timestamp\now()}
+     * is used.
      */
-    public function finish(int $finishTimestamp = null): void
+    public function finish(?int $finishTimestamp = null): void
     {
         if ($this->finished) {
             return;

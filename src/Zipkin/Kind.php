@@ -28,3 +28,11 @@ const PRODUCER = 'PRODUCER';
 * #PRODUCER} of this message is the {@link TraceContext#parentId()} of this span.
 */
 const CONSUMER = 'CONSUMER';
+
+
+class Kind {
+    const CLIENT = 'CLIENT';
+    const SERVER = 'SERVER';
+    const PRODUCER = 'PRODUCER';
+    const CONSUMER = 'CONSUMER';
+}

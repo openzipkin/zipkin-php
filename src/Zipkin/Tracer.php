@@ -70,10 +70,10 @@ final class Tracer
      * }
      * }</pre>
      *
-     * @param SamplingFlags $samplingFlags
-     * @return Span
+     * @param SamplingFlags|null $samplingFlags the sampling flags, defaults to SampleFlags::EMPTY
+     * @return Span a span that has not been started
      */
-    public function newTrace(SamplingFlags $samplingFlags = null): Span
+    public function newTrace(?SamplingFlags $samplingFlags = null): Span
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
@@ -135,11 +135,11 @@ final class Tracer
      * finish the span. Not only is it safe to call the closer, you must call the closer to end the scope, or
      * risk leaking resources associated with the scope.
      *
-     * @param Span $span to place into scope or null to clear the scope
+     * @param Span|null $span to place into scope or null to clear the scope
      *
      * @return callable():void The scope closer
      */
-    public function openScope(Span $span = null): callable
+    public function openScope(?Span $span = null): callable
     {
         return $this->currentTraceContext->createScopeAndRetrieveItsCloser(
             $span === null ? null : $span->getContext()
@@ -189,11 +189,12 @@ final class Tracer
      * whatever the {@link #currentSpan()} was. Make sure you re-apply {@link #withSpanInScope(Span)}
      * so that data is written to the correct trace.
      *
-     * @param SamplingFlags|TraceContext $contextOrFlags
+     * @param TraceContext|SamplingFlags|null $contextOrFlags Either the trace context
+     * to use to create the new span or the SamplingFlags
      * @return Span
      * @throws \RuntimeException
      */
-    public function nextSpan(SamplingFlags $contextOrFlags = null): Span
+    public function nextSpan(?SamplingFlags $contextOrFlags = null): Span
     {
         if ($contextOrFlags === null) {
             $parent = $this->currentTraceContext->getContext();
@@ -230,7 +231,7 @@ final class Tracer
     public function nextSpanWithSampler(
         callable $sampler,
         array $args = [],
-        SamplingFlags $contextOrFlags = null
+        ?SamplingFlags $contextOrFlags = null
     ): Span {
         if ($contextOrFlags === null) {
             $contextOrFlags = $this->currentTraceContext->getContext();

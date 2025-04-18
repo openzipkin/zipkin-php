@@ -26,8 +26,8 @@ class HttpServerTracing
 
     public function __construct(
         Tracing $tracing,
-        HttpServerParser $parser = null,
-        callable $requestSampler = null
+        ?HttpServerParser $parser = null,
+        ?callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
         $this->parser = $parser ?? new DefaultHttpServerParser();

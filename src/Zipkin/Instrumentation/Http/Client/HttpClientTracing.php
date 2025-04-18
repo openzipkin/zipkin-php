@@ -27,8 +27,8 @@ class HttpClientTracing
 
     public function __construct(
         Tracing $tracing,
-        HttpClientParser $parser = null,
-        callable $requestSampler = null
+        ?HttpClientParser $parser = null,
+        ?callable $requestSampler = null
     ) {
         $this->tracing = $tracing;
         $this->parser = $parser ?? new DefaultHttpClientParser();

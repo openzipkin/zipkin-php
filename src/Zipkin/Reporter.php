@@ -9,7 +9,9 @@ use Zipkin\Recording\Span as MutableSpan;
 interface Reporter
 {
     /**
-     * @param MutableSpan[] $spans
+     * Sends the given spans to the transport.
+     *
+     * @param array<MutableSpan> $spans
      * @return void
      */
     public function report(array $spans): void;

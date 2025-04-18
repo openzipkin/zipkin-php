@@ -6,8 +6,8 @@ use mysqli_result;
 use const Zipkin\Tags\ERROR;
 use Zipkin\Tracer;
 use Zipkin\Span;
-
 use Zipkin\Endpoint;
+use Zipkin\Kind;
 use InvalidArgumentException;
 
 /**
@@ -24,113 +24,105 @@ final class Mysqli extends \Mysqli
     ];
 
     private Tracer $tracer;
-
     private array $options;
 
     public function __construct(
         Tracer $tracer,
         array $options = [],
-        string $host = null,
-        string $user = null,
-        string $password = null,
+        ?string $host = null,
+        ?string $user = null,
+        ?string $password = null,
         string $database = '',
-        int $port = null,
-        string $socket = null
+        ?int $port = null,
+        ?string $socket = null
     ) {
         self::validateOptions($options);
         $this->tracer = $tracer;
         $this->options = $options + self::DEFAULT_OPTIONS;
+
+        $defaultHost = \ini_get('mysqli.default_host') ?: '';
+        $defaultUser = \ini_get('mysqli.default_user') ?: '';
+        $defaultPassword = \ini_get('mysqli.default_pw') ?: '';
+        $defaultPort = (int) (\ini_get('mysqli.default_port') ?: 3306);
+        $defaultSocket = \ini_get('mysqli.default_socket') ?: '';
+
         parent::__construct(
-            $host ?? (ini_get('mysqli.default_host') ?: ''),
-            $user ?? (ini_get('mysqli.default_user') ?: ''),
-            $password ?? (ini_get('mysqli.default_pw') ?: ''),
+            $host ?? $defaultHost,
+            $user ?? $defaultUser,
+            $password ?? $defaultPassword,
             $database,
-            $port ?? (($defaultPort = ini_get('mysqli.default_port')) ? (int) $defaultPort : 3306),
-            $socket ?? (ini_get('mysqli.default_socket') ?: '')
+            $port ?? $defaultPort,
+            $socket ?? $defaultSocket
         );
     }
 
-    private static function validateOptions(array $opts): void
+    /**
+     * {@inheritdoc}
+     */
+    public function query(string $query, int $result_mode = MYSQLI_STORE_RESULT): mysqli_result|bool
     {
-        if (array_key_exists('tag_query', $opts) && ($opts['tag_query'] !== (bool) $opts['tag_query'])) {
-            throw new InvalidArgumentException('Invalid tag_query, bool expected');
-        }
+        $span = $this->tracer->nextSpan();
+        $span->start();
+        $span->setName('query');
+        $span->setKind(Kind\CLIENT);
 
-        if (array_key_exists('remote_endpoint', $opts) && !($opts['remote_endpoint'] instanceof Endpoint)) {
-            throw new InvalidArgumentException(sprintf('Invalid remote_endpoint, %s expected', Endpoint::class));
-        }
-
-        if (array_key_exists('default_tags', $opts) && ($opts['default_tags'] !== (array) $opts['default_tags'])) {
-            throw new InvalidArgumentException('Invalid default_tags, array expected');
-        }
-    }
-
-    private function addsTagsAndRemoteEndpoint(Span $span, string $query = null): void
-    {
-        if ($query !== null && $this->options['tag_query']) {
+        if ($this->options['tag_query']) {
             $span->tag('sql.query', $query);
+        }
+
+        foreach ($this->options['default_tags'] as $key => $value) {
+            $span->tag($key, $value);
         }
 
         if ($this->options['remote_endpoint'] !== null) {
             $span->setRemoteEndpoint($this->options['remote_endpoint']);
         }
 
-        foreach ($this->options['default_tags'] as $key => $value) {
-            $span->tag($key, $value);
+        try {
+            $result = parent::query($query, $result_mode);
+            if ($result === false) {
+                $span->tag(ERROR, $this->error);
+            }
+            return $result;
+        } catch (\Throwable $e) {
+            $span->tag(ERROR, $e->getMessage());
+            throw $e;
+        } finally {
+            $span->finish();
         }
     }
 
     /**
-     * Performs a query on the database
-     *
-     * @return mysqli_result|bool
-     * @alias mysqli_query
+     * {@inheritdoc}
      */
-    public function query(string $query, int $resultmode = MYSQLI_STORE_RESULT)
+    public function real_query(string $query): bool
     {
-        if ($resultmode === MYSQLI_ASYNC) {
-            // if $resultmode is async, making the timing on this execution
-            // does not make much sense. For now we just skip tracing on this.
-            return parent::query($query, $resultmode);
-        }
-
         $span = $this->tracer->nextSpan();
-        $span->setName('sql/query');
-        $this->addsTagsAndRemoteEndpoint($span, $query);
+        $span->start();
+        $span->setName('real_query');
+        $span->setKind(Kind\CLIENT);
+
         if ($this->options['tag_query']) {
             $span->tag('sql.query', $query);
         }
 
-        $span->start();
-        try {
-            $result = parent::query($query, $resultmode);
-            if ($result === false) {
-                $span->tag(ERROR, 'true');
-            }
-            return $result;
-        } finally {
-            $span->finish();
+        foreach ($this->options['default_tags'] as $key => $value) {
+            $span->tag($key, $value);
         }
-    }
 
-    /**
-     * @return bool
-     * @alias mysqli_real_query
-     */
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function real_query(string $query)
-    {
-        $span = $this->tracer->nextSpan();
-        $span->setName('sql/query');
-        $this->addsTagsAndRemoteEndpoint($span, $query);
+        if ($this->options['remote_endpoint'] !== null) {
+            $span->setRemoteEndpoint($this->options['remote_endpoint']);
+        }
 
-        $span->start();
         try {
             $result = parent::real_query($query);
             if ($result === false) {
-                $span->tag(ERROR, 'true');
+                $span->tag(ERROR, $this->error);
             }
             return $result;
+        } catch (\Throwable $e) {
+            $span->tag(ERROR, $e->getMessage());
+            throw $e;
         } finally {
             $span->finish();
         }
@@ -138,58 +130,31 @@ final class Mysqli extends \Mysqli
 
     /**
      * {@inheritdoc}
-     * @alias mysqli_begin_transaction
      */
-    // phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function begin_transaction($flags = 0, $name = null)
+    public function begin_transaction(int $flags = 0, ?string $name = null): bool
     {
         $span = $this->tracer->nextSpan();
-        $span->setName('sql/begin_transaction');
-        $this->addsTagsAndRemoteEndpoint($span);
         $span->start();
-        if ($name !== null) {
-            $span->tag('mysqli.transaction_name', (string) $name);
-        }
-        try {
-            if ($name === null) {
-                $result = parent::begin_transaction($flags);
-            } else {
-                $result = parent::begin_transaction($flags, $name);
-            }
+        $span->setName('begin_transaction');
+        $span->setKind(Kind\CLIENT);
 
+        foreach ($this->options['default_tags'] as $key => $value) {
+            $span->tag($key, $value);
+        }
+
+        if ($this->options['remote_endpoint'] !== null) {
+            $span->setRemoteEndpoint($this->options['remote_endpoint']);
+        }
+
+        try {
+            $result = parent::begin_transaction($flags, $name);
             if ($result === false) {
-                $span->tag(ERROR, 'true');
+                $span->tag(ERROR, $this->error);
             }
             return $result;
-        } finally {
-            $span->finish();
-        }
-    }
-
-    /**
-     * @return bool
-     * @alias mysqli_commit
-     */
-    public function commit(int $flags = -1, ?string $name = null)
-    {
-        $span = $this->tracer->nextSpan();
-        $span->setName('sql/begin_transaction');
-        $this->addsTagsAndRemoteEndpoint($span);
-        $span->start();
-        if ($name !== null) {
-            $span->tag('mysqli.transaction_name', $name);
-        }
-        try {
-            if ($name === null) {
-                $result = parent::commit($flags);
-            } else {
-                $result = parent::commit($flags, $name);
-            }
-
-            if ($result === false) {
-                $span->tag(ERROR, 'true');
-            }
-            return $result;
+        } catch (\Throwable $e) {
+            $span->tag(ERROR, $e->getMessage());
+            throw $e;
         } finally {
             $span->finish();
         }
@@ -197,29 +162,80 @@ final class Mysqli extends \Mysqli
 
     /**
      * {@inheritdoc}
-     * @alias mysqli_rollback
      */
-    public function rollback($flags = 0, $name = null)
+    public function commit(int $flags = 0, ?string $name = null): bool
     {
         $span = $this->tracer->nextSpan();
-        $span->setName('sql/rollback');
-        $this->addsTagsAndRemoteEndpoint($span);
         $span->start();
-        if ($name !== null) {
-            $span->tag('mysqli.transaction_name', (string) $name);
+        $span->setName('commit');
+        $span->setKind(Kind\CLIENT);
+
+        foreach ($this->options['default_tags'] as $key => $value) {
+            $span->tag($key, $value);
         }
+
+        if ($this->options['remote_endpoint'] !== null) {
+            $span->setRemoteEndpoint($this->options['remote_endpoint']);
+        }
+
         try {
-            if ($name === null) {
-                $result = parent::commit($flags);
-            } else {
-                $result = parent::commit($flags, $name);
-            }
+            $result = parent::commit($flags, $name);
             if ($result === false) {
-                $span->tag(ERROR, 'true');
+                $span->tag(ERROR, $this->error);
             }
             return $result;
+        } catch (\Throwable $e) {
+            $span->tag(ERROR, $e->getMessage());
+            throw $e;
         } finally {
             $span->finish();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rollback(int $flags = 0, ?string $name = null): bool
+    {
+        $span = $this->tracer->nextSpan();
+        $span->start();
+        $span->setName('rollback');
+        $span->setKind(Kind\CLIENT);
+
+        foreach ($this->options['default_tags'] as $key => $value) {
+            $span->tag($key, $value);
+        }
+
+        if ($this->options['remote_endpoint'] !== null) {
+            $span->setRemoteEndpoint($this->options['remote_endpoint']);
+        }
+
+        try {
+            $result = parent::rollback($flags, $name);
+            if ($result === false) {
+                $span->tag(ERROR, $this->error);
+            }
+            return $result;
+        } catch (\Throwable $e) {
+            $span->tag(ERROR, $e->getMessage());
+            throw $e;
+        } finally {
+            $span->finish();
+        }
+    }
+
+    private static function validateOptions(array $opts): void
+    {
+        if (isset($opts['remote_endpoint']) && !$opts['remote_endpoint'] instanceof Endpoint) {
+            throw new InvalidArgumentException(
+                \sprintf('Invalid remote_endpoint. Expected Endpoint, got %s', \gettype($opts['remote_endpoint']))
+            );
+        }
+
+        if (isset($opts['default_tags']) && !\is_array($opts['default_tags'])) {
+            throw new InvalidArgumentException(
+                \sprintf('Invalid default_tags. Expected array, got %s', \gettype($opts['default_tags']))
+            );
         }
     }
 }
