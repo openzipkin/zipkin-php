@@ -7,11 +7,11 @@ namespace ZipkinTests\Unit\Instrumentation\Http\Client\Psr18;
 use Zipkin\Instrumentation\Http\Client\Request;
 use Zipkin\Instrumentation\Http\Client\Psr18\Response as Psr18Response;
 use Zipkin\Instrumentation\Http\Client\Psr18\Request as Psr18Request;
-use ZipkinTests\Unit\Instrumentation\Http\Client\BaseResponseTest;
+use ZipkinTests\Unit\Instrumentation\Http\Client\BaseResponseTestCase;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Request as Psr7Request;
 
-final class ResponseTest extends BaseResponseTest
+final class ResponseTestCase extends BaseResponseTestCase
 {
     /**
      * {@inheritdoc}

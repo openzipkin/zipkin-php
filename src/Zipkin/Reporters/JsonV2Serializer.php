@@ -13,7 +13,7 @@ class JsonV2Serializer implements SpanSerializer
 {
     private ErrorParser $errorParser;
 
-    public function __construct(ErrorParser $errorParser = null)
+    public function __construct(?ErrorParser $errorParser = null)
     {
         $this->errorParser = $errorParser ?? new DefaultErrorParser();
     }

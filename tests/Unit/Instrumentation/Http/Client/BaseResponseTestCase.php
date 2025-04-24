@@ -8,7 +8,7 @@ use Zipkin\Instrumentation\Http\Client\Response;
 use Zipkin\Instrumentation\Http\Client\Request;
 use PHPUnit\Framework\TestCase;
 
-abstract class BaseResponseTest extends TestCase
+abstract class BaseResponseTestCase extends TestCase
 {
     /**
      * @return array|mixed[] including:
@@ -21,7 +21,7 @@ abstract class BaseResponseTest extends TestCase
         int $statusCode,
         $headers = [],
         $body = null,
-        Request $request = null
+        ?Request $request = null
     ): array;
 
     /**

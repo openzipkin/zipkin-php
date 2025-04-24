@@ -7,11 +7,11 @@ namespace ZipkinTests\Unit\Instrumentation\Http\Server\Psr15;
 use Zipkin\Instrumentation\Http\Server\Request;
 use Zipkin\Instrumentation\Http\Server\Psr15\Response as Psr15Response;
 use Zipkin\Instrumentation\Http\Server\Psr15\Request as Psr15Request;
-use ZipkinTests\Unit\Instrumentation\Http\Server\BaseResponseTest;
+use ZipkinTests\Unit\Instrumentation\Http\Server\BaseResponseTestCase;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Request as Psr7Request;
 
-final class ResponseTest extends BaseResponseTest
+final class ResponseTestCase extends BaseResponseTestCase
 {
     /**
      * {@inheritdoc}
@@ -21,7 +21,7 @@ final class ResponseTest extends BaseResponseTest
         $headers = [],
         $body = null,
         ?Request $request = null,
-        string $route = null
+        ?string $route = null
     ): array {
         $delegateResponse = new Response($statusCode);
         $response = new Psr15Response($delegateResponse, $request);

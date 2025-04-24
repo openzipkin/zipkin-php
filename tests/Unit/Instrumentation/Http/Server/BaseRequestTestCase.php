@@ -7,7 +7,7 @@ namespace ZipkinTests\Unit\Instrumentation\Http\Server;
 use Zipkin\Instrumentation\Http\Server\Request;
 use PHPUnit\Framework\TestCase;
 
-abstract class BaseRequestTest extends TestCase
+abstract class BaseRequestTestCase extends TestCase
 {
     /**
      * @return mixed[] including

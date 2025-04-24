@@ -73,7 +73,7 @@ final class Tracer
      * @param SamplingFlags $samplingFlags
      * @return Span
      */
-    public function newTrace(SamplingFlags $samplingFlags = null): Span
+    public function newTrace(?SamplingFlags $samplingFlags = null): Span
     {
         if ($samplingFlags === null) {
             $samplingFlags = DefaultSamplingFlags::createAsEmpty();
@@ -139,7 +139,7 @@ final class Tracer
      *
      * @return callable():void The scope closer
      */
-    public function openScope(Span $span = null): callable
+    public function openScope(?Span $span = null): callable
     {
         return $this->currentTraceContext->createScopeAndRetrieveItsCloser(
             $span === null ? null : $span->getContext()
@@ -193,7 +193,7 @@ final class Tracer
      * @return Span
      * @throws \RuntimeException
      */
-    public function nextSpan(SamplingFlags $contextOrFlags = null): Span
+    public function nextSpan(?SamplingFlags $contextOrFlags = null): Span
     {
         if ($contextOrFlags === null) {
             $parent = $this->currentTraceContext->getContext();
@@ -230,7 +230,7 @@ final class Tracer
     public function nextSpanWithSampler(
         callable $sampler,
         array $args = [],
-        SamplingFlags $contextOrFlags = null
+        ?SamplingFlags $contextOrFlags = null
     ): Span {
         if ($contextOrFlags === null) {
             $contextOrFlags = $this->currentTraceContext->getContext();

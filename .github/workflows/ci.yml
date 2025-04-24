@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        php-versions: ["7.4", "8.0", "8.1"]
+        php-versions: ["7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -27,9 +27,9 @@ jobs:
           extensions: mysql
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir | tr -d '\n' | tr -d '\r')" >> $GITHUB_OUTPUT
       - name: Cache composer dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -44,17 +44,3 @@ jobs:
         run: composer static-check
       - name: Run tests
         run: composer test -- --coverage-clover=build/logs/clover.xml
-      - name: Upload coverage report to codecov service
-        if: ${{ matrix.operating-system == 'ubuntu-latest' && matrix.php-versions == '8.0' }}
-        run: |
-          wget -c -nc --retry-connrefused --tries=0 https://github.com/satooshi/php-coveralls/releases/download/v2.4.3/php-coveralls.phar
-          chmod +x php-coveralls.phar
-          php php-coveralls.phar --version
-          mkdir -p build/logs
-          php php-coveralls.phar -v
-          bash <(curl -s https://codecov.io/bash)
-        env:
-          # Running coveralls with default config did not work so followed the workaround below:
-          # https://github.com/php-coveralls/php-coveralls/issues/273#issuecomment-537473525
-          COVERALLS_RUN_LOCALLY: 1
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}

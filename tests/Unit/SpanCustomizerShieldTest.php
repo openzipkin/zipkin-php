@@ -34,7 +34,7 @@ final class SpanCustomizerShieldTest extends TestCase
                 $this->test->assertEquals(SpanCustomizerShieldTest::TEST_TAG_VALUE, $value);
             }
 
-            public function annotate(string $value, int $timestamp = null): void
+            public function annotate(string $value, ?int $timestamp = null): void
             {
                 $this->test->assertEquals(SpanCustomizerShieldTest::TEST_ANNOTATION_VALUE, $value);
             }
